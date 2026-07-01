@@ -1,48 +1,50 @@
-# Film Trend 🎬
+# Media Studio AI 🎬
 
-**Film Trend** is an AI-style search engine for shot reference research — inspired by [filmvibes.io](https://filmvibes.io). Search stills & GIF-style previews from feature films, commercials and music videos to build director's treatments, mood boards and animatics.
+تطبيق ويب عربي (RTL) بثلاث أدوات مربوطة ببعض، شغال بـ **Claude API** وبالسيستم برومبت الموجود في `prompts/media-studio-system-prompt.md`:
 
-## Features
-
-| Tool | Where | How it works |
+| الأداة | الدخل | الخرج |
 |---|---|---|
-| **AI Shot Search** | `search.html` | Free-text search over titles, movies, keywords, crew, camera metadata |
-| **Cinematic Filters** | `search.html` | Source (Film / Commercial / Music Video), shot size, camera angle, camera movement, time of day |
-| **Dominant Color filter** | `search.html` | 8 colour buckets as clickable swatches |
-| **Color Harmony tool** | `search.html` | Pick a base hue + complementary / analogous / triadic — the harmony is mapped to colour buckets and applied as a filter |
-| **Search by Image** | `search.html` | Paste any image (Ctrl/⌘+V) — the page reads its dominant colour on a canvas and pulls shots with the same vibe |
-| **Smart Feed** | `search.html` | Opening a shot re-ranks the grid by similarity (movie, palette, composition, time of day, size, movement) |
-| **Hover Motion Previews** | everywhere | Cards play a slow Ken-Burns pan on hover, simulating GIF previews |
-| **Shot Inspector** | lightbox | Full metadata (dir/DP/genre/specs) + Download Still (real SVG export), GIF/MP4 quota messaging, Add to board |
-| **Library** | `movies.html`, `movie.html` | Per-title pages with all shots, crew facts and source tabs |
-| **Pricing** | `pricing.html` | Free / Pro $8 / Team $16 (2 seats min, usage-based extra seats) + FAQ |
-| **Blog** | `blog.html` | Reference-research editorial teasers |
+| 📋 **خطة السوشيال ميديا** | بريف مكتوب أو ملف PDF | خطة كاملة: أهداف SMART، شخصيات جمهور، استراتيجية منصات، أعمدة محتوى، جدول 30 يوم، بنك هوكس، خطة UGC، إعلانات ممولة، لوحة قياس |
+| ✍️ **السيناريو** | فكرة + نوع العمل (UGC / إعلان / فيلم / مسلسل / وثائقي) | Logline، ملخص، شخصيات بهوية بصرية ثابتة، هيكل درامي، مشاهد مرقمة بالحوار والمدة |
+| 🎞️ **الاستوري بورد** | السيناريو (بيتنقل تلقائيًا من الأداة السابقة) | لكل مشهد: وصف الكادر + مواصفات اللقطة + **IMAGE PROMPT** و**MOTION PROMPT** بالإنجليزي جاهزين لأدوات توليد الصور والفيديو |
 
-## Demo imagery
+## التشغيل
 
-There are no copyrighted frames in this repo. Every "still" is generated at runtime by `js/scene.js` — a procedural SVG renderer that composes cinematic frames (horizon, neon city, corridor, window, road, rain, close-up, symmetry) from each title's colour palette, with film grain, letterboxing and a vignette. Swap `sceneSVG()` for real CDN images to go to production.
-
-## Stack
-
-Zero dependencies, zero build step — plain HTML + CSS + vanilla JS. Open `index.html` in a browser or serve statically:
+التطبيق static بالكامل — من غير أي backend أو build:
 
 ```bash
 python3 -m http.server 8000
 # → http://localhost:8000
 ```
 
-## Structure
+1. افتح تبويب **⚙️ الإعدادات**
+2. حط مفتاح Anthropic API (من platform.claude.com → API Keys)
+3. اختار الموديل (الافتراضي: Claude Opus 4.8)
+4. استخدم الأدوات الثلاثة
+
+المفتاح بيتخزن في `localStorage` على جهاز المستخدم بس؛ الاتصال بيروح مباشرة لـ `api.anthropic.com` من المتصفح (بهيدر `anthropic-dangerous-direct-browser-access`).
+
+## البنية
 
 ```
-index.html        Landing page (hero search, marquee, features, workflow, CTA)
-search.html       The search engine (filters, harmony, paste-to-search, smart feed)
-movies.html       Library index with source tabs
-movie.html        Per-title stills page (?m=slug)
-pricing.html      Plans + FAQ
-blog.html         Blog teasers
-css/style.css     Design system (dark cinematic theme)
-js/data.js        Catalogue: 16 titles, 56 shots with full camera metadata
-js/scene.js       Procedural SVG still generator
-js/ui.js          Header/footer, shot cards, lightbox, downloads, toasts
-js/search.js      Search, facets, colour harmony, image-paste search, smart feed
+index.html                              الواجهة (تبويبات الأدوات + الإعدادات)
+css/app.css                             التصميم (داكن، RTL)
+js/prompt.js                            السيستم برومبت (مولّد تلقائيًا — متعدّلوش يدوي)
+js/api.js                               عميل Claude API مع streaming (SSE)
+js/app.js                               منطق الواجهة + Markdown renderer
+prompts/media-studio-system-prompt.md   مصدر السيستم برومبت (عدّل هنا)
+scripts/build-prompt.js                 يولد js/prompt.js من الملف السابق
 ```
+
+لو عدّلت السيستم برومبت:
+
+```bash
+node scripts/build-prompt.js
+```
+
+## ملاحظات تقنية
+
+- **Streaming**: الخرج بيظهر أول بأول (SSE) — مناسب للخطط والسيناريوهات الطويلة (`max_tokens: 64000`)
+- **PDF**: بيترفع كـ base64 `document` block مباشرة للـ API (حد أقصى 30MB)
+- **Adaptive thinking** مفعّل على موديلات 4.6+ لجودة أعلى
+- اللغة: الخطط والسيناريوهات بتطلع بلغة المستخدم؛ برومبتات الصورة والحركة **دايمًا بالإنجليزي** (مفروض من السيستم برومبت)
