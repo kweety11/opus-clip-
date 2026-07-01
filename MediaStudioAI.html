@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Media Studio AI — من البريف للاستوري بورد</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23e8b04b'/><text x='16' y='23' text-anchor='middle' font-size='18'>🎬</text></svg>">
+  <style>
+/* ============================================================
+   MEDIA STUDIO AI — Arabic-first (RTL) studio interface
+   ============================================================ */
+:root {
+  --bg: #0e1014;
+  --surface: #161a22;
+  --surface-2: #1e2430;
+  --line: #2a3140;
+  --text: #edeae3;
+  --muted: #8f95a6;
+  --accent: #e8b04b;
+  --accent-2: #4fc3b8;
+  --err: #e0564f;
+  --radius: 14px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", Tahoma, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+/* ---------- header ---------- */
+.top {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 26px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, #141821, var(--bg));
+}
+.logo {
+  width: 40px; height: 40px; border-radius: 11px; flex: none;
+  background: linear-gradient(135deg, var(--accent), #d4691e 65%, #9c3fb0);
+  display: grid; place-items: center;
+  font-size: 20px;
+}
+.top h1 { font-size: 19px; font-weight: 800; }
+.top h1 em { font-style: normal; color: var(--accent); }
+.top p { color: var(--muted); font-size: 13px; }
+
+/* ---------- tabs ---------- */
+.tabs {
+  display: flex; gap: 8px; padding: 14px 26px 0;
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+}
+.tab-btn {
+  padding: 11px 20px; border: 1px solid transparent; border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  background: transparent; color: var(--muted);
+  font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
+  white-space: nowrap;
+  transition: color .15s, background .15s;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.on {
+  background: var(--surface); color: var(--accent);
+  border-color: var(--line);
+  transform: translateY(1px);
+}
+
+/* ---------- panels ---------- */
+.panel { display: none; padding: 26px; max-width: 1180px; margin: 0 auto; }
+.panel.show { display: block; }
+.panel-grid { display: grid; grid-template-columns: 400px 1fr; gap: 22px; align-items: start; }
+
+.card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 22px;
+}
+.card h3 { font-size: 16px; margin-bottom: 6px; }
+.card .hint { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+
+label.f { display: block; font-size: 13px; color: var(--muted); margin: 14px 0 6px; }
+textarea, input[type="text"], input[type="password"], select {
+  width: 100%; background: var(--bg); color: var(--text);
+  border: 1px solid var(--line); border-radius: 10px;
+  padding: 11px 13px; font: inherit; font-size: 14.5px;
+  outline: none; transition: border-color .15s;
+}
+textarea:focus, input:focus, select:focus { border-color: var(--accent); }
+textarea { resize: vertical; min-height: 130px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 11px 22px; border-radius: 10px; border: 1px solid transparent;
+  font: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
+  transition: background .15s, transform .1s;
+}
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .5; cursor: wait; }
+.btn-primary { background: var(--accent); color: #1c1305; width: 100%; margin-top: 18px; }
+.btn-primary:hover:not(:disabled) { background: #f5c266; }
+.btn-ghost { background: transparent; border-color: var(--line); color: var(--text); font-size: 13.5px; padding: 8px 16px; }
+.btn-ghost:hover { border-color: var(--muted); }
+.btn-stop { background: var(--err); color: #fff; display: none; width: 100%; margin-top: 10px; }
+
+/* pdf upload */
+.upload {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  border: 1.5px dashed var(--line); border-radius: 10px;
+  padding: 16px; color: var(--muted); font-size: 14px; cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.upload:hover { border-color: var(--accent); color: var(--text); }
+.upload input { display: none; }
+#pdf-name { color: var(--accent-2); font-size: 13px; margin-top: 8px; }
+
+/* ---------- output ---------- */
+.out-wrap { position: relative; }
+.out {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 26px 28px;
+  min-height: 340px; max-height: 72vh; overflow: auto;
+  font-size: 15px;
+}
+.out:empty::before { content: "الناتج هيظهر هنا…"; color: #565d70; }
+.out h2, .out h3, .out h4, .out h5 { margin: 20px 0 8px; color: var(--accent); }
+.out h2 { font-size: 20px; } .out h3 { font-size: 17px; } .out h4 { font-size: 15.5px; }
+.out p { margin: 7px 0; }
+.out ul { margin: 8px 22px 8px 0; }
+.out li { margin: 4px 0; }
+.out hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
+.out code {
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: 5px; padding: 1px 7px; font-size: 13.5px;
+  direction: ltr; unicode-bidi: embed;
+}
+.out pre {
+  background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+  padding: 14px 16px; margin: 12px 0; overflow-x: auto;
+  font-size: 13.5px; line-height: 1.6;
+  direction: ltr; text-align: left;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+.out table { border-collapse: collapse; margin: 12px 0; width: 100%; font-size: 13.5px; }
+.out td { border: 1px solid var(--line); padding: 7px 11px; vertical-align: top; }
+.out tr:first-child td { background: var(--surface-2); font-weight: 700; }
+.out .thinking { color: var(--muted); }
+.out .err { color: var(--err); font-weight: 600; }
+
+.actions { display: none; gap: 10px; margin-top: 12px; }
+
+#carry-note {
+  display: none; margin-top: 12px; padding: 10px 16px;
+  background: rgba(79, 195, 184, .08); border: 1px solid rgba(79, 195, 184, .35);
+  border-radius: 10px; color: var(--accent-2); font-size: 13.5px;
+}
+
+/* settings */
+.settings-card { max-width: 560px; }
+.note {
+  margin-top: 16px; padding: 12px 16px; border-radius: 10px;
+  background: rgba(232, 176, 75, .07); border: 1px solid rgba(232, 176, 75, .3);
+  color: var(--muted); font-size: 13.5px;
+}
+.note b { color: var(--accent); }
+
+/* toast */
+.toast {
+  position: fixed; bottom: 26px; right: 50%; transform: translate(50%, 16px);
+  background: var(--surface-2); border: 1px solid var(--line);
+  color: var(--text); padding: 12px 24px; border-radius: 12px; font-size: 14.5px;
+  opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+  z-index: 100; box-shadow: 0 14px 40px rgba(0,0,0,.5);
+}
+.toast.show { opacity: 1; transform: translate(50%, 0); }
+
+@media (max-width: 900px) {
+  .panel-grid { grid-template-columns: 1fr; }
+  .panel { padding: 18px; }
+}
+
+</style>
+</head>
+<body>
+
+  <header class="top">
+    <div class="logo">🎬</div>
+    <div>
+      <h1>Media <em>Studio</em> AI</h1>
+      <p>خطة سوشيال ميديا · سيناريو · استوري بورد ببرومبتات جاهزة — في مكان واحد</p>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn on" data-tab="plan">📋 خطة السوشيال ميديا</button>
+    <button class="tab-btn" data-tab="script">✍️ السيناريو</button>
+    <button class="tab-btn" data-tab="board">🎞️ الاستوري بورد</button>
+    <button class="tab-btn" data-tab="settings">⚙️ الإعدادات</button>
+  </nav>
+
+  <!-- ============ TOOL 1: SOCIAL PLAN ============ -->
+  <section class="panel show" id="panel-plan">
+    <div class="panel-grid">
+      <div class="card">
+        <h3>من البريف لخطة كاملة</h3>
+        <p class="hint">اكتب البريف أو ارفع ملف PDF — هتاخد خطة شاملة: أهداف، جمهور، استراتيجية منصات، أعمدة محتوى، جدول 30 يوم، هوكس جاهزة، خطة إعلانات وقياس.</p>
+
+        <label class="f">البريف (اختياري لو رفعت PDF)</label>
+        <textarea id="plan-brief" placeholder="مثال: براند قهوة مختصة جديد في القاهرة، الجمهور 20-35 سنة، الهدف نبني وعي وزيارات للمحل، الميزانية محدودة، التون شبابي..."></textarea>
+
+        <label class="f">أو ارفع البريف كـ PDF</label>
+        <label class="upload">
+          📎 اختار ملف PDF
+          <input type="file" id="plan-pdf" accept="application/pdf">
+        </label>
+        <div id="pdf-name"></div>
+
+        <button class="btn btn-primary" id="run-plan" onclick="runPlan()">🚀 اعمل الخطة</button>
+        <button class="btn btn-stop" id="stop-plan" onclick="stopRun('plan')">⏹ إيقاف</button>
+      </div>
+
+      <div class="out-wrap">
+        <div class="out" id="out-plan" data-raw=""></div>
+        <div class="actions" id="actions-plan">
+          <button class="btn btn-ghost" onclick="copyOut('plan')">📋 نسخ</button>
+          <button class="btn btn-ghost" onclick="downloadOut('plan','social-media-plan.md')">⬇️ تحميل .md</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TOOL 2: SCRIPT ============ -->
+  <section class="panel" id="panel-script">
+    <div class="panel-grid">
+      <div class="card">
+        <h3>من الفكرة لسيناريو متقسم</h3>
+        <p class="hint">اكتب فكرتك بأي شكل — هتاخد Logline وملخص وشخصيات بهوية بصرية ثابتة وهيكل درامي ومشاهد مرقمة بالحوار والمدة.</p>
+
+        <label class="f">نوع العمل</label>
+        <select id="script-format">
+          <option value="UGC">UGC / فيديو سوشيال</option>
+          <option value="ad">إعلان</option>
+          <option value="film">فيلم قصير</option>
+          <option value="series">حلقة مسلسل</option>
+          <option value="documentary">وثائقي</option>
+          <option value="short">قصة قصيرة</option>
+        </select>
+
+        <label class="f">المدة المستهدفة (اختياري)</label>
+        <input type="text" id="script-duration" placeholder="مثال: 60 ثانية / 3 دقائق">
+
+        <label class="f">الفكرة</label>
+        <textarea id="script-idea" rows="7" placeholder="مثال: إعلان لتطبيق توصيل أكل، البطل موظف مرهق بيرجع البيت متأخر، عايز إحساس دافئ وإنساني مش بيعي مباشر..."></textarea>
+
+        <button class="btn btn-primary" id="run-script" onclick="runScript()">✍️ اكتب السيناريو</button>
+        <button class="btn btn-stop" id="stop-script" onclick="stopRun('script')">⏹ إيقاف</button>
+
+        <div id="carry-note">✓ السيناريو جاهز — روح لتبويب الاستوري بورد واضغط "استخدم آخر سيناريو"</div>
+      </div>
+
+      <div class="out-wrap">
+        <div class="out" id="out-script" data-raw=""></div>
+        <div class="actions" id="actions-script">
+          <button class="btn btn-ghost" onclick="copyOut('script')">📋 نسخ</button>
+          <button class="btn btn-ghost" onclick="downloadOut('script','script.md')">⬇️ تحميل .md</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TOOL 3: STORYBOARD ============ -->
+  <section class="panel" id="panel-board">
+    <div class="panel-grid">
+      <div class="card">
+        <h3>من السيناريو لاستوري بورد + برومبتات</h3>
+        <p class="hint">لكل مشهد: وصف الكادر ومواصفات اللقطة + <b>IMAGE PROMPT</b> بالإنجليزي لتوليد الصورة + <b>MOTION PROMPT</b> بالإنجليزي لتحريكها (Runway / Kling / Veo).</p>
+
+        <button class="btn btn-ghost" style="width:100%" onclick="useLastScript()">↩️ استخدم آخر سيناريو متولد</button>
+
+        <label class="f">أو الصق السيناريو هنا</label>
+        <textarea id="board-script" rows="7" placeholder="الصق السيناريو المتقسم لمشاهد..."></textarea>
+
+        <label class="f">نسبة الأبعاد</label>
+        <select id="board-ratio">
+          <option value="9:16">9:16 — ريلز / تيك توك</option>
+          <option value="16:9">16:9 — يوتيوب / سينمائي</option>
+          <option value="1:1">1:1 — مربع</option>
+          <option value="4:5">4:5 — فيد إنستجرام</option>
+        </select>
+
+        <label class="f">الستايل البصري (اختياري)</label>
+        <input type="text" id="board-style" placeholder="مثال: cinematic photorealism, teal-orange grade">
+
+        <button class="btn btn-primary" id="run-board" onclick="runBoard()">🎞️ اعمل الاستوري بورد</button>
+        <button class="btn btn-stop" id="stop-board" onclick="stopRun('board')">⏹ إيقاف</button>
+      </div>
+
+      <div class="out-wrap">
+        <div class="out" id="out-board" data-raw=""></div>
+        <div class="actions" id="actions-board">
+          <button class="btn btn-ghost" onclick="copyOut('board')">📋 نسخ</button>
+          <button class="btn btn-ghost" onclick="downloadOut('board','storyboard.md')">⬇️ تحميل .md</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SETTINGS ============ -->
+  <section class="panel" id="panel-settings">
+    <div class="card settings-card">
+      <h3>⚙️ الإعدادات</h3>
+      <p class="hint">التطبيق بيتصل بـ Claude API مباشرة من متصفحك — مفتاحك بيتخزن محليًا على جهازك بس ومبيتبعتش لأي سيرفر تاني.</p>
+
+      <label class="f">مفتاح Anthropic API</label>
+      <input type="password" id="set-key" placeholder="sk-ant-..." autocomplete="off">
+
+      <label class="f">الموديل</label>
+      <select id="set-model">
+        <option value="claude-opus-4-8">Claude Opus 4.8 — الأقوى (موصى به)</option>
+        <option value="claude-sonnet-5">Claude Sonnet 5 — توازن سرعة وجودة</option>
+        <option value="claude-haiku-4-5">Claude Haiku 4.5 — الأسرع والأرخص</option>
+      </select>
+
+      <button class="btn btn-primary" onclick="persistSettings()">💾 حفظ</button>
+
+      <div class="note">
+        <b>منين أجيب المفتاح؟</b> من
+        <span dir="ltr">platform.claude.com</span>
+        → API Keys → Create Key. أول ما تحفظه هنا هتقدر تستخدم الأدوات الثلاثة على طول.
+      </div>
+    </div>
+  </section>
+
+  <script>
+/* Auto-generated from prompts/media-studio-system-prompt.md — regenerate with scripts/build-prompt.js */
+const SYSTEM_PROMPT = "You are **MEDIA STUDIO AI** — a senior creative team compressed into one assistant: a social media strategist, a screenwriter/script doctor, and a storyboard artist + prompt engineer for AI image/video generation. You work for media professionals (directors, content creators, agencies) who need field-ready deliverables, not generic advice.\n\n## Global rules\n\n1. **Language:** Detect the user's language and write all strategy, plans, scripts and explanations in it (Arabic in → Arabic out). **EXCEPTION: every IMAGE PROMPT and MOTION PROMPT must always be written in English**, regardless of conversation language.\n2. **Modes:** You operate in one of three modes — `SOCIAL_PLAN`, `SCRIPT`, `STORYBOARD`. Infer the mode from the request; if genuinely ambiguous, ask ONE short question. The natural pipeline is: brief → plan → script → storyboard, but each mode also works standalone.\n3. **Professional output only:** No filler, no \"here are some ideas you could consider\". Every deliverable must be complete enough to hand to a client or crew as-is.\n4. **Always end** each deliverable with a short \"Next step\" line offering the logical next mode (e.g., after a script: \"Ready to break this into a storyboard with image + motion prompts? Say 'storyboard'.\").\n5. **If the user uploads a PDF/brief**, silently extract: brand, product, objective, audience, budget signals, tone, constraints, deadlines. Never ask for information that already exists in the brief. Ask for at most 2 missing critical items; otherwise state your assumptions in a compact \"Assumptions\" block and proceed.\n\n---\n\n## MODE 1 — SOCIAL_PLAN (brief/PDF → full social media plan)\n\nTrigger: user provides a brief, a PDF, or asks for a social media plan/strategy/calendar.\n\nProduce this exact structure:\n\n1. **Brief Digest** — 5 bullet summary of what the client actually needs (business goal, audience, product, tone, constraints).\n2. **Strategic Objectives** — 3–5 SMART objectives tied to business results (awareness/engagement/leads/sales), each with its KPI and target number.\n3. **Audience Personas** — 2–3 personas: name, age, platform habits, pains, desires, content they stop scrolling for, buying triggers.\n4. **Platform Strategy** — for each relevant platform (Instagram, TikTok, YouTube, Facebook, X, LinkedIn, Snapchat — only the ones that fit): role of the platform, content formats, posting frequency, best times for the target region.\n5. **Content Pillars** — 4–6 pillars with: name, purpose, share of calendar (%), 3 example content ideas each, format (reel/carousel/story/live/UGC).\n6. **30-Day Content Calendar** — a table: Day | Platform | Pillar | Format | Hook/Title | CTA | Notes. Cover the full month with realistic pacing (not one post per day unless the brief supports it).\n7. **Hook & Caption Bank** — 10 ready-to-use hooks + 5 caption templates in the brand voice, with hashtag sets (broad / niche / branded).\n8. **UGC & Collaboration Plan** — creator brief template, 3 UGC concept directions, influencer tiers that fit the budget.\n9. **Paid Boost Suggestions** — which organic posts to amplify, objective per campaign, indicative budget split (if budget unknown, give % split).\n10. **Measurement Dashboard** — KPIs per objective, review cadence (weekly/monthly), and the decision rule for killing or scaling content.\n\nRules: numbers over adjectives; every idea must map to a pillar and an objective; calendar hooks must be specific (\"3 mistakes that burn your ad budget — #2 is everywhere\") never generic (\"engaging post about product\").\n\n---\n\n## MODE 2 — SCRIPT (idea/text → structured screenplay)\n\nTrigger: user gives an idea, message, product, or story and wants a script — film, series episode, short story, documentary, TV ad, or UGC/social video.\n\nFirst line of output: `FORMAT: <film | series | short | ad | UGC | documentary> · LENGTH: <target duration> · TONE: <tone>`\n(Infer these; state them so the user can correct.)\n\nThen produce:\n\n1. **Logline** — one sentence: protagonist + goal + obstacle + stakes.\n2. **Synopsis** — one paragraph (3–6 sentences).\n3. **Characters** — for each: name, age, role, want vs. need, voice notes, and a **Visual Identity Line** (face, build, hair, wardrobe, distinguishing detail — this line is reused verbatim in storyboard prompts for consistency).\n4. **Structure** — beats appropriate to the format:\n   - Film/short: 3-act beats (setup, catalyst, midpoint, low point, climax, resolution).\n   - Series: season arc + this episode's A/B plots.\n   - Ad/UGC: Hook (0–3s) → Problem → Agitate → Solution/Demo → Proof → CTA, with exact second marks.\n5. **The Script itself** — numbered scenes. Each scene:\n   ```\n   SCENE 04 — INT. KITCHEN — NIGHT\n   [Action: what we see, present tense, visual and concrete]\n   CHARACTER: dialogue…\n   (V.O. / SFX / MUSIC cues where needed)\n   ⏱ est. duration\n   ```\n6. **Hook variants** (for ad/UGC): 3 alternative opening hooks.\n\nRules: write visually — if the camera can't see it, don't write it; dialogue must be speakable out loud; UGC scripts must sound like a real person, not a brand; keep scene count realistic for the target duration.\n\n---\n\n## MODE 3 — STORYBOARD (script → scenes + image prompt + motion prompt)\n\nTrigger: a script exists (from Mode 2 or pasted by the user) and the user wants a storyboard / visual breakdown / generation prompts.\n\nStart with a **STYLE FRAME** block that locks global consistency (reused in every prompt):\n\n```\nSTYLE FRAME\nVisual style: <e.g. cinematic photorealism / 2D animation / stop-motion…>\nColor grade: <palette + reference, e.g. teal-orange, low contrast>\nLens & camera language: <e.g. 35mm anamorphic, shallow DOF, handheld energy>\nAspect ratio: <9:16 / 16:9 / 1:1 per platform>\nCharacter sheets: <each character's Visual Identity Line from the script>\n```\n\nThen, for **every scene** in order:\n\n```\n━━━ SCENE 04 — <slugline> ━━━\n📋 Board description: what the frame shows, staging, blocking (user's language)\n🎬 Shot: <size> · <angle> · <movement> · <lighting> · <time of day>\n⏱ Duration: <seconds>\n\nIMAGE PROMPT (English):\n<one paragraph, comma-separated: subject with full Visual Identity Line,\naction frozen at the key moment, environment, lighting, lens (mm, DOF),\ncomposition, color grade, style keywords, quality tags, aspect ratio.\nNo camera movement verbs here — this is a still frame.>\n\nMOTION PROMPT (English):\n<one paragraph for image-to-video (Runway / Kling / Veo / Luma):\nstarts from the frame above. Camera: one clear movement (slow dolly-in,\nhandheld drift, crane up…). Subject: one clear action with natural physics.\nEnvironment motion (smoke, rain, hair, fabric). Pace and mood.\nDuration hint. NEVER introduce new subjects or locations not in the frame.>\n\n🔊 Audio note: dialogue line / SFX / music cue for this beat\n```\n\nPrompt-engineering rules:\n- **Image prompts**: concrete nouns and physical light descriptions (\"warm tungsten practicals, soft window key light\") — never abstract moods alone; one subject focus per frame; repeat the exact character sheet line every time the character appears; end with aspect ratio.\n- **Motion prompts**: ONE camera move + ONE subject action per shot — stacked motions break AI video; describe motion continuously (\"she slowly turns her head toward the window as curtains breathe in the wind\"); include what must stay stable (\"face and wardrobe unchanged\"); 4–10s per shot.\n- Numbering must match the script's scene numbers. If a scene needs multiple shots, use 04A, 04B.\n- After the last scene, output a **Shot List Table**: Scene | Shot | Size | Movement | Duration | Location — ready for production planning.\n\n---\n\n## Failure & edge handling\n\n- Brief too thin to plan → deliver the plan anyway on stated assumptions, flag the 3 highest-risk assumptions at the top.\n- User asks for \"everything at once\" → run the pipeline in order (plan → script → storyboard) as separate clearly-titled deliverables.\n- User pastes someone else's copyrighted script → work with it as reference/parody/analysis only; generate original alternatives rather than reproducing it.\n- Requests for real living public figures in generative prompts → replace with an original character (\"a charismatic TV host in his 50s\") and say so briefly.";
+
+/* ============================================================
+   MEDIA STUDIO AI — Claude API client (browser, raw HTTP + SSE)
+   No SDK bundler here, so we call POST /v1/messages directly.
+   The user's API key stays in their browser (localStorage).
+   ============================================================ */
+
+const API_URL = "https://api.anthropic.com/v1/messages";
+
+function getSettings() {
+  return {
+    apiKey: localStorage.getItem("msai_key") || "",
+    model: localStorage.getItem("msai_model") || "claude-opus-4-8",
+  };
+}
+
+function saveSettings(apiKey, model) {
+  localStorage.setItem("msai_key", apiKey.trim());
+  localStorage.setItem("msai_model", model);
+}
+
+/**
+ * Stream a completion from Claude.
+ * @param {Array}  content  user content blocks (text and/or document)
+ * @param {Object} handlers { onText(delta), onDone(fullText), onError(msg) }
+ * @returns {AbortController}
+ */
+function runClaude(content, handlers) {
+  const { apiKey, model } = getSettings();
+  const controller = new AbortController();
+
+  const body = {
+    model,
+    max_tokens: 64000,
+    stream: true,
+    system: SYSTEM_PROMPT,
+    messages: [{ role: "user", content }],
+  };
+  // Haiku 4.5 predates adaptive thinking — only send it to 4.6+ tiers
+  if (!model.startsWith("claude-haiku")) {
+    body.thinking = { type: "adaptive" };
+  }
+
+  (async () => {
+    let full = "";
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        signal: controller.signal,
+        headers: {
+          "content-type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+          // required for calling the API from a browser page
+          "anthropic-dangerous-direct-browser-access": "true",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        let msg = `HTTP ${res.status}`;
+        try {
+          const err = await res.json();
+          msg = err?.error?.message || msg;
+        } catch (_) { /* non-JSON error body */ }
+        if (res.status === 401) msg = "مفتاح API غير صحيح — راجع الإعدادات ⚙️";
+        if (res.status === 429) msg = "تجاوزت حد الطلبات — استنى شوية وحاول تاني";
+        handlers.onError(msg);
+        return;
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+
+        // SSE frames are separated by a blank line
+        const frames = buf.split("\n\n");
+        buf = frames.pop();
+        for (const frame of frames) {
+          const dataLine = frame.split("\n").find(l => l.startsWith("data:"));
+          if (!dataLine) continue;
+          let ev;
+          try { ev = JSON.parse(dataLine.slice(5)); } catch (_) { continue; }
+
+          if (ev.type === "content_block_delta" && ev.delta?.type === "text_delta") {
+            full += ev.delta.text;
+            handlers.onText(ev.delta.text);
+          } else if (ev.type === "message_delta" && ev.delta?.stop_reason === "refusal") {
+            handlers.onError("الطلب اترفض لأسباب تتعلق بسياسة الاستخدام — جرّب تعيد صياغته");
+            return;
+          } else if (ev.type === "error") {
+            handlers.onError(ev.error?.message || "خطأ من الخادم");
+            return;
+          }
+        }
+      }
+      handlers.onDone(full);
+    } catch (e) {
+      if (e.name === "AbortError") handlers.onDone(full);
+      else handlers.onError("تعذّر الاتصال بالخادم — اتأكد من الإنترنت ومفتاح الـ API");
+    }
+  })();
+
+  return controller;
+}
+
+/* read a File (PDF) as a base64 string without data: prefix */
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result.split(",")[1]);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+/* ============================================================
+   MEDIA STUDIO AI — UI logic
+   Tabs: social plan / script / storyboard / settings.
+   Streams Claude output and renders it as markdown.
+   ============================================================ */
+
+let activeController = null;
+let lastScript = "";   // carried from the Script tool into Storyboard
+
+/* ---------- tiny markdown renderer (headings, bold, lists, tables, code) ---------- */
+function mdToHtml(md) {
+  const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const lines = md.split("\n");
+  let html = "", inCode = false, inList = false, inTable = false;
+
+  const inline = s => esc(s)
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<i>$2</i>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>");
+
+  const closeBlocks = () => {
+    if (inList) { html += "</ul>"; inList = false; }
+    if (inTable) { html += "</table>"; inTable = false; }
+  };
+
+  for (const line of lines) {
+    if (line.startsWith("```")) {
+      closeBlocks();
+      html += inCode ? "</pre>" : "<pre>";
+      inCode = !inCode;
+      continue;
+    }
+    if (inCode) { html += esc(line) + "\n"; continue; }
+
+    const h = line.match(/^(#{1,4})\s+(.*)/);
+    if (h) { closeBlocks(); html += `<h${h[1].length + 1}>${inline(h[2])}</h${h[1].length + 1}>`; continue; }
+
+    if (/^\s*[-*•]\s+/.test(line)) {
+      if (inTable) { html += "</table>"; inTable = false; }
+      if (!inList) { html += "<ul>"; inList = true; }
+      html += `<li>${inline(line.replace(/^\s*[-*•]\s+/, ""))}</li>`;
+      continue;
+    }
+
+    if (/^\s*\|/.test(line)) {
+      if (inList) { html += "</ul>"; inList = false; }
+      if (/^\s*\|[\s:|-]+\|\s*$/.test(line)) continue; // separator row
+      if (!inTable) { html += "<table>"; inTable = true; }
+      const cells = line.trim().replace(/^\||\|$/g, "").split("|");
+      html += "<tr>" + cells.map(c => `<td>${inline(c.trim())}</td>`).join("") + "</tr>";
+      continue;
+    }
+
+    if (/^\s*(---|━+)\s*$/.test(line)) { closeBlocks(); html += "<hr>"; continue; }
+    if (line.trim() === "") { closeBlocks(); continue; }
+
+    closeBlocks();
+    html += `<p>${inline(line)}</p>`;
+  }
+  if (inCode) html += "</pre>";
+  if (inList) html += "</ul>";
+  if (inTable) html += "</table>";
+  return html;
+}
+
+/* ---------- tabs ---------- */
+function switchTab(name) {
+  document.querySelectorAll(".tab-btn").forEach(b =>
+    b.classList.toggle("on", b.dataset.tab === name));
+  document.querySelectorAll(".panel").forEach(p =>
+    p.classList.toggle("show", p.id === "panel-" + name));
+}
+
+/* ---------- shared run/render plumbing ---------- */
+function startRun(tool, content) {
+  const { apiKey } = getSettings();
+  if (!apiKey) {
+    toast("ضيف مفتاح الـ API الأول من تبويب الإعدادات ⚙️");
+    switchTab("settings");
+    return;
+  }
+  if (activeController) activeController.abort();
+
+  const out = document.getElementById(`out-${tool}`);
+  const btn = document.getElementById(`run-${tool}`);
+  const stop = document.getElementById(`stop-${tool}`);
+  out.innerHTML = '<p class="thinking">⏳ Claude بيفكر ويجهّز الناتج…</p>';
+  out.dataset.raw = "";
+  btn.disabled = true;
+  stop.style.display = "inline-flex";
+
+  activeController = runClaude(content, {
+    onText(delta) {
+      out.dataset.raw += delta;
+      out.innerHTML = mdToHtml(out.dataset.raw);
+      out.scrollTop = out.scrollHeight;
+    },
+    onDone(full) {
+      btn.disabled = false;
+      stop.style.display = "none";
+      activeController = null;
+      if (!full.trim()) {
+        out.innerHTML = '<p class="thinking">ماوصلش ناتج — حاول تاني</p>';
+        return;
+      }
+      out.innerHTML = mdToHtml(full);
+      document.getElementById(`actions-${tool}`).style.display = "flex";
+      if (tool === "script") {
+        lastScript = full;
+        const carry = document.getElementById("carry-note");
+        if (carry) carry.style.display = "block";
+      }
+    },
+    onError(msg) {
+      btn.disabled = false;
+      stop.style.display = "none";
+      activeController = null;
+      out.innerHTML = `<p class="err">⚠️ ${msg}</p>`;
+    },
+  });
+}
+
+function stopRun(tool) {
+  if (activeController) activeController.abort();
+  document.getElementById(`run-${tool}`).disabled = false;
+  document.getElementById(`stop-${tool}`).style.display = "none";
+}
+
+function copyOut(tool) {
+  navigator.clipboard.writeText(document.getElementById(`out-${tool}`).dataset.raw || "")
+    .then(() => toast("اتنسخ ✓"));
+}
+
+function downloadOut(tool, name) {
+  const blob = new Blob([document.getElementById(`out-${tool}`).dataset.raw || ""], { type: "text/markdown" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ---------- tool 1: social plan ---------- */
+async function runPlan() {
+  const brief = document.getElementById("plan-brief").value.trim();
+  const file = document.getElementById("plan-pdf").files[0];
+  if (!brief && !file) { toast("اكتب البريف أو ارفع ملف PDF"); return; }
+
+  const content = [];
+  if (file) {
+    if (file.size > 30 * 1024 * 1024) { toast("حجم الـ PDF أكبر من 30MB"); return; }
+    content.push({
+      type: "document",
+      source: { type: "base64", media_type: "application/pdf", data: await fileToBase64(file) },
+    });
+  }
+  content.push({
+    type: "text",
+    text: "MODE: SOCIAL_PLAN\n\n" + (brief || "البريف كامل في ملف الـ PDF المرفق. حوّله لخطة سوشيال ميديا شاملة."),
+  });
+  startRun("plan", content);
+}
+
+/* ---------- tool 2: script ---------- */
+function runScript() {
+  const idea = document.getElementById("script-idea").value.trim();
+  if (!idea) { toast("اكتب الفكرة الأول"); return; }
+  const format = document.getElementById("script-format").value;
+  const duration = document.getElementById("script-duration").value.trim();
+  startRun("script", [{
+    type: "text",
+    text: `MODE: SCRIPT\nFORMAT: ${format}${duration ? "\nTARGET DURATION: " + duration : ""}\n\n${idea}`,
+  }]);
+}
+
+/* ---------- tool 3: storyboard ---------- */
+function runBoard() {
+  let script = document.getElementById("board-script").value.trim();
+  if (!script && lastScript) script = lastScript;
+  if (!script) { toast("الصق السيناريو أو ولّده الأول من تبويب السيناريو"); return; }
+  const style = document.getElementById("board-style").value.trim();
+  const ratio = document.getElementById("board-ratio").value;
+  startRun("board", [{
+    type: "text",
+    text: `MODE: STORYBOARD\nASPECT RATIO: ${ratio}${style ? "\nVISUAL STYLE: " + style : ""}\n\nSCRIPT:\n${script}`,
+  }]);
+}
+
+function useLastScript() {
+  if (!lastScript) { toast("مفيش سيناريو متولد لسه"); return; }
+  document.getElementById("board-script").value = lastScript;
+  toast("آخر سيناريو اتحط ✓");
+}
+
+/* ---------- settings ---------- */
+function persistSettings() {
+  const key = document.getElementById("set-key").value;
+  const model = document.getElementById("set-model").value;
+  if (!key.trim()) { toast("اكتب مفتاح الـ API"); return; }
+  saveSettings(key, model);
+  toast("الإعدادات اتحفظت ✓");
+}
+
+/* ---------- toast ---------- */
+let toastEl, toastTimer;
+function toast(msg) {
+  if (!toastEl) {
+    toastEl = document.createElement("div");
+    toastEl.className = "toast";
+    document.body.appendChild(toastEl);
+  }
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2600);
+}
+
+/* ---------- boot ---------- */
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".tab-btn").forEach(b =>
+    b.addEventListener("click", () => switchTab(b.dataset.tab)));
+
+  const { apiKey, model } = getSettings();
+  document.getElementById("set-key").value = apiKey;
+  document.getElementById("set-model").value = model;
+
+  document.getElementById("plan-pdf").addEventListener("change", e => {
+    const f = e.target.files[0];
+    document.getElementById("pdf-name").textContent = f ? `📄 ${f.name}` : "";
+  });
+
+  if (!apiKey) switchTab("settings");
+});
+
+</script>
+</body>
+</html>
