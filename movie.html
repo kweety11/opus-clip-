@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stills — Film Trend</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23f2a33c'/><path d='M12 9l12 7-12 7z' fill='%230b0d12'/></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+
+  <section class="movie-hero">
+    <div class="wrap">
+      <span class="crumb"><a href="movies.html">Library</a> / <span id="crumb-title"></span></span>
+      <h1 id="movie-title"></h1>
+      <div class="facts" id="movie-facts"></div>
+    </div>
+  </section>
+
+  <main class="wrap" style="padding:40px 24px 80px">
+    <div class="shots-grid" id="movie-shots"></div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/scene.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const slug = new URLSearchParams(location.search).get("m") || MOVIES[0].slug;
+      const m = MOVIES.find(x => x.slug === slug) || MOVIES[0];
+      document.title = `${m.title} Stills — Film Trend`;
+      document.getElementById("crumb-title").textContent = m.title;
+      document.getElementById("movie-title").textContent = `${m.title} Stills & Shots`;
+      document.getElementById("movie-facts").innerHTML = `
+        <div><b>${m.year}</b>Year</div>
+        <div><b>${m.director}</b>Director</div>
+        <div><b>${m.dp}</b>Cinematography</div>
+        <div><b>${m.genre}</b>Genre</div>
+        <div><b>${m.country}</b>Country</div>
+        <div><b>${m.src}</b>Source</div>`;
+      const grid = document.getElementById("movie-shots");
+      SHOTS.filter(s => s.movie === slug).forEach(s => grid.appendChild(shotCard(s)));
+    });
+  </script>
+</body>
+</html>

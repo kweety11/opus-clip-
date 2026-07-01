@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shot Search — Film Trend</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23f2a33c'/><path d='M12 9l12 7-12 7z' fill='%230b0d12'/></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+
+  <main class="wrap">
+    <div class="search-layout">
+      <aside class="filters" id="filters"></aside>
+
+      <section>
+        <div class="results-head">
+          <div class="toolbar-search">
+            <span style="color:var(--muted)">🔍</span>
+            <input id="q" type="text" placeholder="Search shots — mood, light, movement, film…" autocomplete="off">
+          </div>
+          <span class="count" id="result-count"></span>
+        </div>
+
+        <p id="smartfeed-note" style="display:none;color:var(--muted);font-size:13.5px;margin:0 0 14px;
+           padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface)"></p>
+
+        <p style="color:var(--muted);font-size:13px;margin:0 0 16px">
+          Tip: paste any image (⌘V / Ctrl+V) anywhere on this page to search by vibe · hover a card for a motion preview
+        </p>
+
+        <div class="shots-grid" id="results"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/scene.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/search.js"></script>
+</body>
+</html>

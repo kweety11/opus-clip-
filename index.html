@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Film Trend — AI Search Engine for Shot References</title>
+  <meta name="description" content="Search 4M+ shots from the best films, commercials and music videos. Stills & GIFs for director's treatments, mood boards and animatics.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23f2a33c'/><path d='M12 9l12 7-12 7z' fill='%230b0d12'/></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <span class="kicker">AI Search Engine for Reference Research</span>
+      <h1>Find the perfect shot<br><span class="grad">in seconds, not weeks.</span></h1>
+      <p class="sub">Search 4M+ shots from the best feature films, commercials and music videos. Stills &amp; GIFs for treatments, mood boards and animatics.</p>
+
+      <form class="search-bar" action="search.html" method="get">
+        <input id="hero-q" name="q" type="text" placeholder="Try “neon rain night city” or “golden hour wide shot”…" autocomplete="off">
+        <button class="btn btn-primary btn-lg" type="submit">Search shots</button>
+      </form>
+
+      <div class="suggest-chips">
+        <a class="chip" href="search.html?q=neon+night">neon night</a>
+        <a class="chip" href="search.html?q=golden+hour">golden hour</a>
+        <a class="chip" href="search.html?q=rain">rain</a>
+        <a class="chip" href="search.html?q=tracking">tracking shot</a>
+        <a class="chip" href="search.html?color=teal">teal palette</a>
+        <a class="chip" href="search.html?q=close-up">close-ups</a>
+      </div>
+
+      <div class="stats">
+        <div><b>4M+</b>indexed shots</div>
+        <div><b>12K+</b>films &amp; videos</div>
+        <div><b>30K+</b>directors &amp; DPs on board</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee"><div class="marquee-track" id="marquee"></div></div>
+
+  <!-- FEATURES -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="kicker">The Toolkit</span>
+        <h2>Everything a treatment needs</h2>
+        <p>Built for directors, DPs and editors who assemble references daily.</p>
+      </div>
+      <div class="feature-grid">
+        <div class="feature"><div class="icon">🔍</div><h3>AI Shot Search</h3><p>Describe the frame in plain words — mood, light, location, lens. The engine finds matching shots across the whole library.</p></div>
+        <div class="feature"><div class="icon">🎛️</div><h3>Cinematic Filters</h3><p>Narrow by shot size, camera angle, camera movement, time of day, year and source — film, commercial or music video.</p></div>
+        <div class="feature"><div class="icon">⚡</div><h3>Smart Feed</h3><p>Hover to preview, click to open — every interaction teaches the feed what you're after, and similar shots float to the top.</p></div>
+        <div class="feature"><div class="icon">🎨</div><h3>Color Harmony Search</h3><p>Pick a base hue, choose complementary, analogous or triadic — and get shots graded in that exact palette.</p></div>
+        <div class="feature"><div class="icon">🖼️</div><h3>Search by Image</h3><p>Paste any frame straight onto the page and get hundreds of shots with the same vibe and dominant colour.</p></div>
+        <div class="feature"><div class="icon">⬇️</div><h3>Stills, GIFs &amp; MP4s</h3><p>Cut and download any shot as a still, GIF or MP4 — ready to drop into your deck, mood video or animatic.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section alt">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="kicker">Workflow</span>
+        <h2>From idea to treatment in three steps</h2>
+      </div>
+      <div class="steps">
+        <div class="step"><h3>Describe or paste</h3><p>Type what you see in your head — or paste a reference image — and hit search.</p></div>
+        <div class="step"><h3>Refine with filters</h3><p>Lock the shot size, movement, time of day and palette until the grid is exactly your film.</p></div>
+        <div class="step"><h3>Export to your deck</h3><p>Download stills and GIFs, or collect shots into boards and share them with your team.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FRESH SHOTS -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="kicker">Fresh in the library</span>
+        <h2>Today's trending shots</h2>
+        <p>Hover any card for a motion preview — click to inspect and download.</p>
+      </div>
+      <div class="shots-grid" id="fresh-shots"></div>
+      <div style="text-align:center;margin-top:36px">
+        <a class="btn btn-ghost btn-lg" href="search.html">Open the full search →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section">
+    <div class="wrap">
+      <div class="cta-band">
+        <h2>Your next treatment starts here</h2>
+        <p>Free forever for browsing. Pro unlocks unlimited GIF &amp; MP4 exports from $8/month.</p>
+        <a class="btn btn-primary btn-lg" href="pricing.html">See pricing</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/scene.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // marquee: a doubled strip of varied shots
+      const strip = [3, 13, 17, 21, 29, 33, 38, 41, 49, 53, 10, 45].map(id => SHOTS.find(s => s.id === id));
+      const track = document.getElementById("marquee");
+      [...strip, ...strip].forEach(s => track.appendChild(shotCard(s)));
+      // fresh grid
+      const fresh = [1, 51, 34, 14, 55, 22, 37, 6].map(id => SHOTS.find(s => s.id === id));
+      const grid = document.getElementById("fresh-shots");
+      fresh.forEach(s => grid.appendChild(shotCard(s)));
+    });
+  </script>
+</body>
+</html>
