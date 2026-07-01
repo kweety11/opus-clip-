@@ -105,6 +105,11 @@ function startRun(tool, content) {
       }
       out.innerHTML = mdToHtml(full);
       document.getElementById(`actions-${tool}`).style.display = "flex";
+      if (tool === "board") {
+        boardView = "full";
+        const sb = document.getElementById("split-board");
+        if (sb) sb.textContent = "🗂️ قسّم المشاهد";
+      }
       if (tool === "script") {
         lastScript = full;
         const carry = document.getElementById("carry-note");
@@ -178,7 +183,9 @@ function runBoard() {
   let script = document.getElementById("board-script").value.trim();
   if (!script && lastScript) script = lastScript;
   if (!script) { toast("الصق السيناريو أو ولّده الأول من تبويب السيناريو"); return; }
-  const style = document.getElementById("board-style").value.trim();
+  const styleSel = document.getElementById("board-style-sel").value;
+  const styleCustom = document.getElementById("board-style").value.trim();
+  const style = [styleSel, styleCustom].filter(Boolean).join(", ");
   const ratio = document.getElementById("board-ratio").value;
   startRun("board", [{
     type: "text",
@@ -190,6 +197,64 @@ function useLastScript() {
   if (!lastScript) { toast("مفيش سيناريو متولد لسه"); return; }
   document.getElementById("board-script").value = lastScript;
   toast("آخر سيناريو اتحط ✓");
+}
+
+/* ---------- storyboard: split into standalone scene cards ---------- */
+let boardView = "full"; // full | scenes
+
+function splitScenes(raw) {
+  // scenes are delimited by the machine-parsed header: ━━━ SCENE 04 …
+  const parts = raw.split(/(?=━{2,}\s*SCENE\s)/i).filter(p => /━{2,}\s*SCENE\s/i.test(p));
+  return parts.map(p => {
+    const header = (p.match(/━{2,}\s*(SCENE[^━\n]*)/i) || [, "SCENE"])[1].trim();
+    const img = (p.match(/IMAGE PROMPT[^:\n]*:?\s*\n?([\s\S]*?)(?=\n\s*(?:MOTION PROMPT|🔊|━|```|$))/i) || [, ""])[1].trim();
+    const mot = (p.match(/MOTION PROMPT[^:\n]*:?\s*\n?([\s\S]*?)(?=\n\s*(?:🔊|━{2,}|IMAGE PROMPT|```|$))/i) || [, ""])[1].trim();
+    return { header, full: p.trim(), img, mot };
+  });
+}
+
+function copyText(txt, label) {
+  navigator.clipboard.writeText(txt).then(() => toast(label + " اتنسخ ✓"));
+}
+
+function toggleBoardView() {
+  const out = document.getElementById("out-board");
+  const btn = document.getElementById("split-board");
+  const raw = out.dataset.raw || "";
+
+  if (boardView === "full") {
+    const scenes = splitScenes(raw);
+    if (!scenes.length) { toast("مش لاقي مشاهد بصيغة ━━━ SCENE — ولّد الاستوري بورد الأول"); return; }
+    window._scenes = scenes;
+    out.innerHTML = scenes.map((s, i) => `
+      <div class="scene-card">
+        <div class="scene-head">
+          <b>🎬 ${s.header.replace(/━/g, "").trim()}</b>
+          <button class="btn btn-ghost btn-xs" onclick="copyText(window._scenes[${i}].full, 'المشهد كامل')">📋 المشهد كامل</button>
+        </div>
+        ${s.img ? `
+        <div class="scene-prompt">
+          <div class="sp-head"><span>🖼 IMAGE PROMPT</span>
+            <button class="btn btn-ghost btn-xs" onclick="copyText(window._scenes[${i}].img, 'برومبت الصورة')">📋 نسخ</button>
+          </div>
+          <pre dir="ltr">${s.img.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>
+        </div>` : ""}
+        ${s.mot ? `
+        <div class="scene-prompt">
+          <div class="sp-head"><span>🎥 MOTION PROMPT</span>
+            <button class="btn btn-ghost btn-xs" onclick="copyText(window._scenes[${i}].mot, 'برومبت الحركة')">📋 نسخ</button>
+          </div>
+          <pre dir="ltr">${s.mot.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>
+        </div>` : ""}
+      </div>`).join("");
+    btn.textContent = "📄 رجّع العرض الكامل";
+    boardView = "scenes";
+    toast(`اتقسم ${scenes.length} مشهد ✓`);
+  } else {
+    out.innerHTML = mdToHtml(raw);
+    btn.textContent = "🗂️ قسّم المشاهد";
+    boardView = "full";
+  }
 }
 
 /* ---------- settings ---------- */
@@ -240,6 +305,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const provSel = document.getElementById("set-provider");
   provSel.innerHTML = Object.entries(PROVIDERS)
     .map(([id, p]) => `<option value="${id}">${p.label}</option>`).join("");
+
+  // populate the visual-styles catalogue (grouped)
+  const styleSel = document.getElementById("board-style-sel");
+  styleSel.innerHTML = '<option value="">— من غير ستايل محدد (الموديل يختار) —</option>' +
+    STYLE_GROUPS.map(g =>
+      `<optgroup label="${g.group}">` +
+      g.styles.map(([val, label]) => `<option value="${val}">${label}</option>`).join("") +
+      `</optgroup>`).join("");
 
   const { provider, apiKey } = getSettings();
   provSel.value = provider;

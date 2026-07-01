@@ -160,6 +160,30 @@ textarea { resize: vertical; min-height: 130px; }
 }
 .note b { color: var(--accent); }
 
+/* scene cards (split storyboard view) */
+.scene-card {
+  border: 1px solid var(--line); border-radius: 12px;
+  background: var(--surface-2); padding: 16px 18px; margin-bottom: 16px;
+}
+.scene-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-bottom: 10px; flex-wrap: wrap;
+}
+.scene-head b { color: var(--accent); font-size: 15px; }
+.scene-prompt { margin-top: 10px; }
+.sp-head {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 12.5px; color: var(--accent-2); font-weight: 700; margin-bottom: 6px;
+}
+.scene-prompt pre {
+  background: var(--bg); border: 1px solid var(--line); border-radius: 9px;
+  padding: 11px 13px; margin: 0; overflow-x: auto;
+  font-size: 13px; line-height: 1.6; white-space: pre-wrap;
+  direction: ltr; text-align: left;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+.btn-xs { padding: 4px 12px; font-size: 12px; }
+
 /* toast */
 .toast {
   position: fixed; bottom: 26px; right: 50%; transform: translate(50%, 16px);

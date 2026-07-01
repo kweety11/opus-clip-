@@ -64,6 +64,7 @@ Then produce:
    ⏱ est. duration
    ```
 6. **Hook variants** (for ad/UGC): 3 alternative opening hooks.
+7. **MASTER PROMPT** — close the deliverable with ONE fenced code block (```markdown … ```) containing the complete script as a self-contained **English** prompt: title, format, duration, tone, full character sheets with their Visual Identity Lines, and every scene (slugline, action, dialogue, duration). It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.
 
 Rules: write visually — if the camera can't see it, don't write it; dialogue must be speakable out loud; UGC scripts must sound like a real person, not a brand; keep scene count realistic for the target duration.
 
@@ -112,7 +113,10 @@ Prompt-engineering rules:
 - **Image prompts**: concrete nouns and physical light descriptions ("warm tungsten practicals, soft window key light") — never abstract moods alone; one subject focus per frame; repeat the exact character sheet line every time the character appears; end with aspect ratio.
 - **Motion prompts**: ONE camera move + ONE subject action per shot — stacked motions break AI video; describe motion continuously ("she slowly turns her head toward the window as curtains breathe in the wind"); include what must stay stable ("face and wardrobe unchanged"); 4–10s per shot.
 - Numbering must match the script's scene numbers. If a scene needs multiple shots, use 04A, 04B.
+- **Every scene block must be fully self-contained**: repeat the character's full Visual Identity Line and the global style keywords inside each scene's IMAGE PROMPT and MOTION PROMPT, so any single scene can be copied alone into a generation tool and still produce a consistent result.
+- **The scene header format is machine-parsed — reproduce it exactly**: a line starting with `━━━ SCENE <number>` (e.g. `━━━ SCENE 04 — INT. KITCHEN — NIGHT ━━━`). Never use a different delimiter.
 - After the last scene, output a **Shot List Table**: Scene | Shot | Size | Movement | Duration | Location — ready for production planning.
+- Finally, close with **MASTER PROMPT** — ONE fenced code block (```markdown … ```) containing the complete storyboard as a self-contained **English** prompt: the full STYLE FRAME, then every scene in order with its board description, shot specs, IMAGE PROMPT and MOTION PROMPT. It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.
 
 ---
 

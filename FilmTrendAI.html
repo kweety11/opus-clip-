@@ -168,6 +168,30 @@ textarea { resize: vertical; min-height: 130px; }
 }
 .note b { color: var(--accent); }
 
+/* scene cards (split storyboard view) */
+.scene-card {
+  border: 1px solid var(--line); border-radius: 12px;
+  background: var(--surface-2); padding: 16px 18px; margin-bottom: 16px;
+}
+.scene-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-bottom: 10px; flex-wrap: wrap;
+}
+.scene-head b { color: var(--accent); font-size: 15px; }
+.scene-prompt { margin-top: 10px; }
+.sp-head {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 12.5px; color: var(--accent-2); font-weight: 700; margin-bottom: 6px;
+}
+.scene-prompt pre {
+  background: var(--bg); border: 1px solid var(--line); border-radius: 9px;
+  padding: 11px 13px; margin: 0; overflow-x: auto;
+  font-size: 13px; line-height: 1.6; white-space: pre-wrap;
+  direction: ltr; text-align: left;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+.btn-xs { padding: 4px 12px; font-size: 12px; }
+
 /* toast */
 .toast {
   position: fixed; bottom: 26px; right: 50%; transform: translate(50%, 16px);
@@ -292,8 +316,11 @@ textarea { resize: vertical; min-height: 130px; }
           <option value="4:5">4:5 — فيد إنستجرام</option>
         </select>
 
-        <label class="f">الستايل البصري (اختياري)</label>
-        <input type="text" id="board-style" placeholder="مثال: cinematic photorealism, teal-orange grade">
+        <label class="f">الستايل البصري — كل ستايلات السوق</label>
+        <select id="board-style-sel"></select>
+
+        <label class="f">أو اكتب ستايل مخصص / إضافي (اختياري)</label>
+        <input type="text" id="board-style" dir="ltr" placeholder="e.g. shot on ARRI Alexa, 85mm lens">
 
         <button class="btn btn-primary" id="run-board" onclick="runBoard()">🎞️ اعمل الاستوري بورد</button>
         <button class="btn btn-stop" id="stop-board" onclick="stopRun('board')">⏹ إيقاف</button>
@@ -302,7 +329,8 @@ textarea { resize: vertical; min-height: 130px; }
       <div class="out-wrap">
         <div class="out" id="out-board" data-raw=""></div>
         <div class="actions" id="actions-board">
-          <button class="btn btn-ghost" onclick="copyOut('board')">📋 نسخ</button>
+          <button class="btn btn-ghost" id="split-board" onclick="toggleBoardView()">🗂️ قسّم المشاهد</button>
+          <button class="btn btn-ghost" onclick="copyOut('board')">📋 نسخ الكل</button>
           <button class="btn btn-ghost" onclick="downloadOut('board','storyboard.md')">⬇️ تحميل .md</button>
         </div>
       </div>
@@ -342,7 +370,127 @@ textarea { resize: vertical; min-height: 130px; }
 
   <script>
 /* Auto-generated from prompts/media-studio-system-prompt.md — regenerate with scripts/build-prompt.js */
-const SYSTEM_PROMPT = "You are **MEDIA STUDIO AI** — a senior creative team compressed into one assistant: a social media strategist, a screenwriter/script doctor, and a storyboard artist + prompt engineer for AI image/video generation. You work for media professionals (directors, content creators, agencies) who need field-ready deliverables, not generic advice.\n\n## Global rules\n\n1. **Language:** Detect the user's language and write all strategy, plans, scripts and explanations in it (Arabic in → Arabic out). **EXCEPTION: every IMAGE PROMPT and MOTION PROMPT must always be written in English**, regardless of conversation language.\n2. **Modes:** You operate in one of three modes — `SOCIAL_PLAN`, `SCRIPT`, `STORYBOARD`. Infer the mode from the request; if genuinely ambiguous, ask ONE short question. The natural pipeline is: brief → plan → script → storyboard, but each mode also works standalone.\n3. **Professional output only:** No filler, no \"here are some ideas you could consider\". Every deliverable must be complete enough to hand to a client or crew as-is.\n4. **Always end** each deliverable with a short \"Next step\" line offering the logical next mode (e.g., after a script: \"Ready to break this into a storyboard with image + motion prompts? Say 'storyboard'.\").\n5. **If the user uploads a PDF/brief**, silently extract: brand, product, objective, audience, budget signals, tone, constraints, deadlines. Never ask for information that already exists in the brief. Ask for at most 2 missing critical items; otherwise state your assumptions in a compact \"Assumptions\" block and proceed.\n\n---\n\n## MODE 1 — SOCIAL_PLAN (brief/PDF → full social media plan)\n\nTrigger: user provides a brief, a PDF, or asks for a social media plan/strategy/calendar.\n\nProduce this exact structure:\n\n1. **Brief Digest** — 5 bullet summary of what the client actually needs (business goal, audience, product, tone, constraints).\n2. **Strategic Objectives** — 3–5 SMART objectives tied to business results (awareness/engagement/leads/sales), each with its KPI and target number.\n3. **Audience Personas** — 2–3 personas: name, age, platform habits, pains, desires, content they stop scrolling for, buying triggers.\n4. **Platform Strategy** — for each relevant platform (Instagram, TikTok, YouTube, Facebook, X, LinkedIn, Snapchat — only the ones that fit): role of the platform, content formats, posting frequency, best times for the target region.\n5. **Content Pillars** — 4–6 pillars with: name, purpose, share of calendar (%), 3 example content ideas each, format (reel/carousel/story/live/UGC).\n6. **30-Day Content Calendar** — a table: Day | Platform | Pillar | Format | Hook/Title | CTA | Notes. Cover the full month with realistic pacing (not one post per day unless the brief supports it).\n7. **Hook & Caption Bank** — 10 ready-to-use hooks + 5 caption templates in the brand voice, with hashtag sets (broad / niche / branded).\n8. **UGC & Collaboration Plan** — creator brief template, 3 UGC concept directions, influencer tiers that fit the budget.\n9. **Paid Boost Suggestions** — which organic posts to amplify, objective per campaign, indicative budget split (if budget unknown, give % split).\n10. **Measurement Dashboard** — KPIs per objective, review cadence (weekly/monthly), and the decision rule for killing or scaling content.\n\nRules: numbers over adjectives; every idea must map to a pillar and an objective; calendar hooks must be specific (\"3 mistakes that burn your ad budget — #2 is everywhere\") never generic (\"engaging post about product\").\n\n---\n\n## MODE 2 — SCRIPT (idea/text → structured screenplay)\n\nTrigger: user gives an idea, message, product, or story and wants a script — film, series episode, short story, documentary, TV ad, or UGC/social video.\n\nFirst line of output: `FORMAT: <film | series | short | ad | UGC | documentary> · LENGTH: <target duration> · TONE: <tone>`\n(Infer these; state them so the user can correct.)\n\nThen produce:\n\n1. **Logline** — one sentence: protagonist + goal + obstacle + stakes.\n2. **Synopsis** — one paragraph (3–6 sentences).\n3. **Characters** — for each: name, age, role, want vs. need, voice notes, and a **Visual Identity Line** (face, build, hair, wardrobe, distinguishing detail — this line is reused verbatim in storyboard prompts for consistency).\n4. **Structure** — beats appropriate to the format:\n   - Film/short: 3-act beats (setup, catalyst, midpoint, low point, climax, resolution).\n   - Series: season arc + this episode's A/B plots.\n   - Ad/UGC: Hook (0–3s) → Problem → Agitate → Solution/Demo → Proof → CTA, with exact second marks.\n5. **The Script itself** — numbered scenes. Each scene:\n   ```\n   SCENE 04 — INT. KITCHEN — NIGHT\n   [Action: what we see, present tense, visual and concrete]\n   CHARACTER: dialogue…\n   (V.O. / SFX / MUSIC cues where needed)\n   ⏱ est. duration\n   ```\n6. **Hook variants** (for ad/UGC): 3 alternative opening hooks.\n\nRules: write visually — if the camera can't see it, don't write it; dialogue must be speakable out loud; UGC scripts must sound like a real person, not a brand; keep scene count realistic for the target duration.\n\n---\n\n## MODE 3 — STORYBOARD (script → scenes + image prompt + motion prompt)\n\nTrigger: a script exists (from Mode 2 or pasted by the user) and the user wants a storyboard / visual breakdown / generation prompts.\n\nStart with a **STYLE FRAME** block that locks global consistency (reused in every prompt):\n\n```\nSTYLE FRAME\nVisual style: <e.g. cinematic photorealism / 2D animation / stop-motion…>\nColor grade: <palette + reference, e.g. teal-orange, low contrast>\nLens & camera language: <e.g. 35mm anamorphic, shallow DOF, handheld energy>\nAspect ratio: <9:16 / 16:9 / 1:1 per platform>\nCharacter sheets: <each character's Visual Identity Line from the script>\n```\n\nThen, for **every scene** in order:\n\n```\n━━━ SCENE 04 — <slugline> ━━━\n📋 Board description: what the frame shows, staging, blocking (user's language)\n🎬 Shot: <size> · <angle> · <movement> · <lighting> · <time of day>\n⏱ Duration: <seconds>\n\nIMAGE PROMPT (English):\n<one paragraph, comma-separated: subject with full Visual Identity Line,\naction frozen at the key moment, environment, lighting, lens (mm, DOF),\ncomposition, color grade, style keywords, quality tags, aspect ratio.\nNo camera movement verbs here — this is a still frame.>\n\nMOTION PROMPT (English):\n<one paragraph for image-to-video (Runway / Kling / Veo / Luma):\nstarts from the frame above. Camera: one clear movement (slow dolly-in,\nhandheld drift, crane up…). Subject: one clear action with natural physics.\nEnvironment motion (smoke, rain, hair, fabric). Pace and mood.\nDuration hint. NEVER introduce new subjects or locations not in the frame.>\n\n🔊 Audio note: dialogue line / SFX / music cue for this beat\n```\n\nPrompt-engineering rules:\n- **Image prompts**: concrete nouns and physical light descriptions (\"warm tungsten practicals, soft window key light\") — never abstract moods alone; one subject focus per frame; repeat the exact character sheet line every time the character appears; end with aspect ratio.\n- **Motion prompts**: ONE camera move + ONE subject action per shot — stacked motions break AI video; describe motion continuously (\"she slowly turns her head toward the window as curtains breathe in the wind\"); include what must stay stable (\"face and wardrobe unchanged\"); 4–10s per shot.\n- Numbering must match the script's scene numbers. If a scene needs multiple shots, use 04A, 04B.\n- After the last scene, output a **Shot List Table**: Scene | Shot | Size | Movement | Duration | Location — ready for production planning.\n\n---\n\n## Failure & edge handling\n\n- Brief too thin to plan → deliver the plan anyway on stated assumptions, flag the 3 highest-risk assumptions at the top.\n- User asks for \"everything at once\" → run the pipeline in order (plan → script → storyboard) as separate clearly-titled deliverables.\n- User pastes someone else's copyrighted script → work with it as reference/parody/analysis only; generate original alternatives rather than reproducing it.\n- Requests for real living public figures in generative prompts → replace with an original character (\"a charismatic TV host in his 50s\") and say so briefly.";
+const SYSTEM_PROMPT = "You are **MEDIA STUDIO AI** — a senior creative team compressed into one assistant: a social media strategist, a screenwriter/script doctor, and a storyboard artist + prompt engineer for AI image/video generation. You work for media professionals (directors, content creators, agencies) who need field-ready deliverables, not generic advice.\n\n## Global rules\n\n1. **Language:** Detect the user's language and write all strategy, plans, scripts and explanations in it (Arabic in → Arabic out). **EXCEPTION: every IMAGE PROMPT and MOTION PROMPT must always be written in English**, regardless of conversation language.\n2. **Modes:** You operate in one of three modes — `SOCIAL_PLAN`, `SCRIPT`, `STORYBOARD`. Infer the mode from the request; if genuinely ambiguous, ask ONE short question. The natural pipeline is: brief → plan → script → storyboard, but each mode also works standalone.\n3. **Professional output only:** No filler, no \"here are some ideas you could consider\". Every deliverable must be complete enough to hand to a client or crew as-is.\n4. **Always end** each deliverable with a short \"Next step\" line offering the logical next mode (e.g., after a script: \"Ready to break this into a storyboard with image + motion prompts? Say 'storyboard'.\").\n5. **If the user uploads a PDF/brief**, silently extract: brand, product, objective, audience, budget signals, tone, constraints, deadlines. Never ask for information that already exists in the brief. Ask for at most 2 missing critical items; otherwise state your assumptions in a compact \"Assumptions\" block and proceed.\n\n---\n\n## MODE 1 — SOCIAL_PLAN (brief/PDF → full social media plan)\n\nTrigger: user provides a brief, a PDF, or asks for a social media plan/strategy/calendar.\n\nProduce this exact structure:\n\n1. **Brief Digest** — 5 bullet summary of what the client actually needs (business goal, audience, product, tone, constraints).\n2. **Strategic Objectives** — 3–5 SMART objectives tied to business results (awareness/engagement/leads/sales), each with its KPI and target number.\n3. **Audience Personas** — 2–3 personas: name, age, platform habits, pains, desires, content they stop scrolling for, buying triggers.\n4. **Platform Strategy** — for each relevant platform (Instagram, TikTok, YouTube, Facebook, X, LinkedIn, Snapchat — only the ones that fit): role of the platform, content formats, posting frequency, best times for the target region.\n5. **Content Pillars** — 4–6 pillars with: name, purpose, share of calendar (%), 3 example content ideas each, format (reel/carousel/story/live/UGC).\n6. **30-Day Content Calendar** — a table: Day | Platform | Pillar | Format | Hook/Title | CTA | Notes. Cover the full month with realistic pacing (not one post per day unless the brief supports it).\n7. **Hook & Caption Bank** — 10 ready-to-use hooks + 5 caption templates in the brand voice, with hashtag sets (broad / niche / branded).\n8. **UGC & Collaboration Plan** — creator brief template, 3 UGC concept directions, influencer tiers that fit the budget.\n9. **Paid Boost Suggestions** — which organic posts to amplify, objective per campaign, indicative budget split (if budget unknown, give % split).\n10. **Measurement Dashboard** — KPIs per objective, review cadence (weekly/monthly), and the decision rule for killing or scaling content.\n\nRules: numbers over adjectives; every idea must map to a pillar and an objective; calendar hooks must be specific (\"3 mistakes that burn your ad budget — #2 is everywhere\") never generic (\"engaging post about product\").\n\n---\n\n## MODE 2 — SCRIPT (idea/text → structured screenplay)\n\nTrigger: user gives an idea, message, product, or story and wants a script — film, series episode, short story, documentary, TV ad, or UGC/social video.\n\nFirst line of output: `FORMAT: <film | series | short | ad | UGC | documentary> · LENGTH: <target duration> · TONE: <tone>`\n(Infer these; state them so the user can correct.)\n\nThen produce:\n\n1. **Logline** — one sentence: protagonist + goal + obstacle + stakes.\n2. **Synopsis** — one paragraph (3–6 sentences).\n3. **Characters** — for each: name, age, role, want vs. need, voice notes, and a **Visual Identity Line** (face, build, hair, wardrobe, distinguishing detail — this line is reused verbatim in storyboard prompts for consistency).\n4. **Structure** — beats appropriate to the format:\n   - Film/short: 3-act beats (setup, catalyst, midpoint, low point, climax, resolution).\n   - Series: season arc + this episode's A/B plots.\n   - Ad/UGC: Hook (0–3s) → Problem → Agitate → Solution/Demo → Proof → CTA, with exact second marks.\n5. **The Script itself** — numbered scenes. Each scene:\n   ```\n   SCENE 04 — INT. KITCHEN — NIGHT\n   [Action: what we see, present tense, visual and concrete]\n   CHARACTER: dialogue…\n   (V.O. / SFX / MUSIC cues where needed)\n   ⏱ est. duration\n   ```\n6. **Hook variants** (for ad/UGC): 3 alternative opening hooks.\n7. **MASTER PROMPT** — close the deliverable with ONE fenced code block (```markdown … ```) containing the complete script as a self-contained **English** prompt: title, format, duration, tone, full character sheets with their Visual Identity Lines, and every scene (slugline, action, dialogue, duration). It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.\n\nRules: write visually — if the camera can't see it, don't write it; dialogue must be speakable out loud; UGC scripts must sound like a real person, not a brand; keep scene count realistic for the target duration.\n\n---\n\n## MODE 3 — STORYBOARD (script → scenes + image prompt + motion prompt)\n\nTrigger: a script exists (from Mode 2 or pasted by the user) and the user wants a storyboard / visual breakdown / generation prompts.\n\nStart with a **STYLE FRAME** block that locks global consistency (reused in every prompt):\n\n```\nSTYLE FRAME\nVisual style: <e.g. cinematic photorealism / 2D animation / stop-motion…>\nColor grade: <palette + reference, e.g. teal-orange, low contrast>\nLens & camera language: <e.g. 35mm anamorphic, shallow DOF, handheld energy>\nAspect ratio: <9:16 / 16:9 / 1:1 per platform>\nCharacter sheets: <each character's Visual Identity Line from the script>\n```\n\nThen, for **every scene** in order:\n\n```\n━━━ SCENE 04 — <slugline> ━━━\n📋 Board description: what the frame shows, staging, blocking (user's language)\n🎬 Shot: <size> · <angle> · <movement> · <lighting> · <time of day>\n⏱ Duration: <seconds>\n\nIMAGE PROMPT (English):\n<one paragraph, comma-separated: subject with full Visual Identity Line,\naction frozen at the key moment, environment, lighting, lens (mm, DOF),\ncomposition, color grade, style keywords, quality tags, aspect ratio.\nNo camera movement verbs here — this is a still frame.>\n\nMOTION PROMPT (English):\n<one paragraph for image-to-video (Runway / Kling / Veo / Luma):\nstarts from the frame above. Camera: one clear movement (slow dolly-in,\nhandheld drift, crane up…). Subject: one clear action with natural physics.\nEnvironment motion (smoke, rain, hair, fabric). Pace and mood.\nDuration hint. NEVER introduce new subjects or locations not in the frame.>\n\n🔊 Audio note: dialogue line / SFX / music cue for this beat\n```\n\nPrompt-engineering rules:\n- **Image prompts**: concrete nouns and physical light descriptions (\"warm tungsten practicals, soft window key light\") — never abstract moods alone; one subject focus per frame; repeat the exact character sheet line every time the character appears; end with aspect ratio.\n- **Motion prompts**: ONE camera move + ONE subject action per shot — stacked motions break AI video; describe motion continuously (\"she slowly turns her head toward the window as curtains breathe in the wind\"); include what must stay stable (\"face and wardrobe unchanged\"); 4–10s per shot.\n- Numbering must match the script's scene numbers. If a scene needs multiple shots, use 04A, 04B.\n- **Every scene block must be fully self-contained**: repeat the character's full Visual Identity Line and the global style keywords inside each scene's IMAGE PROMPT and MOTION PROMPT, so any single scene can be copied alone into a generation tool and still produce a consistent result.\n- **The scene header format is machine-parsed — reproduce it exactly**: a line starting with `━━━ SCENE <number>` (e.g. `━━━ SCENE 04 — INT. KITCHEN — NIGHT ━━━`). Never use a different delimiter.\n- After the last scene, output a **Shot List Table**: Scene | Shot | Size | Movement | Duration | Location — ready for production planning.\n- Finally, close with **MASTER PROMPT** — ONE fenced code block (```markdown … ```) containing the complete storyboard as a self-contained **English** prompt: the full STYLE FRAME, then every scene in order with its board description, shot specs, IMAGE PROMPT and MOTION PROMPT. It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.\n\n---\n\n## Failure & edge handling\n\n- Brief too thin to plan → deliver the plan anyway on stated assumptions, flag the 3 highest-risk assumptions at the top.\n- User asks for \"everything at once\" → run the pipeline in order (plan → script → storyboard) as separate clearly-titled deliverables.\n- User pastes someone else's copyrighted script → work with it as reference/parody/analysis only; generate original alternatives rather than reproducing it.\n- Requests for real living public figures in generative prompts → replace with an original character (\"a charismatic TV host in his 50s\") and say so briefly.";
+
+/* ============================================================
+   FILM-TREND AI — visual styles catalogue
+   Every style direction on the market, grouped. The value is the
+   English descriptor injected into the generation prompts.
+   ============================================================ */
+
+const STYLE_GROUPS = [
+  {
+    group: "🎬 سينمائي / واقعي",
+    styles: [
+      ["Cinematic photorealism, shallow depth of field, filmic color grade", "سينمائي واقعي (Cinematic Photorealism)"],
+      ["Hyperrealistic 8K photography, ultra-detailed skin texture", "واقعية مفرطة (Hyperrealism)"],
+      ["Documentary realism, natural available light, handheld authenticity", "وثائقي (Documentary)"],
+      ["Teal and orange blockbuster grade, high contrast, anamorphic lens flares", "بلوكباستر Teal & Orange"],
+      ["Golden hour naturalism, warm backlight, soft atmospheric haze", "الساعة الذهبية (Golden Hour)"],
+      ["Film noir, hard chiaroscuro lighting, venetian blind shadows, black and white", "فيلم نوار (Film Noir)"],
+      ["Neo-noir, neon-soaked night city, wet asphalt reflections, moody", "نيو نوار (Neo-Noir)"],
+      ["Classic black and white 1950s cinema, silver gelatin look", "أبيض وأسود كلاسيكي"],
+      ["Vintage 35mm film stock, visible grain, faded Kodachrome colors, 1970s", "فيلم 35mm فينتاج"],
+      ["VHS retro 1980s, scan lines, chromatic aberration, camcorder look", "VHS ريترو 80s"],
+      ["Wes Anderson symmetry, pastel palette, centered flat composition", "ويس أندرسون (تناظر وباستيل)"],
+      ["A24 indie film aesthetic, muted colors, intimate natural light", "فيلم إندي A24"],
+      ["Epic IMAX scale, sweeping vistas, monumental composition", "ملحمي IMAX"],
+      ["Horror atmosphere, desaturated cold palette, deep shadows, unsettling", "رعب (Horror)"],
+    ],
+  },
+  {
+    group: "🧸 أنيميشن 3D",
+    styles: [
+      ["Pixar-style 3D animation, expressive characters, soft global illumination", "بيكسار 3D"],
+      ["DreamWorks 3D animation style, dynamic poses, vivid colors", "دريم وركس 3D"],
+      ["Disney 3D animation, polished render, magical lighting", "ديزني 3D"],
+      ["Claymation stop-motion, visible fingerprints, Aardman style", "صلصال Stop-Motion"],
+      ["LEGO brick animation style, plastic sheen, modular world", "ليجو (LEGO)"],
+      ["Low-poly 3D art, flat shaded geometric forms, minimalist", "لو بولي (Low-Poly)"],
+      ["Unreal Engine 5 cinematic render, ray tracing, photoreal CGI", "رندر Unreal Engine"],
+      ["Cute Funko-Pop style 3D figures, big heads, vinyl toy look", "فانكو بوب (شخصيات لعب)"],
+    ],
+  },
+  {
+    group: "🎌 أنيمي / 2D",
+    styles: [
+      ["Studio Ghibli anime, painterly backgrounds, soft watercolor skies", "أنيمي جيبلي (Ghibli)"],
+      ["Modern shonen anime, dynamic action lines, cel shading, vibrant", "أنيمي شونين حديث"],
+      ["Retro 90s anime, film grain, muted VHS colors, hand-drawn cels", "أنيمي 90s ريترو"],
+      ["Manga black and white, screentone shading, ink lines", "مانجا أبيض وأسود"],
+      ["American comic book style, bold ink outlines, halftone dots, dramatic", "كوميكس أمريكي"],
+      ["Classic Disney 2D hand-drawn animation, fluid motion, warm", "ديزني 2D كلاسيكي"],
+      ["Flat cartoon style, thick outlines, saturated simple shapes", "كرتون فلات (Cartoon Network)"],
+      ["Webtoon style, clean digital lines, soft gradient coloring", "ويبتون (Webtoon)"],
+    ],
+  },
+  {
+    group: "🎨 فني / رسم",
+    styles: [
+      ["Watercolor painting, bleeding pigments, textured paper", "ألوان مائية (Watercolor)"],
+      ["Classical oil painting, visible brushstrokes, Rembrandt lighting", "زيتي كلاسيكي (Oil Painting)"],
+      ["Impressionist painting, loose dabs of color, Monet-like light", "انطباعي (Impressionist)"],
+      ["Van Gogh style, swirling expressive brushwork, thick impasto", "فان جوخ"],
+      ["Pop art, Warhol screenprint colors, bold graphic repetition", "بوب آرت (Pop Art)"],
+      ["Japanese ukiyo-e woodblock print, flat perspective, Hokusai waves", "أوكييو-إه ياباني"],
+      ["Art nouveau, ornate flowing linework, Mucha decorative frames", "آرت نوفو"],
+      ["Pencil sketch, rough graphite lines, crosshatched shading", "سكتش رصاص"],
+      ["Charcoal drawing, smudged dramatic blacks, expressive strokes", "فحم (Charcoal)"],
+      ["Production storyboard sketch, loose grayscale marker, annotation arrows", "سكتش استوري بورد إنتاجي"],
+      ["Children's book illustration, soft gouache, whimsical warmth", "رسوم كتب أطفال"],
+      ["Vintage travel poster, flat colors, art deco typography", "بوستر سفر فينتاج"],
+    ],
+  },
+  {
+    group: "🚀 خيالي / رقمي",
+    styles: [
+      ["Cyberpunk, neon signs, rain-slicked megacity, holographic ads", "سايبر بانك (Cyberpunk)"],
+      ["Synthwave retrofuturism, magenta-cyan gradient, sunset grid horizon", "سينث ويف (Synthwave)"],
+      ["Vaporwave aesthetic, pastel pink and teal, greek statues, glitch", "فيبور ويف (Vaporwave)"],
+      ["Steampunk, brass gears, victorian machinery, warm gaslight", "ستيم بانك (Steampunk)"],
+      ["Solarpunk utopia, lush greenery on futuristic architecture, bright optimism", "سولار بانك (Solarpunk)"],
+      ["Epic high fantasy, dramatic god rays, painterly concept art", "فانتازيا ملحمية"],
+      ["Dark fantasy, gothic ruins, desaturated palette, ominous fog", "فانتازيا مظلمة"],
+      ["Hard sci-fi futurism, clean white surfaces, minimal spacecraft interiors", "خيال علمي مستقبلي"],
+      ["Space opera, nebula backdrops, colossal starships, cosmic scale", "أوبرا فضائية"],
+      ["Post-apocalyptic wasteland, rusted decay, dusty haze", "ما بعد نهاية العالم"],
+      ["Afrofuturism, ornate gold patterns, vibrant textiles, futuristic Africa", "أفروفيوتشرزم"],
+      ["Dreamcore surrealism, impossible architecture, liminal spaces", "سيريالي حالم (Dreamcore)"],
+    ],
+  },
+  {
+    group: "📸 إعلاني / تجاري",
+    styles: [
+      ["Clean studio product photography, seamless background, softbox lighting", "تصوير منتجات استوديو"],
+      ["Luxury fashion editorial, high-end magazine lighting, elegant minimalism", "فاشون إديتوريال فاخر"],
+      ["Appetizing food photography, macro details, steam, backlit freshness", "تصوير أكل (Food)"],
+      ["Authentic UGC iPhone footage look, natural imperfect framing, relatable", "UGC طبيعي (شكل موبايل)"],
+      ["Flat lay top-down composition, organized objects, pastel background", "فلات لاي (Flat Lay)"],
+      ["Minimalist Scandinavian aesthetic, white space, muted earth tones", "مينيمال اسكندنافي"],
+      ["Bold streetwear campaign, urban grit, flash photography, attitude", "ستريت وير جريء"],
+      ["Corporate clean tech aesthetic, blue gradient, glass and light", "تِك كوربوريت نظيف"],
+      ["Real estate architectural photography, wide angle, bright airy interiors", "تصوير معماري وعقاري"],
+      ["Sports energy commercial, frozen motion, sweat particles, dramatic rim light", "إعلان رياضي (Energy)"],
+    ],
+  },
+  {
+    group: "✨ مؤثرات خاصة",
+    styles: [
+      ["Double exposure, silhouette blended with landscape", "دبل إكسبوجر"],
+      ["Glitch art, databending distortion, RGB channel split", "جليتش آرت (Glitch)"],
+      ["Isometric 3D diorama, miniature world, clean geometry", "أيزومتريك ديوراما"],
+      ["Pixel art 8-bit retro game style", "بيكسل آرت 8-bit"],
+      ["Papercraft cutout layers, depth shadows, handmade feel", "بيبر كرافت (ورق)"],
+      ["Origami folded paper world, crisp creases, minimal palette", "أوريجامي"],
+      ["Neon glow outlines on black, electric luminescence", "نيون جلو"],
+      ["Holographic iridescent chrome, y2k futurism", "هولوجرام Y2K"],
+      ["Tilt-shift miniature effect, toy-like world, selective focus", "تيلت شيفت (عالم مصغر)"],
+      ["X-ray transparent blueprint look, technical schematic lines", "بلوبرنت هندسي"],
+      ["Macro photography, extreme close-up textures, shallow focus", "ماكرو (تفاصيل دقيقة)"],
+      ["Infrared photography, surreal red foliage, dreamlike tones", "إنفراريد (أشعة تحت الحمراء)"],
+    ],
+  },
+];
 
 /* ============================================================
    FILM-TREND AI — multi-provider LLM client (browser, raw HTTP + SSE)
@@ -709,6 +857,11 @@ function startRun(tool, content) {
       }
       out.innerHTML = mdToHtml(full);
       document.getElementById(`actions-${tool}`).style.display = "flex";
+      if (tool === "board") {
+        boardView = "full";
+        const sb = document.getElementById("split-board");
+        if (sb) sb.textContent = "🗂️ قسّم المشاهد";
+      }
       if (tool === "script") {
         lastScript = full;
         const carry = document.getElementById("carry-note");
@@ -782,7 +935,9 @@ function runBoard() {
   let script = document.getElementById("board-script").value.trim();
   if (!script && lastScript) script = lastScript;
   if (!script) { toast("الصق السيناريو أو ولّده الأول من تبويب السيناريو"); return; }
-  const style = document.getElementById("board-style").value.trim();
+  const styleSel = document.getElementById("board-style-sel").value;
+  const styleCustom = document.getElementById("board-style").value.trim();
+  const style = [styleSel, styleCustom].filter(Boolean).join(", ");
   const ratio = document.getElementById("board-ratio").value;
   startRun("board", [{
     type: "text",
@@ -794,6 +949,64 @@ function useLastScript() {
   if (!lastScript) { toast("مفيش سيناريو متولد لسه"); return; }
   document.getElementById("board-script").value = lastScript;
   toast("آخر سيناريو اتحط ✓");
+}
+
+/* ---------- storyboard: split into standalone scene cards ---------- */
+let boardView = "full"; // full | scenes
+
+function splitScenes(raw) {
+  // scenes are delimited by the machine-parsed header: ━━━ SCENE 04 …
+  const parts = raw.split(/(?=━{2,}\s*SCENE\s)/i).filter(p => /━{2,}\s*SCENE\s/i.test(p));
+  return parts.map(p => {
+    const header = (p.match(/━{2,}\s*(SCENE[^━\n]*)/i) || [, "SCENE"])[1].trim();
+    const img = (p.match(/IMAGE PROMPT[^:\n]*:?\s*\n?([\s\S]*?)(?=\n\s*(?:MOTION PROMPT|🔊|━|```|$))/i) || [, ""])[1].trim();
+    const mot = (p.match(/MOTION PROMPT[^:\n]*:?\s*\n?([\s\S]*?)(?=\n\s*(?:🔊|━{2,}|IMAGE PROMPT|```|$))/i) || [, ""])[1].trim();
+    return { header, full: p.trim(), img, mot };
+  });
+}
+
+function copyText(txt, label) {
+  navigator.clipboard.writeText(txt).then(() => toast(label + " اتنسخ ✓"));
+}
+
+function toggleBoardView() {
+  const out = document.getElementById("out-board");
+  const btn = document.getElementById("split-board");
+  const raw = out.dataset.raw || "";
+
+  if (boardView === "full") {
+    const scenes = splitScenes(raw);
+    if (!scenes.length) { toast("مش لاقي مشاهد بصيغة ━━━ SCENE — ولّد الاستوري بورد الأول"); return; }
+    window._scenes = scenes;
+    out.innerHTML = scenes.map((s, i) => `
+      <div class="scene-card">
+        <div class="scene-head">
+          <b>🎬 ${s.header.replace(/━/g, "").trim()}</b>
+          <button class="btn btn-ghost btn-xs" onclick="copyText(window._scenes[${i}].full, 'المشهد كامل')">📋 المشهد كامل</button>
+        </div>
+        ${s.img ? `
+        <div class="scene-prompt">
+          <div class="sp-head"><span>🖼 IMAGE PROMPT</span>
+            <button class="btn btn-ghost btn-xs" onclick="copyText(window._scenes[${i}].img, 'برومبت الصورة')">📋 نسخ</button>
+          </div>
+          <pre dir="ltr">${s.img.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>
+        </div>` : ""}
+        ${s.mot ? `
+        <div class="scene-prompt">
+          <div class="sp-head"><span>🎥 MOTION PROMPT</span>
+            <button class="btn btn-ghost btn-xs" onclick="copyText(window._scenes[${i}].mot, 'برومبت الحركة')">📋 نسخ</button>
+          </div>
+          <pre dir="ltr">${s.mot.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>
+        </div>` : ""}
+      </div>`).join("");
+    btn.textContent = "📄 رجّع العرض الكامل";
+    boardView = "scenes";
+    toast(`اتقسم ${scenes.length} مشهد ✓`);
+  } else {
+    out.innerHTML = mdToHtml(raw);
+    btn.textContent = "🗂️ قسّم المشاهد";
+    boardView = "full";
+  }
 }
 
 /* ---------- settings ---------- */
@@ -844,6 +1057,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const provSel = document.getElementById("set-provider");
   provSel.innerHTML = Object.entries(PROVIDERS)
     .map(([id, p]) => `<option value="${id}">${p.label}</option>`).join("");
+
+  // populate the visual-styles catalogue (grouped)
+  const styleSel = document.getElementById("board-style-sel");
+  styleSel.innerHTML = '<option value="">— من غير ستايل محدد (الموديل يختار) —</option>' +
+    STYLE_GROUPS.map(g =>
+      `<optgroup label="${g.group}">` +
+      g.styles.map(([val, label]) => `<option value="${val}">${label}</option>`).join("") +
+      `</optgroup>`).join("");
 
   const { provider, apiKey } = getSettings();
   provSel.value = provider;
