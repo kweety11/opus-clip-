@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Media Studio AI — من البريف للاستوري بورد</title>
+  <title>Film-trend AI — من البريف للاستوري بورد</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23e8b04b'/><text x='16' y='23' text-anchor='middle' font-size='18'>🎬</text></svg>">
   <style>
 /* ============================================================
@@ -190,8 +190,8 @@ textarea { resize: vertical; min-height: 130px; }
   <header class="top">
     <div class="logo">🎬</div>
     <div>
-      <h1>Media <em>Studio</em> AI</h1>
-      <p>خطة سوشيال ميديا · سيناريو · استوري بورد ببرومبتات جاهزة — في مكان واحد</p>
+      <h1>Film-trend <em>AI</em></h1>
+      <p>خطة سوشيال ميديا · سيناريو · استوري بورد ببرومبتات جاهزة — بأي موديل AI في السوق</p>
     </div>
   </header>
 
@@ -313,24 +313,29 @@ textarea { resize: vertical; min-height: 130px; }
   <section class="panel" id="panel-settings">
     <div class="card settings-card">
       <h3>⚙️ الإعدادات</h3>
-      <p class="hint">التطبيق بيتصل بـ Claude API مباشرة من متصفحك — مفتاحك بيتخزن محليًا على جهازك بس ومبيتبعتش لأي سيرفر تاني.</p>
+      <p class="hint">اختار أي مزود AI في السوق — أمريكي أو صيني أو أوروبي. التطبيق بيتصل بالمزود مباشرة من متصفحك ومفتاحك بيتخزن محليًا على جهازك بس.</p>
 
-      <label class="f">مفتاح Anthropic API</label>
-      <input type="password" id="set-key" placeholder="sk-ant-..." autocomplete="off">
+      <label class="f">مزود الذكاء الاصطناعي</label>
+      <select id="set-provider"></select>
 
       <label class="f">الموديل</label>
-      <select id="set-model">
-        <option value="claude-opus-4-8">Claude Opus 4.8 — الأقوى (موصى به)</option>
-        <option value="claude-sonnet-5">Claude Sonnet 5 — توازن سرعة وجودة</option>
-        <option value="claude-haiku-4-5">Claude Haiku 4.5 — الأسرع والأرخص</option>
-      </select>
+      <select id="set-model"></select>
+
+      <label class="f">أو اكتب اسم موديل مخصص (اختياري — لأي موديل جديد ينزل)</label>
+      <input type="text" id="set-custom" dir="ltr" placeholder="e.g. gpt-5.2 / deepseek-v4 / gemini-4-pro" autocomplete="off">
+
+      <label class="f">مفتاح API الخاص بالمزود ده</label>
+      <input type="password" id="set-key" dir="ltr" placeholder="sk-..." autocomplete="off">
 
       <button class="btn btn-primary" onclick="persistSettings()">💾 حفظ</button>
 
       <div class="note">
-        <b>منين أجيب المفتاح؟</b> من
-        <span dir="ltr">platform.claude.com</span>
-        → API Keys → Create Key. أول ما تحفظه هنا هتقدر تستخدم الأدوات الثلاثة على طول.
+        <b>منين أجيب المفتاح؟</b> من موقع المزود:
+        <span dir="ltr" id="key-url">platform.claude.com</span>
+        — كل مزود ليه مفتاح مستقل، والتطبيق بيحفظ مفتاح كل مزود لوحده فتقدر تنقّل بينهم براحتك.
+      </div>
+      <div class="note" id="pdf-note" style="display:none">
+        ℹ️ ملاحظة: رفع ملف <b>PDF</b> في أداة الخطة متاح حاليًا مع مزود Anthropic (Claude) بس — مع باقي المزودين انسخ نص البريف في الخانة.
       </div>
     </div>
   </section>
@@ -340,60 +345,185 @@ textarea { resize: vertical; min-height: 130px; }
 const SYSTEM_PROMPT = "You are **MEDIA STUDIO AI** — a senior creative team compressed into one assistant: a social media strategist, a screenwriter/script doctor, and a storyboard artist + prompt engineer for AI image/video generation. You work for media professionals (directors, content creators, agencies) who need field-ready deliverables, not generic advice.\n\n## Global rules\n\n1. **Language:** Detect the user's language and write all strategy, plans, scripts and explanations in it (Arabic in → Arabic out). **EXCEPTION: every IMAGE PROMPT and MOTION PROMPT must always be written in English**, regardless of conversation language.\n2. **Modes:** You operate in one of three modes — `SOCIAL_PLAN`, `SCRIPT`, `STORYBOARD`. Infer the mode from the request; if genuinely ambiguous, ask ONE short question. The natural pipeline is: brief → plan → script → storyboard, but each mode also works standalone.\n3. **Professional output only:** No filler, no \"here are some ideas you could consider\". Every deliverable must be complete enough to hand to a client or crew as-is.\n4. **Always end** each deliverable with a short \"Next step\" line offering the logical next mode (e.g., after a script: \"Ready to break this into a storyboard with image + motion prompts? Say 'storyboard'.\").\n5. **If the user uploads a PDF/brief**, silently extract: brand, product, objective, audience, budget signals, tone, constraints, deadlines. Never ask for information that already exists in the brief. Ask for at most 2 missing critical items; otherwise state your assumptions in a compact \"Assumptions\" block and proceed.\n\n---\n\n## MODE 1 — SOCIAL_PLAN (brief/PDF → full social media plan)\n\nTrigger: user provides a brief, a PDF, or asks for a social media plan/strategy/calendar.\n\nProduce this exact structure:\n\n1. **Brief Digest** — 5 bullet summary of what the client actually needs (business goal, audience, product, tone, constraints).\n2. **Strategic Objectives** — 3–5 SMART objectives tied to business results (awareness/engagement/leads/sales), each with its KPI and target number.\n3. **Audience Personas** — 2–3 personas: name, age, platform habits, pains, desires, content they stop scrolling for, buying triggers.\n4. **Platform Strategy** — for each relevant platform (Instagram, TikTok, YouTube, Facebook, X, LinkedIn, Snapchat — only the ones that fit): role of the platform, content formats, posting frequency, best times for the target region.\n5. **Content Pillars** — 4–6 pillars with: name, purpose, share of calendar (%), 3 example content ideas each, format (reel/carousel/story/live/UGC).\n6. **30-Day Content Calendar** — a table: Day | Platform | Pillar | Format | Hook/Title | CTA | Notes. Cover the full month with realistic pacing (not one post per day unless the brief supports it).\n7. **Hook & Caption Bank** — 10 ready-to-use hooks + 5 caption templates in the brand voice, with hashtag sets (broad / niche / branded).\n8. **UGC & Collaboration Plan** — creator brief template, 3 UGC concept directions, influencer tiers that fit the budget.\n9. **Paid Boost Suggestions** — which organic posts to amplify, objective per campaign, indicative budget split (if budget unknown, give % split).\n10. **Measurement Dashboard** — KPIs per objective, review cadence (weekly/monthly), and the decision rule for killing or scaling content.\n\nRules: numbers over adjectives; every idea must map to a pillar and an objective; calendar hooks must be specific (\"3 mistakes that burn your ad budget — #2 is everywhere\") never generic (\"engaging post about product\").\n\n---\n\n## MODE 2 — SCRIPT (idea/text → structured screenplay)\n\nTrigger: user gives an idea, message, product, or story and wants a script — film, series episode, short story, documentary, TV ad, or UGC/social video.\n\nFirst line of output: `FORMAT: <film | series | short | ad | UGC | documentary> · LENGTH: <target duration> · TONE: <tone>`\n(Infer these; state them so the user can correct.)\n\nThen produce:\n\n1. **Logline** — one sentence: protagonist + goal + obstacle + stakes.\n2. **Synopsis** — one paragraph (3–6 sentences).\n3. **Characters** — for each: name, age, role, want vs. need, voice notes, and a **Visual Identity Line** (face, build, hair, wardrobe, distinguishing detail — this line is reused verbatim in storyboard prompts for consistency).\n4. **Structure** — beats appropriate to the format:\n   - Film/short: 3-act beats (setup, catalyst, midpoint, low point, climax, resolution).\n   - Series: season arc + this episode's A/B plots.\n   - Ad/UGC: Hook (0–3s) → Problem → Agitate → Solution/Demo → Proof → CTA, with exact second marks.\n5. **The Script itself** — numbered scenes. Each scene:\n   ```\n   SCENE 04 — INT. KITCHEN — NIGHT\n   [Action: what we see, present tense, visual and concrete]\n   CHARACTER: dialogue…\n   (V.O. / SFX / MUSIC cues where needed)\n   ⏱ est. duration\n   ```\n6. **Hook variants** (for ad/UGC): 3 alternative opening hooks.\n\nRules: write visually — if the camera can't see it, don't write it; dialogue must be speakable out loud; UGC scripts must sound like a real person, not a brand; keep scene count realistic for the target duration.\n\n---\n\n## MODE 3 — STORYBOARD (script → scenes + image prompt + motion prompt)\n\nTrigger: a script exists (from Mode 2 or pasted by the user) and the user wants a storyboard / visual breakdown / generation prompts.\n\nStart with a **STYLE FRAME** block that locks global consistency (reused in every prompt):\n\n```\nSTYLE FRAME\nVisual style: <e.g. cinematic photorealism / 2D animation / stop-motion…>\nColor grade: <palette + reference, e.g. teal-orange, low contrast>\nLens & camera language: <e.g. 35mm anamorphic, shallow DOF, handheld energy>\nAspect ratio: <9:16 / 16:9 / 1:1 per platform>\nCharacter sheets: <each character's Visual Identity Line from the script>\n```\n\nThen, for **every scene** in order:\n\n```\n━━━ SCENE 04 — <slugline> ━━━\n📋 Board description: what the frame shows, staging, blocking (user's language)\n🎬 Shot: <size> · <angle> · <movement> · <lighting> · <time of day>\n⏱ Duration: <seconds>\n\nIMAGE PROMPT (English):\n<one paragraph, comma-separated: subject with full Visual Identity Line,\naction frozen at the key moment, environment, lighting, lens (mm, DOF),\ncomposition, color grade, style keywords, quality tags, aspect ratio.\nNo camera movement verbs here — this is a still frame.>\n\nMOTION PROMPT (English):\n<one paragraph for image-to-video (Runway / Kling / Veo / Luma):\nstarts from the frame above. Camera: one clear movement (slow dolly-in,\nhandheld drift, crane up…). Subject: one clear action with natural physics.\nEnvironment motion (smoke, rain, hair, fabric). Pace and mood.\nDuration hint. NEVER introduce new subjects or locations not in the frame.>\n\n🔊 Audio note: dialogue line / SFX / music cue for this beat\n```\n\nPrompt-engineering rules:\n- **Image prompts**: concrete nouns and physical light descriptions (\"warm tungsten practicals, soft window key light\") — never abstract moods alone; one subject focus per frame; repeat the exact character sheet line every time the character appears; end with aspect ratio.\n- **Motion prompts**: ONE camera move + ONE subject action per shot — stacked motions break AI video; describe motion continuously (\"she slowly turns her head toward the window as curtains breathe in the wind\"); include what must stay stable (\"face and wardrobe unchanged\"); 4–10s per shot.\n- Numbering must match the script's scene numbers. If a scene needs multiple shots, use 04A, 04B.\n- After the last scene, output a **Shot List Table**: Scene | Shot | Size | Movement | Duration | Location — ready for production planning.\n\n---\n\n## Failure & edge handling\n\n- Brief too thin to plan → deliver the plan anyway on stated assumptions, flag the 3 highest-risk assumptions at the top.\n- User asks for \"everything at once\" → run the pipeline in order (plan → script → storyboard) as separate clearly-titled deliverables.\n- User pastes someone else's copyrighted script → work with it as reference/parody/analysis only; generate original alternatives rather than reproducing it.\n- Requests for real living public figures in generative prompts → replace with an original character (\"a charismatic TV host in his 50s\") and say so briefly.";
 
 /* ============================================================
-   MEDIA STUDIO AI — Claude API client (browser, raw HTTP + SSE)
-   No SDK bundler here, so we call POST /v1/messages directly.
-   The user's API key stays in their browser (localStorage).
+   FILM-TREND AI — multi-provider LLM client (browser, raw HTTP + SSE)
+   Two wire protocols cover the whole market:
+   - "anthropic": Claude Messages API
+   - "openai":    OpenAI-compatible /chat/completions (OpenAI, Gemini,
+                  Grok, DeepSeek, Qwen, Kimi, GLM, Mistral, Groq, OpenRouter)
+   Keys are stored per-provider in localStorage and never leave the browser.
    ============================================================ */
 
-const API_URL = "https://api.anthropic.com/v1/messages";
+const PROVIDERS = {
+  anthropic: {
+    label: "🇺🇸 Anthropic — Claude",
+    protocol: "anthropic",
+    url: "https://api.anthropic.com/v1/messages",
+    models: ["claude-opus-4-8", "claude-sonnet-5", "claude-haiku-4-5"],
+    keyUrl: "platform.claude.com",
+    pdf: true,
+  },
+  openai: {
+    label: "🇺🇸 OpenAI — GPT",
+    protocol: "openai",
+    url: "https://api.openai.com/v1/chat/completions",
+    models: ["gpt-5.1", "gpt-5.1-mini", "gpt-4o"],
+    keyUrl: "platform.openai.com",
+  },
+  gemini: {
+    label: "🇺🇸 Google — Gemini",
+    protocol: "openai",
+    url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+    models: ["gemini-3-pro-preview", "gemini-2.5-pro", "gemini-2.5-flash"],
+    keyUrl: "aistudio.google.com/apikey",
+  },
+  xai: {
+    label: "🇺🇸 xAI — Grok",
+    protocol: "openai",
+    url: "https://api.x.ai/v1/chat/completions",
+    models: ["grok-4", "grok-3-mini"],
+    keyUrl: "console.x.ai",
+  },
+  deepseek: {
+    label: "🇨🇳 DeepSeek",
+    protocol: "openai",
+    url: "https://api.deepseek.com/chat/completions",
+    models: ["deepseek-chat", "deepseek-reasoner"],
+    keyUrl: "platform.deepseek.com",
+  },
+  qwen: {
+    label: "🇨🇳 Alibaba — Qwen",
+    protocol: "openai",
+    url: "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
+    models: ["qwen-max", "qwen-plus", "qwen-turbo"],
+    keyUrl: "modelstudio.console.alibabacloud.com",
+  },
+  moonshot: {
+    label: "🇨🇳 Moonshot — Kimi",
+    protocol: "openai",
+    url: "https://api.moonshot.ai/v1/chat/completions",
+    models: ["kimi-latest", "kimi-k2-turbo-preview"],
+    keyUrl: "platform.moonshot.ai",
+  },
+  zhipu: {
+    label: "🇨🇳 Zhipu — GLM",
+    protocol: "openai",
+    url: "https://api.z.ai/api/paas/v4/chat/completions",
+    models: ["glm-4.6", "glm-4.5-air"],
+    keyUrl: "z.ai",
+  },
+  mistral: {
+    label: "🇪🇺 Mistral",
+    protocol: "openai",
+    url: "https://api.mistral.ai/v1/chat/completions",
+    models: ["mistral-large-latest", "mistral-medium-latest"],
+    keyUrl: "console.mistral.ai",
+  },
+  groq: {
+    label: "🇺🇸 Groq — Llama وموديلات مفتوحة",
+    protocol: "openai",
+    url: "https://api.groq.com/openai/v1/chat/completions",
+    models: ["llama-3.3-70b-versatile", "moonshotai/kimi-k2-instruct"],
+    keyUrl: "console.groq.com",
+  },
+  openrouter: {
+    label: "🌍 OpenRouter — كل الموديلات بمفتاح واحد",
+    protocol: "openai",
+    url: "https://openrouter.ai/api/v1/chat/completions",
+    models: [
+      "anthropic/claude-sonnet-4.5",
+      "openai/gpt-5.1",
+      "google/gemini-3-pro-preview",
+      "deepseek/deepseek-chat-v3.1",
+      "qwen/qwen3-max",
+      "moonshotai/kimi-k2",
+      "z-ai/glm-4.6",
+      "x-ai/grok-4",
+    ],
+    keyUrl: "openrouter.ai/keys",
+  },
+};
 
+/* ---------- settings ---------- */
 function getSettings() {
+  const provider = localStorage.getItem("fta_provider") || "anthropic";
+  const p = PROVIDERS[provider] ? provider : "anthropic";
+  const custom = (localStorage.getItem("fta_custom_model_" + p) || "").trim();
   return {
-    apiKey: localStorage.getItem("msai_key") || "",
-    model: localStorage.getItem("msai_model") || "claude-opus-4-8",
+    provider: p,
+    apiKey: localStorage.getItem("fta_key_" + p) || "",
+    model: custom || localStorage.getItem("fta_model_" + p) || PROVIDERS[p].models[0],
   };
 }
 
-function saveSettings(apiKey, model) {
-  localStorage.setItem("msai_key", apiKey.trim());
-  localStorage.setItem("msai_model", model);
+function saveSettings(provider, apiKey, model, customModel) {
+  localStorage.setItem("fta_provider", provider);
+  localStorage.setItem("fta_key_" + provider, apiKey.trim());
+  localStorage.setItem("fta_model_" + provider, model);
+  localStorage.setItem("fta_custom_model_" + provider, (customModel || "").trim());
 }
 
-/**
- * Stream a completion from Claude.
- * @param {Array}  content  user content blocks (text and/or document)
- * @param {Object} handlers { onText(delta), onDone(fullText), onError(msg) }
- * @returns {AbortController}
- */
-function runClaude(content, handlers) {
-  const { apiKey, model } = getSettings();
+/* ============================================================
+   streaming client — returns AbortController
+   content: array of blocks [{type:"text",text}] and optionally
+   one {type:"document", source:{...}} (Claude only)
+   ============================================================ */
+function runLLM(content, handlers) {
+  const { provider, apiKey, model } = getSettings();
+  const P = PROVIDERS[provider];
   const controller = new AbortController();
 
-  const body = {
-    model,
-    max_tokens: 64000,
-    stream: true,
-    system: SYSTEM_PROMPT,
-    messages: [{ role: "user", content }],
-  };
-  // Haiku 4.5 predates adaptive thinking — only send it to 4.6+ tiers
-  if (!model.startsWith("claude-haiku")) {
-    body.thinking = { type: "adaptive" };
+  const hasPdf = content.some(b => b.type === "document");
+  if (hasPdf && !P.pdf) {
+    handlers.onError("رفع الـ PDF متاح حاليًا مع Claude بس — اختار Anthropic من الإعدادات أو انسخ نص البريف في الخانة");
+    return controller;
+  }
+
+  let url, headers, body;
+
+  if (P.protocol === "anthropic") {
+    url = P.url;
+    headers = {
+      "content-type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true",
+    };
+    body = {
+      model,
+      max_tokens: 64000,
+      stream: true,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: "user", content }],
+    };
+    if (!model.startsWith("claude-haiku")) body.thinking = { type: "adaptive" };
+  } else {
+    url = P.url;
+    headers = {
+      "content-type": "application/json",
+      "authorization": "Bearer " + apiKey,
+    };
+    if (provider === "openrouter") {
+      headers["HTTP-Referer"] = "https://film-trend.ai";
+      headers["X-Title"] = "Film-trend AI";
+    }
+    const userText = content.filter(b => b.type === "text").map(b => b.text).join("\n\n");
+    body = {
+      model,
+      stream: true,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: userText },
+      ],
+    };
   }
 
   (async () => {
     let full = "";
     try {
-      const res = await fetch(API_URL, {
+      const res = await fetch(url, {
         method: "POST",
         signal: controller.signal,
-        headers: {
-          "content-type": "application/json",
-          "x-api-key": apiKey,
-          "anthropic-version": "2023-06-01",
-          // required for calling the API from a browser page
-          "anthropic-dangerous-direct-browser-access": "true",
-        },
+        headers,
         body: JSON.stringify(body),
       });
 
@@ -401,10 +531,10 @@ function runClaude(content, handlers) {
         let msg = `HTTP ${res.status}`;
         try {
           const err = await res.json();
-          msg = err?.error?.message || msg;
+          msg = err?.error?.message || err?.message || JSON.stringify(err).slice(0, 200);
         } catch (_) { /* non-JSON error body */ }
-        if (res.status === 401) msg = "مفتاح API غير صحيح — راجع الإعدادات ⚙️";
-        if (res.status === 429) msg = "تجاوزت حد الطلبات — استنى شوية وحاول تاني";
+        if (res.status === 401 || res.status === 403) msg = `مفتاح ${P.label.replace(/^[^ ]+ /, "")} غير صحيح — راجع الإعدادات ⚙️`;
+        if (res.status === 429) msg = "تجاوزت حد الطلبات أو الرصيد خلص — راجع حسابك عند المزود";
         handlers.onError(msg);
         return;
       }
@@ -418,31 +548,44 @@ function runClaude(content, handlers) {
         if (done) break;
         buf += decoder.decode(value, { stream: true });
 
-        // SSE frames are separated by a blank line
         const frames = buf.split("\n\n");
         buf = frames.pop();
         for (const frame of frames) {
-          const dataLine = frame.split("\n").find(l => l.startsWith("data:"));
-          if (!dataLine) continue;
-          let ev;
-          try { ev = JSON.parse(dataLine.slice(5)); } catch (_) { continue; }
+          for (const line of frame.split("\n")) {
+            if (!line.startsWith("data:")) continue;
+            const payload = line.slice(5).trim();
+            if (payload === "[DONE]") continue;
+            let ev;
+            try { ev = JSON.parse(payload); } catch (_) { continue; }
 
-          if (ev.type === "content_block_delta" && ev.delta?.type === "text_delta") {
-            full += ev.delta.text;
-            handlers.onText(ev.delta.text);
-          } else if (ev.type === "message_delta" && ev.delta?.stop_reason === "refusal") {
-            handlers.onError("الطلب اترفض لأسباب تتعلق بسياسة الاستخدام — جرّب تعيد صياغته");
-            return;
-          } else if (ev.type === "error") {
-            handlers.onError(ev.error?.message || "خطأ من الخادم");
-            return;
+            let delta = "";
+            if (P.protocol === "anthropic") {
+              if (ev.type === "content_block_delta" && ev.delta?.type === "text_delta") delta = ev.delta.text;
+              else if (ev.type === "message_delta" && ev.delta?.stop_reason === "refusal") {
+                handlers.onError("الطلب اترفض لأسباب تتعلق بسياسة الاستخدام — جرّب تعيد صياغته");
+                return;
+              } else if (ev.type === "error") {
+                handlers.onError(ev.error?.message || "خطأ من الخادم");
+                return;
+              }
+            } else {
+              delta = ev.choices?.[0]?.delta?.content || "";
+              if (ev.error) {
+                handlers.onError(ev.error.message || "خطأ من الخادم");
+                return;
+              }
+            }
+            if (delta) {
+              full += delta;
+              handlers.onText(delta);
+            }
           }
         }
       }
       handlers.onDone(full);
     } catch (e) {
       if (e.name === "AbortError") handlers.onDone(full);
-      else handlers.onError("تعذّر الاتصال بالخادم — اتأكد من الإنترنت ومفتاح الـ API");
+      else handlers.onError("تعذّر الاتصال بـ " + P.label.replace(/^[^ ]+ /, "") + " — اتأكد من الإنترنت والمفتاح");
     }
   })();
 
@@ -460,9 +603,9 @@ function fileToBase64(file) {
 }
 
 /* ============================================================
-   MEDIA STUDIO AI — UI logic
+   FILM-TREND AI — UI logic
    Tabs: social plan / script / storyboard / settings.
-   Streams Claude output and renders it as markdown.
+   Streams LLM output (any configured provider) and renders markdown.
    ============================================================ */
 
 let activeController = null;
@@ -534,9 +677,9 @@ function switchTab(name) {
 
 /* ---------- shared run/render plumbing ---------- */
 function startRun(tool, content) {
-  const { apiKey } = getSettings();
+  const { apiKey, provider } = getSettings();
   if (!apiKey) {
-    toast("ضيف مفتاح الـ API الأول من تبويب الإعدادات ⚙️");
+    toast(`ضيف مفتاح ${PROVIDERS[provider].label} الأول من تبويب الإعدادات ⚙️`);
     switchTab("settings");
     return;
   }
@@ -545,12 +688,12 @@ function startRun(tool, content) {
   const out = document.getElementById(`out-${tool}`);
   const btn = document.getElementById(`run-${tool}`);
   const stop = document.getElementById(`stop-${tool}`);
-  out.innerHTML = '<p class="thinking">⏳ Claude بيفكر ويجهّز الناتج…</p>';
+  out.innerHTML = '<p class="thinking">⏳ الموديل بيفكر ويجهّز الناتج…</p>';
   out.dataset.raw = "";
   btn.disabled = true;
   stop.style.display = "inline-flex";
 
-  activeController = runClaude(content, {
+  activeController = runLLM(content, {
     onText(delta) {
       out.dataset.raw += delta;
       out.innerHTML = mdToHtml(out.dataset.raw);
@@ -654,12 +797,28 @@ function useLastScript() {
 }
 
 /* ---------- settings ---------- */
+function fillProviderUI(provider) {
+  const P = PROVIDERS[provider];
+  const modelSel = document.getElementById("set-model");
+  modelSel.innerHTML = P.models.map(m => `<option value="${m}">${m}</option>`).join("");
+
+  const savedModel = localStorage.getItem("fta_model_" + provider);
+  if (savedModel && P.models.includes(savedModel)) modelSel.value = savedModel;
+
+  document.getElementById("set-key").value = localStorage.getItem("fta_key_" + provider) || "";
+  document.getElementById("set-custom").value = localStorage.getItem("fta_custom_model_" + provider) || "";
+  document.getElementById("key-url").textContent = P.keyUrl;
+  document.getElementById("pdf-note").style.display = P.pdf ? "none" : "block";
+}
+
 function persistSettings() {
+  const provider = document.getElementById("set-provider").value;
   const key = document.getElementById("set-key").value;
   const model = document.getElementById("set-model").value;
-  if (!key.trim()) { toast("اكتب مفتاح الـ API"); return; }
-  saveSettings(key, model);
-  toast("الإعدادات اتحفظت ✓");
+  const custom = document.getElementById("set-custom").value;
+  if (!key.trim()) { toast("اكتب مفتاح الـ API الخاص بالمزود ده"); return; }
+  saveSettings(provider, key, model, custom);
+  toast(`الإعدادات اتحفظت ✓ — شغال دلوقتي على ${PROVIDERS[provider].label}`);
 }
 
 /* ---------- toast ---------- */
@@ -681,9 +840,15 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".tab-btn").forEach(b =>
     b.addEventListener("click", () => switchTab(b.dataset.tab)));
 
-  const { apiKey, model } = getSettings();
-  document.getElementById("set-key").value = apiKey;
-  document.getElementById("set-model").value = model;
+  // populate provider dropdown from the registry
+  const provSel = document.getElementById("set-provider");
+  provSel.innerHTML = Object.entries(PROVIDERS)
+    .map(([id, p]) => `<option value="${id}">${p.label}</option>`).join("");
+
+  const { provider, apiKey } = getSettings();
+  provSel.value = provider;
+  fillProviderUI(provider);
+  provSel.addEventListener("change", () => fillProviderUI(provSel.value));
 
   document.getElementById("plan-pdf").addEventListener("change", e => {
     const f = e.target.files[0];

@@ -1,7 +1,7 @@
 /* ============================================================
-   MEDIA STUDIO AI — UI logic
+   FILM-TREND AI — UI logic
    Tabs: social plan / script / storyboard / settings.
-   Streams Claude output and renders it as markdown.
+   Streams LLM output (any configured provider) and renders markdown.
    ============================================================ */
 
 let activeController = null;
@@ -73,9 +73,9 @@ function switchTab(name) {
 
 /* ---------- shared run/render plumbing ---------- */
 function startRun(tool, content) {
-  const { apiKey } = getSettings();
+  const { apiKey, provider } = getSettings();
   if (!apiKey) {
-    toast("ضيف مفتاح الـ API الأول من تبويب الإعدادات ⚙️");
+    toast(`ضيف مفتاح ${PROVIDERS[provider].label} الأول من تبويب الإعدادات ⚙️`);
     switchTab("settings");
     return;
   }
@@ -84,12 +84,12 @@ function startRun(tool, content) {
   const out = document.getElementById(`out-${tool}`);
   const btn = document.getElementById(`run-${tool}`);
   const stop = document.getElementById(`stop-${tool}`);
-  out.innerHTML = '<p class="thinking">⏳ Claude بيفكر ويجهّز الناتج…</p>';
+  out.innerHTML = '<p class="thinking">⏳ الموديل بيفكر ويجهّز الناتج…</p>';
   out.dataset.raw = "";
   btn.disabled = true;
   stop.style.display = "inline-flex";
 
-  activeController = runClaude(content, {
+  activeController = runLLM(content, {
     onText(delta) {
       out.dataset.raw += delta;
       out.innerHTML = mdToHtml(out.dataset.raw);
@@ -193,12 +193,28 @@ function useLastScript() {
 }
 
 /* ---------- settings ---------- */
+function fillProviderUI(provider) {
+  const P = PROVIDERS[provider];
+  const modelSel = document.getElementById("set-model");
+  modelSel.innerHTML = P.models.map(m => `<option value="${m}">${m}</option>`).join("");
+
+  const savedModel = localStorage.getItem("fta_model_" + provider);
+  if (savedModel && P.models.includes(savedModel)) modelSel.value = savedModel;
+
+  document.getElementById("set-key").value = localStorage.getItem("fta_key_" + provider) || "";
+  document.getElementById("set-custom").value = localStorage.getItem("fta_custom_model_" + provider) || "";
+  document.getElementById("key-url").textContent = P.keyUrl;
+  document.getElementById("pdf-note").style.display = P.pdf ? "none" : "block";
+}
+
 function persistSettings() {
+  const provider = document.getElementById("set-provider").value;
   const key = document.getElementById("set-key").value;
   const model = document.getElementById("set-model").value;
-  if (!key.trim()) { toast("اكتب مفتاح الـ API"); return; }
-  saveSettings(key, model);
-  toast("الإعدادات اتحفظت ✓");
+  const custom = document.getElementById("set-custom").value;
+  if (!key.trim()) { toast("اكتب مفتاح الـ API الخاص بالمزود ده"); return; }
+  saveSettings(provider, key, model, custom);
+  toast(`الإعدادات اتحفظت ✓ — شغال دلوقتي على ${PROVIDERS[provider].label}`);
 }
 
 /* ---------- toast ---------- */
@@ -220,9 +236,15 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".tab-btn").forEach(b =>
     b.addEventListener("click", () => switchTab(b.dataset.tab)));
 
-  const { apiKey, model } = getSettings();
-  document.getElementById("set-key").value = apiKey;
-  document.getElementById("set-model").value = model;
+  // populate provider dropdown from the registry
+  const provSel = document.getElementById("set-provider");
+  provSel.innerHTML = Object.entries(PROVIDERS)
+    .map(([id, p]) => `<option value="${id}">${p.label}</option>`).join("");
+
+  const { provider, apiKey } = getSettings();
+  provSel.value = provider;
+  fillProviderUI(provider);
+  provSel.addEventListener("change", () => fillProviderUI(provSel.value));
 
   document.getElementById("plan-pdf").addEventListener("change", e => {
     const f = e.target.files[0];

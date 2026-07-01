@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Media Studio AI — من البريف للاستوري بورد</title>
+  <title>Film-trend AI — من البريف للاستوري بورد</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23e8b04b'/><text x='16' y='23' text-anchor='middle' font-size='18'>🎬</text></svg>">
   <link rel="stylesheet" href="css/app.css">
 </head>
@@ -12,8 +12,8 @@
   <header class="top">
     <div class="logo">🎬</div>
     <div>
-      <h1>Media <em>Studio</em> AI</h1>
-      <p>خطة سوشيال ميديا · سيناريو · استوري بورد ببرومبتات جاهزة — في مكان واحد</p>
+      <h1>Film-trend <em>AI</em></h1>
+      <p>خطة سوشيال ميديا · سيناريو · استوري بورد ببرومبتات جاهزة — بأي موديل AI في السوق</p>
     </div>
   </header>
 
@@ -135,24 +135,29 @@
   <section class="panel" id="panel-settings">
     <div class="card settings-card">
       <h3>⚙️ الإعدادات</h3>
-      <p class="hint">التطبيق بيتصل بـ Claude API مباشرة من متصفحك — مفتاحك بيتخزن محليًا على جهازك بس ومبيتبعتش لأي سيرفر تاني.</p>
+      <p class="hint">اختار أي مزود AI في السوق — أمريكي أو صيني أو أوروبي. التطبيق بيتصل بالمزود مباشرة من متصفحك ومفتاحك بيتخزن محليًا على جهازك بس.</p>
 
-      <label class="f">مفتاح Anthropic API</label>
-      <input type="password" id="set-key" placeholder="sk-ant-..." autocomplete="off">
+      <label class="f">مزود الذكاء الاصطناعي</label>
+      <select id="set-provider"></select>
 
       <label class="f">الموديل</label>
-      <select id="set-model">
-        <option value="claude-opus-4-8">Claude Opus 4.8 — الأقوى (موصى به)</option>
-        <option value="claude-sonnet-5">Claude Sonnet 5 — توازن سرعة وجودة</option>
-        <option value="claude-haiku-4-5">Claude Haiku 4.5 — الأسرع والأرخص</option>
-      </select>
+      <select id="set-model"></select>
+
+      <label class="f">أو اكتب اسم موديل مخصص (اختياري — لأي موديل جديد ينزل)</label>
+      <input type="text" id="set-custom" dir="ltr" placeholder="e.g. gpt-5.2 / deepseek-v4 / gemini-4-pro" autocomplete="off">
+
+      <label class="f">مفتاح API الخاص بالمزود ده</label>
+      <input type="password" id="set-key" dir="ltr" placeholder="sk-..." autocomplete="off">
 
       <button class="btn btn-primary" onclick="persistSettings()">💾 حفظ</button>
 
       <div class="note">
-        <b>منين أجيب المفتاح؟</b> من
-        <span dir="ltr">platform.claude.com</span>
-        → API Keys → Create Key. أول ما تحفظه هنا هتقدر تستخدم الأدوات الثلاثة على طول.
+        <b>منين أجيب المفتاح؟</b> من موقع المزود:
+        <span dir="ltr" id="key-url">platform.claude.com</span>
+        — كل مزود ليه مفتاح مستقل، والتطبيق بيحفظ مفتاح كل مزود لوحده فتقدر تنقّل بينهم براحتك.
+      </div>
+      <div class="note" id="pdf-note" style="display:none">
+        ℹ️ ملاحظة: رفع ملف <b>PDF</b> في أداة الخطة متاح حاليًا مع مزود Anthropic (Claude) بس — مع باقي المزودين انسخ نص البريف في الخانة.
       </div>
     </div>
   </section>

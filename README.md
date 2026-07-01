@@ -1,6 +1,8 @@
-# Media Studio AI 🎬
+# Film-trend AI 🎬
 
-تطبيق ويب عربي (RTL) بثلاث أدوات مربوطة ببعض، شغال بـ **Claude API** وبالسيستم برومبت الموجود في `prompts/media-studio-system-prompt.md`:
+تطبيق ويب عربي (RTL) بثلاث أدوات مربوطة ببعض، بيشتغل مع **أي مزود LLM في السوق** — أمريكي وصيني وأوروبي — بالسيستم برومبت الموجود في `prompts/media-studio-system-prompt.md`:
+
+**المزودون المدعومون:** Anthropic Claude · OpenAI GPT · Google Gemini · xAI Grok · DeepSeek · Alibaba Qwen · Moonshot Kimi · Zhipu GLM · Mistral · Groq · OpenRouter (كل الموديلات بمفتاح واحد) — مع خانة موديل مخصص لأي موديل جديد ينزل.
 
 | الأداة | الدخل | الخرج |
 |---|---|---|
@@ -18,11 +20,11 @@ python3 -m http.server 8000
 ```
 
 1. افتح تبويب **⚙️ الإعدادات**
-2. حط مفتاح Anthropic API (من platform.claude.com → API Keys)
-3. اختار الموديل (الافتراضي: Claude Opus 4.8)
+2. اختار المزود والموديل
+3. حط مفتاح API الخاص بالمزود (كل مزود بمفتاحه، بيتحفظ لوحده)
 4. استخدم الأدوات الثلاثة
 
-المفتاح بيتخزن في `localStorage` على جهاز المستخدم بس؛ الاتصال بيروح مباشرة لـ `api.anthropic.com` من المتصفح (بهيدر `anthropic-dangerous-direct-browser-access`).
+المفاتيح بتتخزن في `localStorage` على جهاز المستخدم بس؛ الاتصال بيروح مباشرة لسيرفر المزود من المتصفح. في نسخة ملف واحد جاهزة: `FilmTrendAI.html` — تنزلها وتدوس دبل كليك.
 
 ## البنية
 
@@ -30,7 +32,7 @@ python3 -m http.server 8000
 index.html                              الواجهة (تبويبات الأدوات + الإعدادات)
 css/app.css                             التصميم (داكن، RTL)
 js/prompt.js                            السيستم برومبت (مولّد تلقائيًا — متعدّلوش يدوي)
-js/api.js                               عميل Claude API مع streaming (SSE)
+js/api.js                               عميل multi-provider مع streaming (بروتوكول Anthropic + OpenAI-compatible)
 js/app.js                               منطق الواجهة + Markdown renderer
 prompts/media-studio-system-prompt.md   مصدر السيستم برومبت (عدّل هنا)
 scripts/build-prompt.js                 يولد js/prompt.js من الملف السابق
@@ -45,6 +47,6 @@ node scripts/build-prompt.js
 ## ملاحظات تقنية
 
 - **Streaming**: الخرج بيظهر أول بأول (SSE) — مناسب للخطط والسيناريوهات الطويلة (`max_tokens: 64000`)
-- **PDF**: بيترفع كـ base64 `document` block مباشرة للـ API (حد أقصى 30MB)
-- **Adaptive thinking** مفعّل على موديلات 4.6+ لجودة أعلى
+- **PDF**: بيترفع كـ base64 `document` block (متاح مع Claude؛ باقي المزودين نص بس)
+- **Adaptive thinking** مفعّل على موديلات Claude 4.6+ · باقي المزودين عبر `/chat/completions` القياسي
 - اللغة: الخطط والسيناريوهات بتطلع بلغة المستخدم؛ برومبتات الصورة والحركة **دايمًا بالإنجليزي** (مفروض من السيستم برومبت)
