@@ -168,6 +168,18 @@ textarea { resize: vertical; min-height: 130px; }
 }
 .note b { color: var(--accent); }
 
+/* mode switch (cloud account vs own key) */
+.mode-switch { display: flex; gap: 10px; margin-bottom: 20px; }
+.mode-btn {
+  flex: 1; padding: 14px 12px; border-radius: 12px; cursor: pointer;
+  border: 1.5px solid var(--line); background: var(--bg); color: var(--muted);
+  font: inherit; font-size: 14.5px; font-weight: 700; text-align: center;
+  transition: border-color .15s, color .15s;
+}
+.mode-btn small { display: block; font-weight: 400; font-size: 11.5px; margin-top: 4px; }
+.mode-btn:hover { color: var(--text); }
+.mode-btn.on { border-color: var(--accent); color: var(--accent); background: rgba(232, 176, 75, .06); }
+
 /* scene cards (split storyboard view) */
 .scene-card {
   border: 1px solid var(--line); border-radius: 12px;
@@ -341,7 +353,29 @@ textarea { resize: vertical; min-height: 130px; }
   <section class="panel" id="panel-settings">
     <div class="card settings-card">
       <h3>⚙️ الإعدادات</h3>
+
+      <div class="mode-switch" id="mode-switch" style="display:none">
+        <button class="mode-btn" data-mode="cloud" onclick="setMode('cloud')">☁️ حساب Film-trend<small>من غير أي مفتاح — شهر مجاني</small></button>
+        <button class="mode-btn" data-mode="byok" onclick="setMode('byok')">🔑 مفتاحي الخاص<small>استخدم مفتاح API بتاعك</small></button>
+      </div>
+
+      <!-- cloud account -->
+      <div id="cloud-box" style="display:none">
+        <p class="hint">سجّل بإيميلك بس — من غير مفاتيح ولا حسابات عند أي مزود. أول شهر مجاني بالكامل، وبعدها 10$/شهر.</p>
+        <label class="f">الإيميل</label>
+        <input type="text" id="cloud-email" dir="ltr" placeholder="you@example.com" autocomplete="email">
+        <button class="btn btn-primary" onclick="doCloudSignup()">🚀 ابدأ التجربة المجانية</button>
+        <div class="note" id="cloud-usage" style="display:none"></div>
+      </div>
+
+      <!-- bring your own key -->
+      <div id="byok-box">
       <p class="hint">اختار أي مزود AI في السوق — أمريكي أو صيني أو أوروبي. التطبيق بيتصل بالمزود مباشرة من متصفحك ومفتاحك بيتخزن محليًا على جهازك بس.</p>
+
+      <div class="note">
+        💡 <b>مش عايز تدفع؟</b> اختار <b>Google — Gemini</b> — مفتاحه <b>مجاني بالكامل</b> من
+        <span dir="ltr">aistudio.google.com/apikey</span> (تسجيل بحساب جوجل ودقيقة واحدة) وجودته ممتازة.
+      </div>
 
       <label class="f">مزود الذكاء الاصطناعي</label>
       <select id="set-provider"></select>
@@ -365,10 +399,20 @@ textarea { resize: vertical; min-height: 130px; }
       <div class="note" id="pdf-note" style="display:none">
         ℹ️ ملاحظة: رفع ملف <b>PDF</b> في أداة الخطة متاح حاليًا مع مزود Anthropic (Claude) بس — مع باقي المزودين انسخ نص البريف في الخانة.
       </div>
+      </div><!-- /byok-box -->
     </div>
   </section>
 
   <script>
+/* ============================================================
+   FILM-TREND AI — owner configuration
+   After deploying backend/worker.js to Cloudflare (see
+   backend/README.md), put its URL here to enable the
+   "Film-trend account" mode (free trial + subscriptions).
+   Leave empty to hide that mode.
+   ============================================================ */
+const FT_BACKEND_URL = "";
+
 /* Auto-generated from prompts/media-studio-system-prompt.md — regenerate with scripts/build-prompt.js */
 const SYSTEM_PROMPT = "You are **MEDIA STUDIO AI** — a senior creative team compressed into one assistant: a social media strategist, a screenwriter/script doctor, and a storyboard artist + prompt engineer for AI image/video generation. You work for media professionals (directors, content creators, agencies) who need field-ready deliverables, not generic advice.\n\n## Global rules\n\n1. **Language:** Detect the user's language and write all strategy, plans, scripts and explanations in it (Arabic in → Arabic out). **EXCEPTION: every IMAGE PROMPT and MOTION PROMPT must always be written in English**, regardless of conversation language.\n2. **Modes:** You operate in one of three modes — `SOCIAL_PLAN`, `SCRIPT`, `STORYBOARD`. Infer the mode from the request; if genuinely ambiguous, ask ONE short question. The natural pipeline is: brief → plan → script → storyboard, but each mode also works standalone.\n3. **Professional output only:** No filler, no \"here are some ideas you could consider\". Every deliverable must be complete enough to hand to a client or crew as-is.\n4. **Always end** each deliverable with a short \"Next step\" line offering the logical next mode (e.g., after a script: \"Ready to break this into a storyboard with image + motion prompts? Say 'storyboard'.\").\n5. **If the user uploads a PDF/brief**, silently extract: brand, product, objective, audience, budget signals, tone, constraints, deadlines. Never ask for information that already exists in the brief. Ask for at most 2 missing critical items; otherwise state your assumptions in a compact \"Assumptions\" block and proceed.\n\n---\n\n## MODE 1 — SOCIAL_PLAN (brief/PDF → full social media plan)\n\nTrigger: user provides a brief, a PDF, or asks for a social media plan/strategy/calendar.\n\nProduce this exact structure:\n\n1. **Brief Digest** — 5 bullet summary of what the client actually needs (business goal, audience, product, tone, constraints).\n2. **Strategic Objectives** — 3–5 SMART objectives tied to business results (awareness/engagement/leads/sales), each with its KPI and target number.\n3. **Audience Personas** — 2–3 personas: name, age, platform habits, pains, desires, content they stop scrolling for, buying triggers.\n4. **Platform Strategy** — for each relevant platform (Instagram, TikTok, YouTube, Facebook, X, LinkedIn, Snapchat — only the ones that fit): role of the platform, content formats, posting frequency, best times for the target region.\n5. **Content Pillars** — 4–6 pillars with: name, purpose, share of calendar (%), 3 example content ideas each, format (reel/carousel/story/live/UGC).\n6. **30-Day Content Calendar** — a table: Day | Platform | Pillar | Format | Hook/Title | CTA | Notes. Cover the full month with realistic pacing (not one post per day unless the brief supports it).\n7. **Hook & Caption Bank** — 10 ready-to-use hooks + 5 caption templates in the brand voice, with hashtag sets (broad / niche / branded).\n8. **UGC & Collaboration Plan** — creator brief template, 3 UGC concept directions, influencer tiers that fit the budget.\n9. **Paid Boost Suggestions** — which organic posts to amplify, objective per campaign, indicative budget split (if budget unknown, give % split).\n10. **Measurement Dashboard** — KPIs per objective, review cadence (weekly/monthly), and the decision rule for killing or scaling content.\n\nRules: numbers over adjectives; every idea must map to a pillar and an objective; calendar hooks must be specific (\"3 mistakes that burn your ad budget — #2 is everywhere\") never generic (\"engaging post about product\").\n\n---\n\n## MODE 2 — SCRIPT (idea/text → structured screenplay)\n\nTrigger: user gives an idea, message, product, or story and wants a script — film, series episode, short story, documentary, TV ad, or UGC/social video.\n\nFirst line of output: `FORMAT: <film | series | short | ad | UGC | documentary> · LENGTH: <target duration> · TONE: <tone>`\n(Infer these; state them so the user can correct.)\n\nThen produce:\n\n1. **Logline** — one sentence: protagonist + goal + obstacle + stakes.\n2. **Synopsis** — one paragraph (3–6 sentences).\n3. **Characters** — for each: name, age, role, want vs. need, voice notes, and a **Visual Identity Line** (face, build, hair, wardrobe, distinguishing detail — this line is reused verbatim in storyboard prompts for consistency).\n4. **Structure** — beats appropriate to the format:\n   - Film/short: 3-act beats (setup, catalyst, midpoint, low point, climax, resolution).\n   - Series: season arc + this episode's A/B plots.\n   - Ad/UGC: Hook (0–3s) → Problem → Agitate → Solution/Demo → Proof → CTA, with exact second marks.\n5. **The Script itself** — numbered scenes. Each scene:\n   ```\n   SCENE 04 — INT. KITCHEN — NIGHT\n   [Action: what we see, present tense, visual and concrete]\n   CHARACTER: dialogue…\n   (V.O. / SFX / MUSIC cues where needed)\n   ⏱ est. duration\n   ```\n6. **Hook variants** (for ad/UGC): 3 alternative opening hooks.\n7. **MASTER PROMPT** — close the deliverable with ONE fenced code block (```markdown … ```) containing the complete script as a self-contained **English** prompt: title, format, duration, tone, full character sheets with their Visual Identity Lines, and every scene (slugline, action, dialogue, duration). It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.\n\nRules: write visually — if the camera can't see it, don't write it; dialogue must be speakable out loud; UGC scripts must sound like a real person, not a brand; keep scene count realistic for the target duration.\n\n---\n\n## MODE 3 — STORYBOARD (script → scenes + image prompt + motion prompt)\n\nTrigger: a script exists (from Mode 2 or pasted by the user) and the user wants a storyboard / visual breakdown / generation prompts.\n\nStart with a **STYLE FRAME** block that locks global consistency (reused in every prompt):\n\n```\nSTYLE FRAME\nVisual style: <e.g. cinematic photorealism / 2D animation / stop-motion…>\nColor grade: <palette + reference, e.g. teal-orange, low contrast>\nLens & camera language: <e.g. 35mm anamorphic, shallow DOF, handheld energy>\nAspect ratio: <9:16 / 16:9 / 1:1 per platform>\nCharacter sheets: <each character's Visual Identity Line from the script>\n```\n\nThen, for **every scene** in order:\n\n```\n━━━ SCENE 04 — <slugline> ━━━\n📋 Board description: what the frame shows, staging, blocking (user's language)\n🎬 Shot: <size> · <angle> · <movement> · <lighting> · <time of day>\n⏱ Duration: <seconds>\n\nIMAGE PROMPT (English):\n<one paragraph, comma-separated: subject with full Visual Identity Line,\naction frozen at the key moment, environment, lighting, lens (mm, DOF),\ncomposition, color grade, style keywords, quality tags, aspect ratio.\nNo camera movement verbs here — this is a still frame.>\n\nMOTION PROMPT (English):\n<one paragraph for image-to-video (Runway / Kling / Veo / Luma):\nstarts from the frame above. Camera: one clear movement (slow dolly-in,\nhandheld drift, crane up…). Subject: one clear action with natural physics.\nEnvironment motion (smoke, rain, hair, fabric). Pace and mood.\nDuration hint. NEVER introduce new subjects or locations not in the frame.>\n\n🔊 Audio note: dialogue line / SFX / music cue for this beat\n```\n\nPrompt-engineering rules:\n- **Image prompts**: concrete nouns and physical light descriptions (\"warm tungsten practicals, soft window key light\") — never abstract moods alone; one subject focus per frame; repeat the exact character sheet line every time the character appears; end with aspect ratio.\n- **Motion prompts**: ONE camera move + ONE subject action per shot — stacked motions break AI video; describe motion continuously (\"she slowly turns her head toward the window as curtains breathe in the wind\"); include what must stay stable (\"face and wardrobe unchanged\"); 4–10s per shot.\n- Numbering must match the script's scene numbers. If a scene needs multiple shots, use 04A, 04B.\n- **Every scene block must be fully self-contained**: repeat the character's full Visual Identity Line and the global style keywords inside each scene's IMAGE PROMPT and MOTION PROMPT, so any single scene can be copied alone into a generation tool and still produce a consistent result.\n- **The scene header format is machine-parsed — reproduce it exactly**: a line starting with `━━━ SCENE <number>` (e.g. `━━━ SCENE 04 — INT. KITCHEN — NIGHT ━━━`). Never use a different delimiter.\n- After the last scene, output a **Shot List Table**: Scene | Shot | Size | Movement | Duration | Location — ready for production planning.\n- Finally, close with **MASTER PROMPT** — ONE fenced code block (```markdown … ```) containing the complete storyboard as a self-contained **English** prompt: the full STYLE FRAME, then every scene in order with its board description, shot specs, IMAGE PROMPT and MOTION PROMPT. It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.\n\n---\n\n## Failure & edge handling\n\n- Brief too thin to plan → deliver the plan anyway on stated assumptions, flag the 3 highest-risk assumptions at the top.\n- User asks for \"everything at once\" → run the pipeline in order (plan → script → storyboard) as separate clearly-titled deliverables.\n- User pastes someone else's copyrighted script → work with it as reference/parody/analysis only; generate original alternatives rather than reproducing it.\n- Requests for real living public figures in generative prompts → replace with an original character (\"a charismatic TV host in his 50s\") and say so briefly.";
 
@@ -518,7 +562,7 @@ const PROVIDERS = {
     keyUrl: "platform.openai.com",
   },
   gemini: {
-    label: "🇺🇸 Google — Gemini",
+    label: "🇺🇸 Google — Gemini (مفتاح مجاني)",
     protocol: "openai",
     url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
     models: ["gemini-3-pro-preview", "gemini-2.5-pro", "gemini-2.5-flash"],
@@ -592,11 +636,19 @@ const PROVIDERS = {
 };
 
 /* ---------- settings ---------- */
+function backendUrl() {
+  // localStorage override lets the owner test a Worker before baking it in
+  return (localStorage.getItem("fta_backend") || FT_BACKEND_URL || "").replace(/\/+$/, "");
+}
+
 function getSettings() {
+  const mode = localStorage.getItem("fta_mode") === "cloud" && backendUrl() ? "cloud" : "byok";
   const provider = localStorage.getItem("fta_provider") || "anthropic";
   const p = PROVIDERS[provider] ? provider : "anthropic";
   const custom = (localStorage.getItem("fta_custom_model_" + p) || "").trim();
   return {
+    mode,
+    cloudToken: localStorage.getItem("fta_cloud_token") || "",
     provider: p,
     apiKey: localStorage.getItem("fta_key_" + p) || "",
     model: custom || localStorage.getItem("fta_model_" + p) || PROVIDERS[p].models[0],
@@ -616,19 +668,29 @@ function saveSettings(provider, apiKey, model, customModel) {
    one {type:"document", source:{...}} (Claude only)
    ============================================================ */
 function runLLM(content, handlers) {
-  const { provider, apiKey, model } = getSettings();
-  const P = PROVIDERS[provider];
+  const { mode, cloudToken, provider, apiKey, model } = getSettings();
+  const P = mode === "cloud" ? { protocol: "cloud", label: "☁️ حساب Film-trend", pdf: false } : PROVIDERS[provider];
   const controller = new AbortController();
 
   const hasPdf = content.some(b => b.type === "document");
   if (hasPdf && !P.pdf) {
-    handlers.onError("رفع الـ PDF متاح حاليًا مع Claude بس — اختار Anthropic من الإعدادات أو انسخ نص البريف في الخانة");
+    handlers.onError("رفع الـ PDF متاح حاليًا مع Claude بس (وضع المفتاح الخاص) — أو انسخ نص البريف في الخانة");
     return controller;
   }
 
   let url, headers, body;
 
-  if (P.protocol === "anthropic") {
+  if (P.protocol === "cloud") {
+    url = backendUrl() + "/generate";
+    headers = {
+      "content-type": "application/json",
+      "authorization": "Bearer " + cloudToken,
+    };
+    body = {
+      system: SYSTEM_PROMPT,
+      user: content.filter(b => b.type === "text").map(b => b.text).join("\n\n"),
+    };
+  } else if (P.protocol === "anthropic") {
     url = P.url;
     headers = {
       "content-type": "application/json",
@@ -676,13 +738,20 @@ function runLLM(content, handlers) {
       });
 
       if (!res.ok) {
-        let msg = `HTTP ${res.status}`;
+        let msg = `HTTP ${res.status}`, code = "";
         try {
           const err = await res.json();
-          msg = err?.error?.message || err?.message || JSON.stringify(err).slice(0, 200);
+          code = typeof err?.error === "string" ? err.error : "";
+          msg = err?.error?.message || code || err?.message || JSON.stringify(err).slice(0, 200);
         } catch (_) { /* non-JSON error body */ }
-        if (res.status === 401 || res.status === 403) msg = `مفتاح ${P.label.replace(/^[^ ]+ /, "")} غير صحيح — راجع الإعدادات ⚙️`;
-        if (res.status === 429) msg = "تجاوزت حد الطلبات أو الرصيد خلص — راجع حسابك عند المزود";
+        if (P.protocol === "cloud") {
+          if (code === "trial_over") msg = "التجربة المجانية خلصت 🎬 — فعّل الاشتراك (10$/شهر) عشان تكمل";
+          else if (code === "daily_cap") msg = "وصلت للحد اليومي — كمّل بكرة أو فعّل الاشتراك";
+          else if (res.status === 401) msg = "الجلسة انتهت — سجّل بإيميلك تاني من الإعدادات ⚙️";
+        } else {
+          if (res.status === 401 || res.status === 403) msg = `مفتاح ${P.label.replace(/^[^ ]+ /, "")} غير صحيح — راجع الإعدادات ⚙️`;
+          if (res.status === 429) msg = "تجاوزت حد الطلبات أو الرصيد خلص — راجع حسابك عند المزود";
+        }
         handlers.onError(msg);
         return;
       }
@@ -738,6 +807,30 @@ function runLLM(content, handlers) {
   })();
 
   return controller;
+}
+
+/* ---------- cloud account (Film-trend backend) ---------- */
+async function cloudSignup(email) {
+  const res = await fetch(backendUrl() + "/signup", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "signup failed");
+  localStorage.setItem("fta_cloud_token", data.token);
+  localStorage.setItem("fta_cloud_email", email);
+  return data.usage;
+}
+
+async function cloudUsage() {
+  const token = localStorage.getItem("fta_cloud_token");
+  if (!token || !backendUrl()) return null;
+  const res = await fetch(backendUrl() + "/me", {
+    headers: { authorization: "Bearer " + token },
+  });
+  if (!res.ok) return null;
+  return (await res.json()).usage;
 }
 
 /* read a File (PDF) as a base64 string without data: prefix */
@@ -825,9 +918,11 @@ function switchTab(name) {
 
 /* ---------- shared run/render plumbing ---------- */
 function startRun(tool, content) {
-  const { apiKey, provider } = getSettings();
-  if (!apiKey) {
-    toast(`ضيف مفتاح ${PROVIDERS[provider].label} الأول من تبويب الإعدادات ⚙️`);
+  const { mode, cloudToken, apiKey, provider } = getSettings();
+  if (mode === "cloud" ? !cloudToken : !apiKey) {
+    toast(mode === "cloud"
+      ? "سجّل بإيميلك الأول من تبويب الإعدادات ⚙️"
+      : `ضيف مفتاح ${PROVIDERS[provider].label} الأول من تبويب الإعدادات ⚙️`);
     switchTab("settings");
     return;
   }
@@ -1034,7 +1129,41 @@ function persistSettings() {
   const custom = document.getElementById("set-custom").value;
   if (!key.trim()) { toast("اكتب مفتاح الـ API الخاص بالمزود ده"); return; }
   saveSettings(provider, key, model, custom);
+  localStorage.setItem("fta_mode", "byok");
   toast(`الإعدادات اتحفظت ✓ — شغال دلوقتي على ${PROVIDERS[provider].label}`);
+}
+
+/* ---------- cloud account mode ---------- */
+function setMode(mode) {
+  localStorage.setItem("fta_mode", mode);
+  document.querySelectorAll(".mode-btn").forEach(b =>
+    b.classList.toggle("on", b.dataset.mode === mode));
+  document.getElementById("cloud-box").style.display = mode === "cloud" ? "block" : "none";
+  document.getElementById("byok-box").style.display = mode === "byok" ? "block" : "none";
+}
+
+function renderUsage(u) {
+  const box = document.getElementById("cloud-usage");
+  if (!u) { box.style.display = "none"; return; }
+  box.style.display = "block";
+  box.innerHTML = u.paid
+    ? `✅ <b>اشتراكك فعّال</b> حتى ${u.paid_until} — استخدام غير محدود (بحد يومي عادل)`
+    : u.active
+      ? `🎁 <b>التجربة المجانية شغالة</b> — استخدمت <b>${u.used}</b> من <b>${u.limit}</b> توليدة · تنتهي ${u.trial_ends}`
+      : `⛔ التجربة المجانية خلصت — الاشتراك <b>10$/شهر</b> يفتح الاستخدام تاني`;
+}
+
+async function doCloudSignup() {
+  const email = document.getElementById("cloud-email").value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast("اكتب إيميل صحيح"); return; }
+  try {
+    const usage = await cloudSignup(email);
+    localStorage.setItem("fta_mode", "cloud");
+    renderUsage(usage);
+    toast("حسابك جاهز ✓ — ابدأ استخدم الأدوات");
+  } catch (e) {
+    toast("حصلت مشكلة في التسجيل — حاول تاني");
+  }
 }
 
 /* ---------- toast ---------- */
@@ -1069,17 +1198,27 @@ document.addEventListener("DOMContentLoaded", () => {
       g.styles.map(([val, label]) => `<option value="${val}">${label}</option>`).join("") +
       `</optgroup>`).join("");
 
-  const { provider, apiKey } = getSettings();
+  const { mode, provider, apiKey, cloudToken } = getSettings();
   provSel.value = provider;
   fillProviderUI(provider);
   provSel.addEventListener("change", () => fillProviderUI(provSel.value));
+
+  // cloud mode only appears when the owner has deployed the backend
+  if (backendUrl()) {
+    document.getElementById("mode-switch").style.display = "flex";
+    setMode(mode === "cloud" ? "cloud" : (cloudToken || !apiKey ? "cloud" : "byok"));
+    const savedEmail = localStorage.getItem("fta_cloud_email");
+    if (savedEmail) document.getElementById("cloud-email").value = savedEmail;
+    cloudUsage().then(renderUsage);
+  }
 
   document.getElementById("plan-pdf").addEventListener("change", e => {
     const f = e.target.files[0];
     document.getElementById("pdf-name").textContent = f ? `📄 ${f.name}` : "";
   });
 
-  if (!apiKey) switchTab("settings");
+  const ready = (mode === "cloud" && cloudToken) || apiKey;
+  if (!ready) switchTab("settings");
 });
 
 </script>

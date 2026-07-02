@@ -24,7 +24,7 @@ const PROVIDERS = {
     keyUrl: "platform.openai.com",
   },
   gemini: {
-    label: "🇺🇸 Google — Gemini",
+    label: "🇺🇸 Google — Gemini (مفتاح مجاني)",
     protocol: "openai",
     url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
     models: ["gemini-3-pro-preview", "gemini-2.5-pro", "gemini-2.5-flash"],
@@ -98,11 +98,19 @@ const PROVIDERS = {
 };
 
 /* ---------- settings ---------- */
+function backendUrl() {
+  // localStorage override lets the owner test a Worker before baking it in
+  return (localStorage.getItem("fta_backend") || FT_BACKEND_URL || "").replace(/\/+$/, "");
+}
+
 function getSettings() {
+  const mode = localStorage.getItem("fta_mode") === "cloud" && backendUrl() ? "cloud" : "byok";
   const provider = localStorage.getItem("fta_provider") || "anthropic";
   const p = PROVIDERS[provider] ? provider : "anthropic";
   const custom = (localStorage.getItem("fta_custom_model_" + p) || "").trim();
   return {
+    mode,
+    cloudToken: localStorage.getItem("fta_cloud_token") || "",
     provider: p,
     apiKey: localStorage.getItem("fta_key_" + p) || "",
     model: custom || localStorage.getItem("fta_model_" + p) || PROVIDERS[p].models[0],
@@ -122,19 +130,29 @@ function saveSettings(provider, apiKey, model, customModel) {
    one {type:"document", source:{...}} (Claude only)
    ============================================================ */
 function runLLM(content, handlers) {
-  const { provider, apiKey, model } = getSettings();
-  const P = PROVIDERS[provider];
+  const { mode, cloudToken, provider, apiKey, model } = getSettings();
+  const P = mode === "cloud" ? { protocol: "cloud", label: "☁️ حساب Film-trend", pdf: false } : PROVIDERS[provider];
   const controller = new AbortController();
 
   const hasPdf = content.some(b => b.type === "document");
   if (hasPdf && !P.pdf) {
-    handlers.onError("رفع الـ PDF متاح حاليًا مع Claude بس — اختار Anthropic من الإعدادات أو انسخ نص البريف في الخانة");
+    handlers.onError("رفع الـ PDF متاح حاليًا مع Claude بس (وضع المفتاح الخاص) — أو انسخ نص البريف في الخانة");
     return controller;
   }
 
   let url, headers, body;
 
-  if (P.protocol === "anthropic") {
+  if (P.protocol === "cloud") {
+    url = backendUrl() + "/generate";
+    headers = {
+      "content-type": "application/json",
+      "authorization": "Bearer " + cloudToken,
+    };
+    body = {
+      system: SYSTEM_PROMPT,
+      user: content.filter(b => b.type === "text").map(b => b.text).join("\n\n"),
+    };
+  } else if (P.protocol === "anthropic") {
     url = P.url;
     headers = {
       "content-type": "application/json",
@@ -182,13 +200,20 @@ function runLLM(content, handlers) {
       });
 
       if (!res.ok) {
-        let msg = `HTTP ${res.status}`;
+        let msg = `HTTP ${res.status}`, code = "";
         try {
           const err = await res.json();
-          msg = err?.error?.message || err?.message || JSON.stringify(err).slice(0, 200);
+          code = typeof err?.error === "string" ? err.error : "";
+          msg = err?.error?.message || code || err?.message || JSON.stringify(err).slice(0, 200);
         } catch (_) { /* non-JSON error body */ }
-        if (res.status === 401 || res.status === 403) msg = `مفتاح ${P.label.replace(/^[^ ]+ /, "")} غير صحيح — راجع الإعدادات ⚙️`;
-        if (res.status === 429) msg = "تجاوزت حد الطلبات أو الرصيد خلص — راجع حسابك عند المزود";
+        if (P.protocol === "cloud") {
+          if (code === "trial_over") msg = "التجربة المجانية خلصت 🎬 — فعّل الاشتراك (10$/شهر) عشان تكمل";
+          else if (code === "daily_cap") msg = "وصلت للحد اليومي — كمّل بكرة أو فعّل الاشتراك";
+          else if (res.status === 401) msg = "الجلسة انتهت — سجّل بإيميلك تاني من الإعدادات ⚙️";
+        } else {
+          if (res.status === 401 || res.status === 403) msg = `مفتاح ${P.label.replace(/^[^ ]+ /, "")} غير صحيح — راجع الإعدادات ⚙️`;
+          if (res.status === 429) msg = "تجاوزت حد الطلبات أو الرصيد خلص — راجع حسابك عند المزود";
+        }
         handlers.onError(msg);
         return;
       }
@@ -244,6 +269,30 @@ function runLLM(content, handlers) {
   })();
 
   return controller;
+}
+
+/* ---------- cloud account (Film-trend backend) ---------- */
+async function cloudSignup(email) {
+  const res = await fetch(backendUrl() + "/signup", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "signup failed");
+  localStorage.setItem("fta_cloud_token", data.token);
+  localStorage.setItem("fta_cloud_email", email);
+  return data.usage;
+}
+
+async function cloudUsage() {
+  const token = localStorage.getItem("fta_cloud_token");
+  if (!token || !backendUrl()) return null;
+  const res = await fetch(backendUrl() + "/me", {
+    headers: { authorization: "Bearer " + token },
+  });
+  if (!res.ok) return null;
+  return (await res.json()).usage;
 }
 
 /* read a File (PDF) as a base64 string without data: prefix */

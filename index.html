@@ -139,7 +139,29 @@
   <section class="panel" id="panel-settings">
     <div class="card settings-card">
       <h3>⚙️ الإعدادات</h3>
+
+      <div class="mode-switch" id="mode-switch" style="display:none">
+        <button class="mode-btn" data-mode="cloud" onclick="setMode('cloud')">☁️ حساب Film-trend<small>من غير أي مفتاح — شهر مجاني</small></button>
+        <button class="mode-btn" data-mode="byok" onclick="setMode('byok')">🔑 مفتاحي الخاص<small>استخدم مفتاح API بتاعك</small></button>
+      </div>
+
+      <!-- cloud account -->
+      <div id="cloud-box" style="display:none">
+        <p class="hint">سجّل بإيميلك بس — من غير مفاتيح ولا حسابات عند أي مزود. أول شهر مجاني بالكامل، وبعدها 10$/شهر.</p>
+        <label class="f">الإيميل</label>
+        <input type="text" id="cloud-email" dir="ltr" placeholder="you@example.com" autocomplete="email">
+        <button class="btn btn-primary" onclick="doCloudSignup()">🚀 ابدأ التجربة المجانية</button>
+        <div class="note" id="cloud-usage" style="display:none"></div>
+      </div>
+
+      <!-- bring your own key -->
+      <div id="byok-box">
       <p class="hint">اختار أي مزود AI في السوق — أمريكي أو صيني أو أوروبي. التطبيق بيتصل بالمزود مباشرة من متصفحك ومفتاحك بيتخزن محليًا على جهازك بس.</p>
+
+      <div class="note">
+        💡 <b>مش عايز تدفع؟</b> اختار <b>Google — Gemini</b> — مفتاحه <b>مجاني بالكامل</b> من
+        <span dir="ltr">aistudio.google.com/apikey</span> (تسجيل بحساب جوجل ودقيقة واحدة) وجودته ممتازة.
+      </div>
 
       <label class="f">مزود الذكاء الاصطناعي</label>
       <select id="set-provider"></select>
@@ -163,9 +185,11 @@
       <div class="note" id="pdf-note" style="display:none">
         ℹ️ ملاحظة: رفع ملف <b>PDF</b> في أداة الخطة متاح حاليًا مع مزود Anthropic (Claude) بس — مع باقي المزودين انسخ نص البريف في الخانة.
       </div>
+      </div><!-- /byok-box -->
     </div>
   </section>
 
+  <script src="js/config.js"></script>
   <script src="js/prompt.js"></script>
   <script src="js/styles.js"></script>
   <script src="js/api.js"></script>

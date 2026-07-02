@@ -73,9 +73,11 @@ function switchTab(name) {
 
 /* ---------- shared run/render plumbing ---------- */
 function startRun(tool, content) {
-  const { apiKey, provider } = getSettings();
-  if (!apiKey) {
-    toast(`ضيف مفتاح ${PROVIDERS[provider].label} الأول من تبويب الإعدادات ⚙️`);
+  const { mode, cloudToken, apiKey, provider } = getSettings();
+  if (mode === "cloud" ? !cloudToken : !apiKey) {
+    toast(mode === "cloud"
+      ? "سجّل بإيميلك الأول من تبويب الإعدادات ⚙️"
+      : `ضيف مفتاح ${PROVIDERS[provider].label} الأول من تبويب الإعدادات ⚙️`);
     switchTab("settings");
     return;
   }
@@ -282,7 +284,41 @@ function persistSettings() {
   const custom = document.getElementById("set-custom").value;
   if (!key.trim()) { toast("اكتب مفتاح الـ API الخاص بالمزود ده"); return; }
   saveSettings(provider, key, model, custom);
+  localStorage.setItem("fta_mode", "byok");
   toast(`الإعدادات اتحفظت ✓ — شغال دلوقتي على ${PROVIDERS[provider].label}`);
+}
+
+/* ---------- cloud account mode ---------- */
+function setMode(mode) {
+  localStorage.setItem("fta_mode", mode);
+  document.querySelectorAll(".mode-btn").forEach(b =>
+    b.classList.toggle("on", b.dataset.mode === mode));
+  document.getElementById("cloud-box").style.display = mode === "cloud" ? "block" : "none";
+  document.getElementById("byok-box").style.display = mode === "byok" ? "block" : "none";
+}
+
+function renderUsage(u) {
+  const box = document.getElementById("cloud-usage");
+  if (!u) { box.style.display = "none"; return; }
+  box.style.display = "block";
+  box.innerHTML = u.paid
+    ? `✅ <b>اشتراكك فعّال</b> حتى ${u.paid_until} — استخدام غير محدود (بحد يومي عادل)`
+    : u.active
+      ? `🎁 <b>التجربة المجانية شغالة</b> — استخدمت <b>${u.used}</b> من <b>${u.limit}</b> توليدة · تنتهي ${u.trial_ends}`
+      : `⛔ التجربة المجانية خلصت — الاشتراك <b>10$/شهر</b> يفتح الاستخدام تاني`;
+}
+
+async function doCloudSignup() {
+  const email = document.getElementById("cloud-email").value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast("اكتب إيميل صحيح"); return; }
+  try {
+    const usage = await cloudSignup(email);
+    localStorage.setItem("fta_mode", "cloud");
+    renderUsage(usage);
+    toast("حسابك جاهز ✓ — ابدأ استخدم الأدوات");
+  } catch (e) {
+    toast("حصلت مشكلة في التسجيل — حاول تاني");
+  }
 }
 
 /* ---------- toast ---------- */
@@ -317,15 +353,25 @@ document.addEventListener("DOMContentLoaded", () => {
       g.styles.map(([val, label]) => `<option value="${val}">${label}</option>`).join("") +
       `</optgroup>`).join("");
 
-  const { provider, apiKey } = getSettings();
+  const { mode, provider, apiKey, cloudToken } = getSettings();
   provSel.value = provider;
   fillProviderUI(provider);
   provSel.addEventListener("change", () => fillProviderUI(provSel.value));
+
+  // cloud mode only appears when the owner has deployed the backend
+  if (backendUrl()) {
+    document.getElementById("mode-switch").style.display = "flex";
+    setMode(mode === "cloud" ? "cloud" : (cloudToken || !apiKey ? "cloud" : "byok"));
+    const savedEmail = localStorage.getItem("fta_cloud_email");
+    if (savedEmail) document.getElementById("cloud-email").value = savedEmail;
+    cloudUsage().then(renderUsage);
+  }
 
   document.getElementById("plan-pdf").addEventListener("change", e => {
     const f = e.target.files[0];
     document.getElementById("pdf-name").textContent = f ? `📄 ${f.name}` : "";
   });
 
-  if (!apiKey) switchTab("settings");
+  const ready = (mode === "cloud" && cloudToken) || apiKey;
+  if (!ready) switchTab("settings");
 });

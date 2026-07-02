@@ -160,6 +160,18 @@ textarea { resize: vertical; min-height: 130px; }
 }
 .note b { color: var(--accent); }
 
+/* mode switch (cloud account vs own key) */
+.mode-switch { display: flex; gap: 10px; margin-bottom: 20px; }
+.mode-btn {
+  flex: 1; padding: 14px 12px; border-radius: 12px; cursor: pointer;
+  border: 1.5px solid var(--line); background: var(--bg); color: var(--muted);
+  font: inherit; font-size: 14.5px; font-weight: 700; text-align: center;
+  transition: border-color .15s, color .15s;
+}
+.mode-btn small { display: block; font-weight: 400; font-size: 11.5px; margin-top: 4px; }
+.mode-btn:hover { color: var(--text); }
+.mode-btn.on { border-color: var(--accent); color: var(--accent); background: rgba(232, 176, 75, .06); }
+
 /* scene cards (split storyboard view) */
 .scene-card {
   border: 1px solid var(--line); border-radius: 12px;
