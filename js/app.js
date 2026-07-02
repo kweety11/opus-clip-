@@ -207,8 +207,11 @@ function splitScenes(raw) {
   const parts = raw.split(/(?=━{2,}\s*SCENE\s)/i).filter(p => /━{2,}\s*SCENE\s/i.test(p));
   return parts.map(p => {
     const header = (p.match(/━{2,}\s*(SCENE[^━\n]*)/i) || [, "SCENE"])[1].trim();
-    const img = (p.match(/IMAGE PROMPT[^:\n]*:?\s*\n?([\s\S]*?)(?=\n\s*(?:MOTION PROMPT|🔊|━|```|$))/i) || [, ""])[1].trim();
-    const mot = (p.match(/MOTION PROMPT[^:\n]*:?\s*\n?([\s\S]*?)(?=\n\s*(?:🔊|━{2,}|IMAGE PROMPT|```|$))/i) || [, ""])[1].trim();
+    // lookahead stops at the next section: audio note, next scene, another
+    // prompt, a code fence, a table row (shot list), or a heading
+    const stop = "(?=\\n\\s*(?:🔊|━{2,}|IMAGE PROMPT|MOTION PROMPT|```|\\||#)|$)";
+    const img = (p.match(new RegExp("IMAGE PROMPT[^:\\n]*:?\\s*\\n?([\\s\\S]*?)" + stop, "i")) || [, ""])[1].trim();
+    const mot = (p.match(new RegExp("MOTION PROMPT[^:\\n]*:?\\s*\\n?([\\s\\S]*?)" + stop, "i")) || [, ""])[1].trim();
     return { header, full: p.trim(), img, mot };
   });
 }
