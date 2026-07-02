@@ -3,405 +3,660 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Film-trend AI — من البريف للاستوري بورد</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23e8b04b'/><text x='16' y='23' text-anchor='middle' font-size='18'>🎬</text></svg>">
+  <title>Film-trend AI — استوديو الإنتاج بالذكاء الاصطناعي</title>
+  <meta name="description" content="خطة سوشيال ميديا، سيناريو، استوري بورد ببرومبتات جاهزة، وفويس أوفر بأصوات جوجل — بأي موديل AI في السوق.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23f2b23e'/><text x='16' y='23' text-anchor='middle' font-size='18'>🎬</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
 /* ============================================================
-   MEDIA STUDIO AI — Arabic-first (RTL) studio interface
+   FILM-TREND AI — professional SaaS design system (RTL, Arabic)
+   Type: Cairo (variable) · dark premium palette · gold accent
    ============================================================ */
 :root {
-  --bg: #0e1014;
-  --surface: #161a22;
-  --surface-2: #1e2430;
-  --line: #2a3140;
-  --text: #edeae3;
-  --muted: #8f95a6;
-  --accent: #e8b04b;
-  --accent-2: #4fc3b8;
+  --bg: #0a0c11;
+  --bg-2: #0d1017;
+  --surface: #131722;
+  --surface-2: #1a1f2d;
+  --line: #242b3d;
+  --line-soft: #1c2231;
+  --text: #f0eee8;
+  --muted: #98a0b3;
+  --faint: #5d6579;
+  --accent: #f2b23e;
+  --accent-deep: #e8862d;
+  --accent-grad: linear-gradient(120deg, #f6c15a, #f2b23e 45%, #e8862d);
+  --teal: #43cabb;
   --err: #e0564f;
-  --radius: 14px;
+  --r-lg: 20px;
+  --r: 14px;
+  --r-sm: 10px;
+  --shadow-lg: 0 24px 70px rgba(0, 0, 0, .55);
+  --shadow: 0 10px 34px rgba(0, 0, 0, .38);
+  --font: "Cairo", "Segoe UI", Tahoma, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: "Segoe UI", Tahoma, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font);
   font-size: 16px;
-  line-height: 1.7;
-  min-height: 100vh;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ---------- header ---------- */
-.top {
-  display: flex; align-items: center; gap: 14px;
-  padding: 16px 26px;
-  border-bottom: 1px solid var(--line);
-  background: linear-gradient(180deg, #141821, var(--bg));
-}
-.logo {
-  width: 40px; height: 40px; border-radius: 11px; flex: none;
-  background: linear-gradient(135deg, var(--accent), #d4691e 65%, #9c3fb0);
-  display: grid; place-items: center;
-  font-size: 20px;
-}
-.top h1 { font-size: 19px; font-weight: 800; }
-.top h1 em { font-style: normal; color: var(--accent); }
-.top p { color: var(--muted); font-size: 13px; }
+::selection { background: rgba(242, 178, 62, .3); }
+a { color: inherit; text-decoration: none; }
+img, svg { max-width: 100%; }
 
-/* ---------- tabs ---------- */
-.tabs {
-  display: flex; gap: 8px; padding: 14px 26px 0;
-  border-bottom: 1px solid var(--line);
-  overflow-x: auto;
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 28px; }
+
+/* ============ header ============ */
+.site-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10, 12, 17, .78);
+  backdrop-filter: blur(18px) saturate(140%);
+  border-bottom: 1px solid var(--line-soft);
 }
-.tab-btn {
-  padding: 11px 20px; border: 1px solid transparent; border-bottom: none;
-  border-radius: 12px 12px 0 0;
-  background: transparent; color: var(--muted);
-  font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
-  white-space: nowrap;
+.site-header .wrap { display: flex; align-items: center; gap: 30px; height: 72px; }
+.brand { display: flex; align-items: center; gap: 12px; font-weight: 900; font-size: 20px; cursor: pointer; }
+.brand .mark {
+  width: 38px; height: 38px; border-radius: 11px; flex: none;
+  background: var(--accent-grad);
+  display: grid; place-items: center; font-size: 19px;
+  box-shadow: 0 6px 18px rgba(242, 178, 62, .35);
+}
+.brand em { font-style: normal; background: var(--accent-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.head-nav { display: flex; gap: 6px; flex: 1; }
+.head-nav a {
+  padding: 8px 16px; border-radius: 10px; font-size: 15px; font-weight: 600; color: var(--muted);
   transition: color .15s, background .15s;
 }
-.tab-btn:hover { color: var(--text); }
-.tab-btn.on {
-  background: var(--surface); color: var(--accent);
-  border-color: var(--line);
-  transform: translateY(1px);
-}
+.head-nav a:hover { color: var(--text); background: var(--surface); }
 
-/* ---------- panels ---------- */
-.panel { display: none; padding: 26px; max-width: 1180px; margin: 0 auto; }
-.panel.show { display: block; }
-.panel-grid { display: grid; grid-template-columns: 400px 1fr; gap: 22px; align-items: start; }
-
-.card {
-  background: var(--surface); border: 1px solid var(--line);
-  border-radius: var(--radius); padding: 22px;
-}
-.card h3 { font-size: 16px; margin-bottom: 6px; }
-.card .hint { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
-
-label.f { display: block; font-size: 13px; color: var(--muted); margin: 14px 0 6px; }
-textarea, input[type="text"], input[type="password"], select {
-  width: 100%; background: var(--bg); color: var(--text);
-  border: 1px solid var(--line); border-radius: 10px;
-  padding: 11px 13px; font: inherit; font-size: 14.5px;
-  outline: none; transition: border-color .15s;
-}
-textarea:focus, input:focus, select:focus { border-color: var(--accent); }
-textarea { resize: vertical; min-height: 130px; }
-
+/* ============ buttons ============ */
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 11px 22px; border-radius: 10px; border: 1px solid transparent;
-  font: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
-  transition: background .15s, transform .1s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  padding: 12px 26px; border-radius: 12px; border: 1px solid transparent;
+  font: inherit; font-size: 15.5px; font-weight: 800; cursor: pointer; line-height: 1.4;
+  transition: transform .13s, box-shadow .2s, background .15s, border-color .15s;
+  white-space: nowrap;
 }
-.btn:active { transform: translateY(1px); }
+.btn:active { transform: translateY(1.5px); }
 .btn:disabled { opacity: .5; cursor: wait; }
-.btn-primary { background: var(--accent); color: #1c1305; width: 100%; margin-top: 18px; }
-.btn-primary:hover:not(:disabled) { background: #f5c266; }
-.btn-ghost { background: transparent; border-color: var(--line); color: var(--text); font-size: 13.5px; padding: 8px 16px; }
-.btn-ghost:hover { border-color: var(--muted); }
+.btn-primary {
+  background: var(--accent-grad); color: #201302;
+  box-shadow: 0 8px 26px rgba(242, 178, 62, .3);
+}
+.btn-primary:hover:not(:disabled) { box-shadow: 0 12px 34px rgba(242, 178, 62, .45); transform: translateY(-1px); }
+.btn-ghost { border-color: var(--line); color: var(--text); background: rgba(255, 255, 255, .02); }
+.btn-ghost:hover { border-color: var(--muted); background: var(--surface); }
+.btn-lg { padding: 16px 36px; font-size: 17px; border-radius: 14px; }
+.btn-sm { padding: 8px 18px; font-size: 13.5px; font-weight: 700; }
+.btn-xs { padding: 5px 13px; font-size: 12px; font-weight: 700; border-radius: 8px; }
+.btn-block { width: 100%; margin-top: 20px; }
 .btn-stop { background: var(--err); color: #fff; display: none; width: 100%; margin-top: 10px; }
 
-/* pdf upload */
+/* ============ landing ============ */
+.hero {
+  position: relative; overflow: hidden; text-align: center;
+  padding: 110px 0 90px;
+}
+.hero::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(720px 420px at 50% -8%, rgba(242, 178, 62, .16), transparent 65%),
+    radial-gradient(560px 380px at 12% 28%, rgba(232, 134, 45, .08), transparent 60%),
+    radial-gradient(560px 380px at 88% 32%, rgba(67, 202, 187, .07), transparent 60%);
+}
+.hero > .wrap { position: relative; }
+.kicker {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 18px; border-radius: 999px;
+  border: 1px solid rgba(242, 178, 62, .35); background: rgba(242, 178, 62, .08);
+  color: var(--accent); font-size: 13.5px; font-weight: 700; margin-bottom: 26px;
+}
+.hero h1 {
+  font-size: clamp(40px, 6.4vw, 72px); font-weight: 900; line-height: 1.22;
+  letter-spacing: -.5px; margin-bottom: 22px;
+}
+.hero h1 .grad { background: var(--accent-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero .sub { max-width: 640px; margin: 0 auto 40px; color: var(--muted); font-size: 19px; font-weight: 500; }
+.hero-ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.hero-stats {
+  display: flex; gap: 56px; justify-content: center; margin-top: 64px; flex-wrap: wrap;
+}
+.hero-stats b { display: block; font-size: 34px; font-weight: 900; background: var(--accent-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero-stats span { color: var(--muted); font-size: 14px; font-weight: 600; }
+
+.section { padding: 96px 0; }
+.section.alt { background: var(--bg-2); border-block: 1px solid var(--line-soft); }
+.sec-head { text-align: center; max-width: 620px; margin: 0 auto 56px; }
+.sec-head h2 { font-size: clamp(28px, 4vw, 42px); font-weight: 900; margin-bottom: 12px; }
+.sec-head p { color: var(--muted); font-size: 17px; }
+
+.feat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.feat {
+  background: var(--surface); border: 1px solid var(--line-soft); border-radius: var(--r-lg);
+  padding: 30px 26px; position: relative; overflow: hidden;
+  transition: transform .2s, border-color .2s, box-shadow .25s;
+}
+.feat:hover { transform: translateY(-5px); border-color: #313a52; box-shadow: var(--shadow); }
+.feat .num {
+  position: absolute; top: 14px; inset-inline-end: 20px;
+  font-size: 44px; font-weight: 900; color: rgba(242, 178, 62, .1); line-height: 1;
+}
+.feat .ico {
+  width: 52px; height: 52px; border-radius: 15px; margin-bottom: 20px;
+  display: grid; place-items: center; font-size: 25px;
+  background: linear-gradient(135deg, rgba(242, 178, 62, .16), rgba(232, 134, 45, .08));
+  border: 1px solid rgba(242, 178, 62, .22);
+}
+.feat h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+.feat p { color: var(--muted); font-size: 14px; line-height: 1.75; }
+
+.how-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; counter-reset: hstep; }
+.how {
+  background: var(--surface); border: 1px solid var(--line-soft); border-radius: var(--r);
+  padding: 26px 22px; text-align: center;
+}
+.how::before {
+  counter-increment: hstep; content: counter(hstep);
+  display: grid; place-items: center; width: 46px; height: 46px; margin: 0 auto 16px;
+  border-radius: 50%; background: var(--accent-grad); color: #201302;
+  font-size: 20px; font-weight: 900;
+}
+.how p { font-size: 15px; font-weight: 700; }
+
+.price-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 420px)); gap: 22px; justify-content: center; }
+.price {
+  background: var(--surface); border: 1px solid var(--line-soft); border-radius: var(--r-lg);
+  padding: 38px 34px; display: flex; flex-direction: column;
+}
+.price.hot {
+  border-color: rgba(242, 178, 62, .55); position: relative;
+  background: linear-gradient(180deg, rgba(242, 178, 62, .08), transparent 45%), var(--surface);
+  box-shadow: 0 16px 50px rgba(242, 178, 62, .12);
+}
+.price .flag {
+  position: absolute; top: -14px; inset-inline-start: 50%; transform: translateX(50%);
+  background: var(--accent-grad); color: #201302; font-size: 12px; font-weight: 900;
+  padding: 5px 18px; border-radius: 999px;
+}
+[dir="ltr"] .price .flag { transform: translateX(-50%); }
+.price h3 { font-size: 19px; font-weight: 800; }
+.price .amount { font-size: 52px; font-weight: 900; margin: 14px 0 4px; }
+.price .amount small { font-size: 15px; color: var(--muted); font-weight: 600; }
+.price ul { list-style: none; margin: 22px 0 30px; flex: 1; }
+.price li { padding: 9px 0; font-size: 15px; color: #cdd2e0; display: flex; gap: 11px; font-weight: 600; }
+.price li::before { content: "✓"; color: var(--teal); font-weight: 900; }
+.price-note { text-align: center; color: var(--faint); font-size: 13px; margin-top: 18px; }
+
+.site-footer { border-top: 1px solid var(--line-soft); padding: 44px 0; text-align: center; color: var(--muted); font-size: 14px; }
+
+/* ============ studio ============ */
+body.in-studio #landing { display: none; }
+#studio { display: none; }
+body.in-studio #studio { display: block; }
+
+.stepper-bar {
+  border-bottom: 1px solid var(--line-soft); background: var(--bg-2);
+  position: sticky; top: 72px; z-index: 90;
+}
+.stepper { display: flex; align-items: stretch; gap: 4px; overflow-x: auto; padding: 12px 0; }
+.step-btn {
+  display: flex; align-items: center; gap: 11px;
+  padding: 11px 20px; border-radius: 12px; cursor: pointer;
+  border: 1px solid transparent; background: transparent; color: var(--muted);
+  font: inherit; font-size: 15px; font-weight: 700; white-space: nowrap;
+  transition: all .15s;
+}
+.step-btn:hover { color: var(--text); background: var(--surface); }
+.step-btn.on { background: var(--surface); border-color: var(--line); color: var(--accent); }
+.step-btn .n {
+  display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--surface-2); border: 1.5px solid var(--line); color: var(--muted);
+  font-size: 13.5px; font-weight: 800; transition: all .15s;
+}
+.step-btn.on .n { background: var(--accent-grad); border-color: transparent; color: #201302; }
+.step-btn.done .n { background: var(--teal); border-color: transparent; color: #06231f; }
+.step-btn.done .n::before { content: "✓"; }
+.step-btn.done .n span { display: none; }
+.step-sep { align-self: center; width: 26px; height: 2px; background: var(--line); border-radius: 2px; flex: none; }
+.step-gear { margin-inline-start: auto; }
+
+.panel { display: none; padding: 34px 0 90px; }
+.panel.show { display: block; }
+.panel-grid { display: grid; grid-template-columns: 410px 1fr; gap: 24px; align-items: start; }
+
+.card {
+  background: var(--surface); border: 1px solid var(--line-soft);
+  border-radius: var(--r-lg); padding: 28px;
+  box-shadow: var(--shadow);
+}
+.card h3 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+.card .hint { color: var(--muted); font-size: 13.5px; margin-bottom: 18px; line-height: 1.8; }
+
+label.f { display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin: 16px 0 7px; }
+textarea, input[type="text"], input[type="password"], select {
+  width: 100%; background: var(--bg); color: var(--text);
+  border: 1.5px solid var(--line); border-radius: var(--r-sm);
+  padding: 12px 15px; font: inherit; font-size: 14.5px; font-weight: 500;
+  outline: none; transition: border-color .15s, box-shadow .15s;
+}
+textarea:focus, input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(242, 178, 62, .13); }
+textarea { resize: vertical; min-height: 130px; }
+
 .upload {
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  border: 1.5px dashed var(--line); border-radius: 10px;
-  padding: 16px; color: var(--muted); font-size: 14px; cursor: pointer;
-  transition: border-color .15s, color .15s;
+  border: 1.5px dashed var(--line); border-radius: var(--r-sm);
+  padding: 17px; color: var(--muted); font-size: 14px; font-weight: 700; cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s;
 }
-.upload:hover { border-color: var(--accent); color: var(--text); }
+.upload:hover { border-color: var(--accent); color: var(--text); background: rgba(242, 178, 62, .04); }
 .upload input { display: none; }
-#pdf-name { color: var(--accent-2); font-size: 13px; margin-top: 8px; }
+#pdf-name { color: var(--teal); font-size: 13px; font-weight: 700; margin-top: 8px; }
 
-/* ---------- output ---------- */
-.out-wrap { position: relative; }
+/* output */
 .out {
-  background: var(--surface); border: 1px solid var(--line);
-  border-radius: var(--radius); padding: 26px 28px;
-  min-height: 340px; max-height: 72vh; overflow: auto;
-  font-size: 15px;
+  background: var(--surface); border: 1px solid var(--line-soft);
+  border-radius: var(--r-lg); padding: 28px 30px;
+  min-height: 380px; max-height: 74vh; overflow: auto;
+  font-size: 15px; box-shadow: var(--shadow);
 }
-.out:empty::before { content: "الناتج هيظهر هنا…"; color: #565d70; }
-.out h2, .out h3, .out h4, .out h5 { margin: 20px 0 8px; color: var(--accent); }
-.out h2 { font-size: 20px; } .out h3 { font-size: 17px; } .out h4 { font-size: 15.5px; }
+.out:empty::before { content: "الناتج هيظهر هنا…"; color: var(--faint); font-weight: 600; }
+.out h2, .out h3, .out h4, .out h5 { margin: 22px 0 8px; color: var(--accent); font-weight: 800; }
+.out h2 { font-size: 21px; } .out h3 { font-size: 17.5px; } .out h4 { font-size: 15.5px; }
 .out p { margin: 7px 0; }
 .out ul { margin: 8px 22px 8px 0; }
+[dir="ltr"] .out ul { margin: 8px 0 8px 22px; }
 .out li { margin: 4px 0; }
-.out hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
+.out hr { border: 0; border-top: 1px solid var(--line); margin: 20px 0; }
 .out code {
-  background: var(--surface-2); border: 1px solid var(--line);
-  border-radius: 5px; padding: 1px 7px; font-size: 13.5px;
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px;
+  padding: 1px 8px; font-size: 13px; font-family: var(--mono);
   direction: ltr; unicode-bidi: embed;
 }
 .out pre {
-  background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
-  padding: 14px 16px; margin: 12px 0; overflow-x: auto;
-  font-size: 13.5px; line-height: 1.6;
+  background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 15px 17px; margin: 13px 0; overflow-x: auto;
+  font-size: 13px; line-height: 1.65; font-family: var(--mono);
   direction: ltr; text-align: left;
-  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
 }
-.out table { border-collapse: collapse; margin: 12px 0; width: 100%; font-size: 13.5px; }
-.out td { border: 1px solid var(--line); padding: 7px 11px; vertical-align: top; }
-.out tr:first-child td { background: var(--surface-2); font-weight: 700; }
-.out .thinking { color: var(--muted); }
-.out .err { color: var(--err); font-weight: 600; }
+.out table { border-collapse: collapse; margin: 14px 0; width: 100%; font-size: 13.5px; }
+.out td { border: 1px solid var(--line); padding: 8px 12px; vertical-align: top; }
+.out tr:first-child td { background: var(--surface-2); font-weight: 800; }
+.out .thinking { color: var(--muted); font-weight: 600; }
+.out .err { color: var(--err); font-weight: 700; }
 
-.actions { display: none; gap: 10px; margin-top: 12px; }
+.actions { display: none; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
 
 #carry-note {
-  display: none; margin-top: 12px; padding: 10px 16px;
-  background: rgba(79, 195, 184, .08); border: 1px solid rgba(79, 195, 184, .35);
-  border-radius: 10px; color: var(--accent-2); font-size: 13.5px;
+  display: none; margin-top: 14px; padding: 12px 17px;
+  background: rgba(67, 202, 187, .08); border: 1px solid rgba(67, 202, 187, .35);
+  border-radius: var(--r-sm); color: var(--teal); font-size: 13.5px; font-weight: 700;
 }
 
+/* scene cards */
+.scene-card {
+  border: 1px solid var(--line); border-radius: var(--r);
+  background: var(--surface-2); padding: 18px 20px; margin-bottom: 18px;
+}
+.scene-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.scene-head b { color: var(--accent); font-size: 15px; font-weight: 800; }
+.scene-prompt { margin-top: 12px; }
+.sp-head { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; color: var(--teal); font-weight: 800; margin-bottom: 6px; }
+.scene-prompt pre {
+  background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 12px 14px; margin: 0; overflow-x: auto;
+  font-size: 12.5px; line-height: 1.65; white-space: pre-wrap;
+  direction: ltr; text-align: left; font-family: var(--mono);
+}
+
+/* voice-over */
+.voice-result { display: none; margin-top: 18px; }
+.voice-result audio { width: 100%; margin-bottom: 12px; }
+.voice-status { color: var(--muted); font-size: 14px; font-weight: 700; margin-top: 14px; }
+.voice-status.err { color: var(--err); }
+
 /* settings */
-.settings-card { max-width: 560px; }
+.settings-card { max-width: 620px; margin: 0 auto; }
+.mode-switch { display: flex; gap: 12px; margin-bottom: 22px; }
+.mode-btn {
+  flex: 1; padding: 16px 12px; border-radius: var(--r); cursor: pointer;
+  border: 1.5px solid var(--line); background: var(--bg); color: var(--muted);
+  font: inherit; font-size: 15px; font-weight: 800; text-align: center;
+  transition: border-color .15s, color .15s, background .15s;
+}
+.mode-btn small { display: block; font-weight: 500; font-size: 12px; margin-top: 4px; color: var(--faint); }
+.mode-btn:hover { color: var(--text); }
+.mode-btn.on { border-color: var(--accent); color: var(--accent); background: rgba(242, 178, 62, .06); }
+.mode-btn.on small { color: var(--muted); }
 .note {
-  margin-top: 16px; padding: 12px 16px; border-radius: 10px;
-  background: rgba(232, 176, 75, .07); border: 1px solid rgba(232, 176, 75, .3);
-  color: var(--muted); font-size: 13.5px;
+  margin-top: 16px; padding: 13px 17px; border-radius: var(--r-sm);
+  background: rgba(242, 178, 62, .06); border: 1px solid rgba(242, 178, 62, .25);
+  color: var(--muted); font-size: 13.5px; line-height: 1.8;
 }
 .note b { color: var(--accent); }
 
-/* mode switch (cloud account vs own key) */
-.mode-switch { display: flex; gap: 10px; margin-bottom: 20px; }
-.mode-btn {
-  flex: 1; padding: 14px 12px; border-radius: 12px; cursor: pointer;
-  border: 1.5px solid var(--line); background: var(--bg); color: var(--muted);
-  font: inherit; font-size: 14.5px; font-weight: 700; text-align: center;
-  transition: border-color .15s, color .15s;
-}
-.mode-btn small { display: block; font-weight: 400; font-size: 11.5px; margin-top: 4px; }
-.mode-btn:hover { color: var(--text); }
-.mode-btn.on { border-color: var(--accent); color: var(--accent); background: rgba(232, 176, 75, .06); }
-
-/* scene cards (split storyboard view) */
-.scene-card {
-  border: 1px solid var(--line); border-radius: 12px;
-  background: var(--surface-2); padding: 16px 18px; margin-bottom: 16px;
-}
-.scene-head {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  margin-bottom: 10px; flex-wrap: wrap;
-}
-.scene-head b { color: var(--accent); font-size: 15px; }
-.scene-prompt { margin-top: 10px; }
-.sp-head {
-  display: flex; align-items: center; justify-content: space-between;
-  font-size: 12.5px; color: var(--accent-2); font-weight: 700; margin-bottom: 6px;
-}
-.scene-prompt pre {
-  background: var(--bg); border: 1px solid var(--line); border-radius: 9px;
-  padding: 11px 13px; margin: 0; overflow-x: auto;
-  font-size: 13px; line-height: 1.6; white-space: pre-wrap;
-  direction: ltr; text-align: left;
-  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
-}
-.btn-xs { padding: 4px 12px; font-size: 12px; }
-
 /* toast */
 .toast {
-  position: fixed; bottom: 26px; right: 50%; transform: translate(50%, 16px);
+  position: fixed; bottom: 28px; right: 50%; transform: translate(50%, 16px);
   background: var(--surface-2); border: 1px solid var(--line);
-  color: var(--text); padding: 12px 24px; border-radius: 12px; font-size: 14.5px;
+  color: var(--text); padding: 13px 26px; border-radius: 13px;
+  font-size: 14.5px; font-weight: 700;
   opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
-  z-index: 100; box-shadow: 0 14px 40px rgba(0,0,0,.5);
+  z-index: 300; box-shadow: var(--shadow-lg);
 }
 .toast.show { opacity: 1; transform: translate(50%, 0); }
 
-@media (max-width: 900px) {
+/* responsive */
+@media (max-width: 1020px) {
+  .feat-grid, .how-grid { grid-template-columns: 1fr 1fr; }
   .panel-grid { grid-template-columns: 1fr; }
-  .panel { padding: 18px; }
+  .head-nav { display: none; }
+}
+@media (max-width: 620px) {
+  .feat-grid, .how-grid, .price-grid { grid-template-columns: 1fr; }
+  .hero { padding: 70px 0 60px; }
+  .hero-stats { gap: 30px; }
+  .mode-switch { flex-direction: column; }
 }
 
 </style>
 </head>
 <body>
 
-  <header class="top">
-    <div class="logo">🎬</div>
-    <div>
-      <h1>Film-trend <em>AI</em></h1>
-      <p>خطة سوشيال ميديا · سيناريو · استوري بورد ببرومبتات جاهزة — بأي موديل AI في السوق</p>
+  <!-- ================= HEADER ================= -->
+  <header class="site-header">
+    <div class="wrap">
+      <div class="brand" onclick="goLanding()">
+        <span class="mark">🎬</span>
+        <span>Film-trend <em>AI</em></span>
+      </div>
+      <nav class="head-nav" id="head-nav">
+        <a href="#features" onclick="goLanding()">المميزات</a>
+        <a href="#pricing" onclick="goLanding()">الأسعار</a>
+      </nav>
+      <button class="btn btn-primary btn-sm" onclick="openStudio()">افتح الاستوديو ←</button>
     </div>
   </header>
 
-  <nav class="tabs">
-    <button class="tab-btn on" data-tab="plan">📋 خطة السوشيال ميديا</button>
-    <button class="tab-btn" data-tab="script">✍️ السيناريو</button>
-    <button class="tab-btn" data-tab="board">🎞️ الاستوري بورد</button>
-    <button class="tab-btn" data-tab="settings">⚙️ الإعدادات</button>
-  </nav>
+  <!-- ================= LANDING ================= -->
+  <div id="landing">
 
-  <!-- ============ TOOL 1: SOCIAL PLAN ============ -->
-  <section class="panel show" id="panel-plan">
-    <div class="panel-grid">
-      <div class="card">
-        <h3>من البريف لخطة كاملة</h3>
-        <p class="hint">اكتب البريف أو ارفع ملف PDF — هتاخد خطة شاملة: أهداف، جمهور، استراتيجية منصات، أعمدة محتوى، جدول 30 يوم، هوكس جاهزة، خطة إعلانات وقياس.</p>
-
-        <label class="f">البريف (اختياري لو رفعت PDF)</label>
-        <textarea id="plan-brief" placeholder="مثال: براند قهوة مختصة جديد في القاهرة، الجمهور 20-35 سنة، الهدف نبني وعي وزيارات للمحل، الميزانية محدودة، التون شبابي..."></textarea>
-
-        <label class="f">أو ارفع البريف كـ PDF</label>
-        <label class="upload">
-          📎 اختار ملف PDF
-          <input type="file" id="plan-pdf" accept="application/pdf">
-        </label>
-        <div id="pdf-name"></div>
-
-        <button class="btn btn-primary" id="run-plan" onclick="runPlan()">🚀 اعمل الخطة</button>
-        <button class="btn btn-stop" id="stop-plan" onclick="stopRun('plan')">⏹ إيقاف</button>
+    <section class="hero">
+      <div class="wrap">
+        <span class="kicker">✦ من البريف للفيديو النهائي — في مكان واحد</span>
+        <h1>استوديو إنتاج كامل<br><span class="grad">بالذكاء الاصطناعي</span></h1>
+        <p class="sub">خطة سوشيال ميديا، سيناريو، استوري بورد ببرومبتات جاهزة للتوليد، وفويس أوفر بأصوات جوجل الاحترافية — بأي موديل AI في السوق.</p>
+        <div class="hero-ctas">
+          <button class="btn btn-primary btn-lg" onclick="openStudio()">🚀 ابدأ مجانًا</button>
+          <a class="btn btn-ghost btn-lg" href="#pricing">شوف الأسعار</a>
+        </div>
+        <div class="hero-stats">
+          <div><b>4</b><span>أدوات متكاملة</span></div>
+          <div><b>11</b><span>مزود AI مدعوم</span></div>
+          <div><b>76</b><span>ستايل بصري</span></div>
+          <div><b>16</b><span>صوت فويس أوفر</span></div>
+        </div>
       </div>
+    </section>
 
-      <div class="out-wrap">
-        <div class="out" id="out-plan" data-raw=""></div>
-        <div class="actions" id="actions-plan">
-          <button class="btn btn-ghost" onclick="copyOut('plan')">📋 نسخ</button>
-          <button class="btn btn-ghost" onclick="downloadOut('plan','social-media-plan.md')">⬇️ تحميل .md</button>
+    <section class="section" id="features">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2>كل خطوات الإنتاج</h2>
+          <p>أربع أدوات بتسلّم بعضها — من أول فكرة لحد ملفات جاهزة للنشر.</p>
+        </div>
+        <div class="feat-grid">
+          <div class="feat"><span class="num">01</span><div class="ico">📋</div><h3>خطة السوشيال ميديا</h3><p>بريف مكتوب أو PDF يتحول لخطة كاملة: أهداف، جمهور، جدول 30 يوم، هوكس جاهزة وقياس.</p></div>
+          <div class="feat"><span class="num">02</span><div class="ico">✍️</div><h3>السيناريو</h3><p>فكرتك تبقى سيناريو متقسم مشاهد بهوية بصرية ثابتة للشخصيات وبرومبت ماستر بالإنجليزي.</p></div>
+          <div class="feat"><span class="num">03</span><div class="ico">🎞️</div><h3>الاستوري بورد</h3><p>لكل مشهد برومبت صورة وبرومبت حركة بالإنجليزي جاهزين لأدوات التوليد، مع تقسيم المشاهد لكروت.</p></div>
+          <div class="feat"><span class="num">04</span><div class="ico">🎙️</div><h3>الفويس أوفر</h3><p>أصوات جوجل الاحترافية بالعربي والإنجليزي — من نص السيناريو لملف صوت جاهز للمونتاج.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="wrap">
+        <div class="sec-head"><h2>إزاي بتشتغل؟</h2></div>
+        <div class="how-grid">
+          <div class="how"><p>اكتب البريف أو ارفع PDF</p></div>
+          <div class="how"><p>ولّد السيناريو وعدّل عليه</p></div>
+          <div class="how"><p>خد برومبتات المشاهد وولّد الفيجوال</p></div>
+          <div class="how"><p>سجّل الفويس أوفر ونزّل الملفات</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="pricing">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2>أسعار بسيطة</h2>
+          <p>جرّب كل حاجة ببلاش لمدة شهر — من غير بطاقة ائتمان.</p>
+        </div>
+        <div class="price-grid">
+          <div class="price">
+            <h3>التجربة المجانية</h3>
+            <div class="amount">$0 <small>/ أول شهر</small></div>
+            <ul>
+              <li>40 توليدة كاملة</li>
+              <li>كل الأدوات الأربعة</li>
+              <li>كل الستايلات والأصوات</li>
+              <li>من غير بطاقة ائتمان</li>
+            </ul>
+            <button class="btn btn-ghost" onclick="openStudio()">ابدأ التجربة</button>
+          </div>
+          <div class="price hot">
+            <span class="flag">الأكثر اختيارًا</span>
+            <h3>الاحترافي</h3>
+            <div class="amount">$10 <small>/ شهريًا</small></div>
+            <ul>
+              <li>استخدام غير محدود*</li>
+              <li>أولوية في الموديلات الأقوى</li>
+              <li>كل الستايلات والأصوات</li>
+              <li>دعم مباشر</li>
+            </ul>
+            <button class="btn btn-primary" onclick="openStudio()">ابدأ دلوقتي</button>
+          </div>
+        </div>
+        <p class="price-note">* بحد يومي عادل لمنع إساءة الاستخدام</p>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="wrap">© 2026 Film-trend AI — استوديو الإنتاج بالذكاء الاصطناعي، عربي أولًا.</div>
+    </footer>
+  </div>
+
+  <!-- ================= STUDIO ================= -->
+  <div id="studio">
+
+    <div class="stepper-bar">
+      <div class="wrap">
+        <div class="stepper">
+          <button class="step-btn on" data-tab="plan"><span class="n"><span>1</span></span>الخطة</button>
+          <span class="step-sep"></span>
+          <button class="step-btn" data-tab="script"><span class="n"><span>2</span></span>السيناريو</button>
+          <span class="step-sep"></span>
+          <button class="step-btn" data-tab="board"><span class="n"><span>3</span></span>الاستوري بورد</button>
+          <span class="step-sep"></span>
+          <button class="step-btn" data-tab="voice"><span class="n"><span>4</span></span>الفويس أوفر</button>
+          <button class="step-btn step-gear" data-tab="settings">⚙️ الإعدادات</button>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- ============ TOOL 2: SCRIPT ============ -->
-  <section class="panel" id="panel-script">
-    <div class="panel-grid">
-      <div class="card">
-        <h3>من الفكرة لسيناريو متقسم</h3>
-        <p class="hint">اكتب فكرتك بأي شكل — هتاخد Logline وملخص وشخصيات بهوية بصرية ثابتة وهيكل درامي ومشاهد مرقمة بالحوار والمدة.</p>
+    <!-- STEP 1: PLAN -->
+    <section class="panel show" id="panel-plan">
+      <div class="wrap"><div class="panel-grid">
+        <div class="card">
+          <h3>من البريف لخطة كاملة</h3>
+          <p class="hint">اكتب البريف أو ارفع ملف PDF — هتاخد خطة شاملة: أهداف، جمهور، استراتيجية منصات، جدول 30 يوم، هوكس جاهزة وقياس.</p>
+          <label class="f">البريف (اختياري لو رفعت PDF)</label>
+          <textarea id="plan-brief" placeholder="مثال: براند قهوة مختصة جديد في القاهرة، الجمهور 20-35 سنة، الهدف وعي وزيارات، التون شبابي..."></textarea>
+          <label class="f">أو ارفع البريف كـ PDF</label>
+          <label class="upload">📎 اختار ملف PDF<input type="file" id="plan-pdf" accept="application/pdf"></label>
+          <div id="pdf-name"></div>
+          <button class="btn btn-primary btn-block" id="run-plan" onclick="runPlan()">🚀 اعمل الخطة</button>
+          <button class="btn btn-stop" id="stop-plan" onclick="stopRun('plan')">⏹ إيقاف</button>
+        </div>
+        <div>
+          <div class="out" id="out-plan" data-raw=""></div>
+          <div class="actions" id="actions-plan">
+            <button class="btn btn-ghost btn-sm" onclick="copyOut('plan')">📋 نسخ</button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadOut('plan','social-media-plan.md')">⬇️ تحميل .md</button>
+          </div>
+        </div>
+      </div></div>
+    </section>
 
-        <label class="f">نوع العمل</label>
-        <select id="script-format">
-          <option value="UGC">UGC / فيديو سوشيال</option>
-          <option value="ad">إعلان</option>
-          <option value="film">فيلم قصير</option>
-          <option value="series">حلقة مسلسل</option>
-          <option value="documentary">وثائقي</option>
-          <option value="short">قصة قصيرة</option>
-        </select>
+    <!-- STEP 2: SCRIPT -->
+    <section class="panel" id="panel-script">
+      <div class="wrap"><div class="panel-grid">
+        <div class="card">
+          <h3>من الفكرة لسيناريو متقسم</h3>
+          <p class="hint">اكتب فكرتك بأي شكل — هتاخد Logline وشخصيات بهوية بصرية ثابتة ومشاهد مرقمة بالحوار والمدة، وبرومبت ماستر بالإنجليزي.</p>
+          <label class="f">نوع العمل</label>
+          <select id="script-format">
+            <option value="UGC">UGC / فيديو سوشيال</option>
+            <option value="ad">إعلان</option>
+            <option value="film">فيلم قصير</option>
+            <option value="series">حلقة مسلسل</option>
+            <option value="documentary">وثائقي</option>
+            <option value="short">قصة قصيرة</option>
+          </select>
+          <label class="f">المدة المستهدفة (اختياري)</label>
+          <input type="text" id="script-duration" placeholder="مثال: 60 ثانية / 3 دقائق">
+          <label class="f">الفكرة</label>
+          <textarea id="script-idea" rows="7" placeholder="مثال: إعلان لتطبيق توصيل أكل، البطل موظف مرهق بيرجع البيت متأخر، إحساس دافئ إنساني..."></textarea>
+          <button class="btn btn-primary btn-block" id="run-script" onclick="runScript()">✍️ اكتب السيناريو</button>
+          <button class="btn btn-stop" id="stop-script" onclick="stopRun('script')">⏹ إيقاف</button>
+          <div id="carry-note">✓ السيناريو جاهز — روح لخطوة الاستوري بورد واضغط "استخدم آخر سيناريو"</div>
+        </div>
+        <div>
+          <div class="out" id="out-script" data-raw=""></div>
+          <div class="actions" id="actions-script">
+            <button class="btn btn-ghost btn-sm" onclick="copyOut('script')">📋 نسخ</button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadOut('script','script.md')">⬇️ تحميل .md</button>
+          </div>
+        </div>
+      </div></div>
+    </section>
 
-        <label class="f">المدة المستهدفة (اختياري)</label>
-        <input type="text" id="script-duration" placeholder="مثال: 60 ثانية / 3 دقائق">
+    <!-- STEP 3: STORYBOARD -->
+    <section class="panel" id="panel-board">
+      <div class="wrap"><div class="panel-grid">
+        <div class="card">
+          <h3>من السيناريو لاستوري بورد + برومبتات</h3>
+          <p class="hint">لكل مشهد: وصف الكادر + <b>IMAGE PROMPT</b> لتوليد الصورة + <b>MOTION PROMPT</b> لتحريكها (Runway / Kling / Veo).</p>
+          <button class="btn btn-ghost btn-block" style="margin-top:0" onclick="useLastScript()">↩️ استخدم آخر سيناريو متولد</button>
+          <label class="f">أو الصق السيناريو هنا</label>
+          <textarea id="board-script" rows="6" placeholder="الصق السيناريو المتقسم لمشاهد..."></textarea>
+          <label class="f">نسبة الأبعاد</label>
+          <select id="board-ratio">
+            <option value="9:16">9:16 — ريلز / تيك توك</option>
+            <option value="16:9">16:9 — يوتيوب / سينمائي</option>
+            <option value="1:1">1:1 — مربع</option>
+            <option value="4:5">4:5 — فيد إنستجرام</option>
+          </select>
+          <label class="f">الستايل البصري — كل ستايلات السوق</label>
+          <select id="board-style-sel"></select>
+          <label class="f">أو اكتب ستايل مخصص / إضافي (اختياري)</label>
+          <input type="text" id="board-style" dir="ltr" placeholder="e.g. shot on ARRI Alexa, 85mm lens">
+          <button class="btn btn-primary btn-block" id="run-board" onclick="runBoard()">🎞️ اعمل الاستوري بورد</button>
+          <button class="btn btn-stop" id="stop-board" onclick="stopRun('board')">⏹ إيقاف</button>
+        </div>
+        <div>
+          <div class="out" id="out-board" data-raw=""></div>
+          <div class="actions" id="actions-board">
+            <button class="btn btn-ghost btn-sm" id="split-board" onclick="toggleBoardView()">🗂️ قسّم المشاهد</button>
+            <button class="btn btn-ghost btn-sm" onclick="copyOut('board')">📋 نسخ الكل</button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadOut('board','storyboard.md')">⬇️ تحميل .md</button>
+          </div>
+        </div>
+      </div></div>
+    </section>
 
-        <label class="f">الفكرة</label>
-        <textarea id="script-idea" rows="7" placeholder="مثال: إعلان لتطبيق توصيل أكل، البطل موظف مرهق بيرجع البيت متأخر، عايز إحساس دافئ وإنساني مش بيعي مباشر..."></textarea>
+    <!-- STEP 4: VOICE-OVER -->
+    <section class="panel" id="panel-voice">
+      <div class="wrap"><div class="panel-grid">
+        <div class="card">
+          <h3>الفويس أوفر — أصوات Google</h3>
+          <p class="hint">أصوات Gemini الاحترافية بتتكلم <b>عربي وإنجليزي</b>. بيستخدم مفتاح Google Gemini (المجاني) من الإعدادات.</p>
+          <button class="btn btn-ghost btn-block" style="margin-top:0" onclick="useScriptForVoice()">↩️ هات النص من آخر سيناريو</button>
+          <label class="f">النص</label>
+          <textarea id="voice-text" rows="6" placeholder="اكتب أو الصق النص اللي عايز تسمعه — عربي أو إنجليزي..."></textarea>
+          <label class="f">الصوت</label>
+          <select id="voice-name"></select>
+          <label class="f">أسلوب الأداء</label>
+          <select id="voice-style">
+            <option value="doc">وثائقي دافئ</option>
+            <option value="promo">إعلاني حماسي</option>
+            <option value="story">قصصي هادئ</option>
+            <option value="news">إخباري رسمي</option>
+            <option value="ugc">طبيعي عفوي (UGC)</option>
+            <option value="none">عادي — من غير توجيه</option>
+          </select>
+          <button class="btn btn-primary btn-block" id="run-voice" onclick="runVoice()">🎙️ ولّد الصوت</button>
+        </div>
+        <div>
+          <div class="card">
+            <h3>🎧 النتيجة</h3>
+            <p class="voice-status" id="voice-status">اكتب النص واختار الصوت واضغط "ولّد الصوت"</p>
+            <div class="voice-result" id="voice-result">
+              <audio id="voice-audio" controls></audio>
+              <button class="btn btn-ghost btn-sm" id="voice-dl">⬇️ تحميل WAV</button>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </section>
 
-        <button class="btn btn-primary" id="run-script" onclick="runScript()">✍️ اكتب السيناريو</button>
-        <button class="btn btn-stop" id="stop-script" onclick="stopRun('script')">⏹ إيقاف</button>
+    <!-- SETTINGS -->
+    <section class="panel" id="panel-settings">
+      <div class="wrap">
+        <div class="card settings-card">
+          <h3>⚙️ الإعدادات</h3>
 
-        <div id="carry-note">✓ السيناريو جاهز — روح لتبويب الاستوري بورد واضغط "استخدم آخر سيناريو"</div>
-      </div>
+          <div class="mode-switch" id="mode-switch" style="display:none">
+            <button class="mode-btn" data-mode="cloud" onclick="setMode('cloud')">☁️ حساب Film-trend<small>من غير أي مفتاح — شهر مجاني</small></button>
+            <button class="mode-btn" data-mode="byok" onclick="setMode('byok')">🔑 مفتاحي الخاص<small>استخدم مفتاح API بتاعك</small></button>
+          </div>
 
-      <div class="out-wrap">
-        <div class="out" id="out-script" data-raw=""></div>
-        <div class="actions" id="actions-script">
-          <button class="btn btn-ghost" onclick="copyOut('script')">📋 نسخ</button>
-          <button class="btn btn-ghost" onclick="downloadOut('script','script.md')">⬇️ تحميل .md</button>
+          <div id="cloud-box" style="display:none">
+            <p class="hint">سجّل بإيميلك بس — من غير مفاتيح ولا حسابات عند أي مزود. أول شهر مجاني بالكامل، وبعدها 10$/شهر.</p>
+            <label class="f">الإيميل</label>
+            <input type="text" id="cloud-email" dir="ltr" placeholder="you@example.com" autocomplete="email">
+            <button class="btn btn-primary btn-block" onclick="doCloudSignup()">🚀 ابدأ التجربة المجانية</button>
+            <div class="note" id="cloud-usage" style="display:none"></div>
+          </div>
+
+          <div id="byok-box">
+            <p class="hint">اختار أي مزود AI في السوق — أمريكي أو صيني أو أوروبي. مفتاحك بيتخزن محليًا على جهازك بس.</p>
+            <div class="note">💡 <b>مش عايز تدفع؟</b> اختار <b>Google — Gemini</b> — مفتاحه <b>مجاني بالكامل</b> من <span dir="ltr">aistudio.google.com/apikey</span> وجودته ممتازة (وهو نفسه اللي بيشغّل الفويس أوفر).</div>
+            <label class="f">مزود الذكاء الاصطناعي</label>
+            <select id="set-provider"></select>
+            <label class="f">الموديل</label>
+            <select id="set-model"></select>
+            <label class="f">أو اكتب اسم موديل مخصص (اختياري — لأي موديل جديد ينزل)</label>
+            <input type="text" id="set-custom" dir="ltr" placeholder="e.g. gpt-5.2 / deepseek-v4" autocomplete="off">
+            <label class="f">مفتاح API الخاص بالمزود ده</label>
+            <input type="password" id="set-key" dir="ltr" placeholder="sk-..." autocomplete="off">
+            <button class="btn btn-primary btn-block" onclick="persistSettings()">💾 حفظ</button>
+            <div class="note"><b>منين أجيب المفتاح؟</b> من موقع المزود: <span dir="ltr" id="key-url">platform.claude.com</span> — كل مزود مفتاحه بيتحفظ لوحده فتقدر تنقّل بينهم براحتك.</div>
+            <div class="note" id="pdf-note" style="display:none">ℹ️ رفع ملف <b>PDF</b> متاح حاليًا مع Anthropic (Claude) بس — مع باقي المزودين انسخ نص البريف.</div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- ============ TOOL 3: STORYBOARD ============ -->
-  <section class="panel" id="panel-board">
-    <div class="panel-grid">
-      <div class="card">
-        <h3>من السيناريو لاستوري بورد + برومبتات</h3>
-        <p class="hint">لكل مشهد: وصف الكادر ومواصفات اللقطة + <b>IMAGE PROMPT</b> بالإنجليزي لتوليد الصورة + <b>MOTION PROMPT</b> بالإنجليزي لتحريكها (Runway / Kling / Veo).</p>
-
-        <button class="btn btn-ghost" style="width:100%" onclick="useLastScript()">↩️ استخدم آخر سيناريو متولد</button>
-
-        <label class="f">أو الصق السيناريو هنا</label>
-        <textarea id="board-script" rows="7" placeholder="الصق السيناريو المتقسم لمشاهد..."></textarea>
-
-        <label class="f">نسبة الأبعاد</label>
-        <select id="board-ratio">
-          <option value="9:16">9:16 — ريلز / تيك توك</option>
-          <option value="16:9">16:9 — يوتيوب / سينمائي</option>
-          <option value="1:1">1:1 — مربع</option>
-          <option value="4:5">4:5 — فيد إنستجرام</option>
-        </select>
-
-        <label class="f">الستايل البصري — كل ستايلات السوق</label>
-        <select id="board-style-sel"></select>
-
-        <label class="f">أو اكتب ستايل مخصص / إضافي (اختياري)</label>
-        <input type="text" id="board-style" dir="ltr" placeholder="e.g. shot on ARRI Alexa, 85mm lens">
-
-        <button class="btn btn-primary" id="run-board" onclick="runBoard()">🎞️ اعمل الاستوري بورد</button>
-        <button class="btn btn-stop" id="stop-board" onclick="stopRun('board')">⏹ إيقاف</button>
-      </div>
-
-      <div class="out-wrap">
-        <div class="out" id="out-board" data-raw=""></div>
-        <div class="actions" id="actions-board">
-          <button class="btn btn-ghost" id="split-board" onclick="toggleBoardView()">🗂️ قسّم المشاهد</button>
-          <button class="btn btn-ghost" onclick="copyOut('board')">📋 نسخ الكل</button>
-          <button class="btn btn-ghost" onclick="downloadOut('board','storyboard.md')">⬇️ تحميل .md</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ SETTINGS ============ -->
-  <section class="panel" id="panel-settings">
-    <div class="card settings-card">
-      <h3>⚙️ الإعدادات</h3>
-
-      <div class="mode-switch" id="mode-switch" style="display:none">
-        <button class="mode-btn" data-mode="cloud" onclick="setMode('cloud')">☁️ حساب Film-trend<small>من غير أي مفتاح — شهر مجاني</small></button>
-        <button class="mode-btn" data-mode="byok" onclick="setMode('byok')">🔑 مفتاحي الخاص<small>استخدم مفتاح API بتاعك</small></button>
-      </div>
-
-      <!-- cloud account -->
-      <div id="cloud-box" style="display:none">
-        <p class="hint">سجّل بإيميلك بس — من غير مفاتيح ولا حسابات عند أي مزود. أول شهر مجاني بالكامل، وبعدها 10$/شهر.</p>
-        <label class="f">الإيميل</label>
-        <input type="text" id="cloud-email" dir="ltr" placeholder="you@example.com" autocomplete="email">
-        <button class="btn btn-primary" onclick="doCloudSignup()">🚀 ابدأ التجربة المجانية</button>
-        <div class="note" id="cloud-usage" style="display:none"></div>
-      </div>
-
-      <!-- bring your own key -->
-      <div id="byok-box">
-      <p class="hint">اختار أي مزود AI في السوق — أمريكي أو صيني أو أوروبي. التطبيق بيتصل بالمزود مباشرة من متصفحك ومفتاحك بيتخزن محليًا على جهازك بس.</p>
-
-      <div class="note">
-        💡 <b>مش عايز تدفع؟</b> اختار <b>Google — Gemini</b> — مفتاحه <b>مجاني بالكامل</b> من
-        <span dir="ltr">aistudio.google.com/apikey</span> (تسجيل بحساب جوجل ودقيقة واحدة) وجودته ممتازة.
-      </div>
-
-      <label class="f">مزود الذكاء الاصطناعي</label>
-      <select id="set-provider"></select>
-
-      <label class="f">الموديل</label>
-      <select id="set-model"></select>
-
-      <label class="f">أو اكتب اسم موديل مخصص (اختياري — لأي موديل جديد ينزل)</label>
-      <input type="text" id="set-custom" dir="ltr" placeholder="e.g. gpt-5.2 / deepseek-v4 / gemini-4-pro" autocomplete="off">
-
-      <label class="f">مفتاح API الخاص بالمزود ده</label>
-      <input type="password" id="set-key" dir="ltr" placeholder="sk-..." autocomplete="off">
-
-      <button class="btn btn-primary" onclick="persistSettings()">💾 حفظ</button>
-
-      <div class="note">
-        <b>منين أجيب المفتاح؟</b> من موقع المزود:
-        <span dir="ltr" id="key-url">platform.claude.com</span>
-        — كل مزود ليه مفتاح مستقل، والتطبيق بيحفظ مفتاح كل مزود لوحده فتقدر تنقّل بينهم براحتك.
-      </div>
-      <div class="note" id="pdf-note" style="display:none">
-        ℹ️ ملاحظة: رفع ملف <b>PDF</b> في أداة الخطة متاح حاليًا مع مزود Anthropic (Claude) بس — مع باقي المزودين انسخ نص البريف في الخانة.
-      </div>
-      </div><!-- /byok-box -->
-    </div>
-  </section>
+    </section>
+  </div>
 
   <script>
 /* ============================================================
@@ -535,6 +790,103 @@ const STYLE_GROUPS = [
     ],
   },
 ];
+
+/* ============================================================
+   FILM-TREND AI — voice-over via Google Gemini TTS
+   Uses the user's (free) Google AI Studio key. All voices are
+   multilingual — they speak Arabic and English natively.
+   ============================================================ */
+
+const TTS_MODEL = "gemini-2.5-flash-preview-tts";
+
+const TTS_VOICES = [
+  ["Charon",       "شارون — ذكر · عميق إخباري (ممتاز للوثائقي)"],
+  ["Algieba",      "الجيبا — ذكر · دافئ هادئ"],
+  ["Orus",         "أوروس — ذكر · حازم واثق"],
+  ["Puck",         "پَك — ذكر · حيوي شبابي"],
+  ["Fenrir",       "فنرير — ذكر · متحمس قوي"],
+  ["Enceladus",    "إنسيلادوس — ذكر · هامس هادئ"],
+  ["Rasalgethi",   "رأس الجاثي — ذكر · معلوماتي واضح"],
+  ["Schedar",      "شيدار — ذكر · متزن رسمي"],
+  ["Kore",         "كوري — أنثى · واضح احترافي"],
+  ["Zephyr",       "زفير — أنثى · مشرق مبهج"],
+  ["Leda",         "ليدا — أنثى · شبابي خفيف"],
+  ["Aoede",        "أويدي — أنثى · منطلق طبيعي"],
+  ["Despina",      "ديسبينا — أنثى · ناعم حنون"],
+  ["Erinome",      "إرينومي — أنثى · واضح مباشر"],
+  ["Achernar",     "أخر النهر — أنثى · ناعم راقي"],
+  ["Sulafat",      "سولافات — أنثى · دافئ قصصي"],
+];
+
+const TTS_STYLES = {
+  none:  "",
+  doc:   "Read the following in a warm, deep documentary narrator tone, measured pacing: ",
+  promo: "Read the following as an energetic, exciting commercial voice-over with punch: ",
+  story: "Read the following in a calm, intimate storytelling tone: ",
+  news:  "Read the following in a formal, clear news anchor tone: ",
+  ugc:   "Read the following casually and naturally, like a friend talking on camera: ",
+};
+
+/**
+ * Generate speech. Returns a WAV Blob.
+ */
+async function ttsGenerate(text, voiceName, stylePrefix) {
+  const key = localStorage.getItem("fta_key_gemini") || "";
+  if (!key) throw new Error("NO_KEY");
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${TTS_MODEL}:generateContent?key=${encodeURIComponent(key)}`,
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: (stylePrefix || "") + text }] }],
+        generationConfig: {
+          responseModalities: ["AUDIO"],
+          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName } } },
+        },
+      }),
+    }
+  );
+
+  if (!res.ok) {
+    let msg = "HTTP " + res.status;
+    try { msg = (await res.json())?.error?.message || msg; } catch (_) { /* ignore */ }
+    if (res.status === 400 || res.status === 403) throw new Error("BAD_KEY:" + msg);
+    if (res.status === 429) throw new Error("RATE:" + msg);
+    throw new Error(msg);
+  }
+
+  const data = await res.json();
+  const part = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+  if (!part) throw new Error("no audio in response");
+
+  // Gemini TTS returns raw 16-bit PCM; sample rate is in the mimeType (rate=24000)
+  const rate = parseInt((part.inlineData.mimeType.match(/rate=(\d+)/) || [, "24000"])[1], 10);
+  const pcm = Uint8Array.from(atob(part.inlineData.data), c => c.charCodeAt(0));
+  return pcmToWav(pcm, rate);
+}
+
+/* wrap raw 16-bit mono PCM in a WAV container so <audio> can play it */
+function pcmToWav(pcm, sampleRate) {
+  const header = new ArrayBuffer(44);
+  const v = new DataView(header);
+  const str = (off, s) => { for (let i = 0; i < s.length; i++) v.setUint8(off + i, s.charCodeAt(i)); };
+  str(0, "RIFF");
+  v.setUint32(4, 36 + pcm.length, true);
+  str(8, "WAVE");
+  str(12, "fmt ");
+  v.setUint32(16, 16, true);        // fmt chunk size
+  v.setUint16(20, 1, true);         // PCM
+  v.setUint16(22, 1, true);         // mono
+  v.setUint32(24, sampleRate, true);
+  v.setUint32(28, sampleRate * 2, true); // byte rate
+  v.setUint16(32, 2, true);         // block align
+  v.setUint16(34, 16, true);        // bits per sample
+  str(36, "data");
+  v.setUint32(40, pcm.length, true);
+  return new Blob([header, pcm], { type: "audio/wav" });
+}
 
 /* ============================================================
    FILM-TREND AI — multi-provider LLM client (browser, raw HTTP + SSE)
@@ -908,12 +1260,28 @@ function mdToHtml(md) {
   return html;
 }
 
-/* ---------- tabs ---------- */
+/* ---------- landing / studio views ---------- */
+function openStudio() {
+  document.body.classList.add("in-studio");
+  window.scrollTo(0, 0);
+}
+function goLanding() {
+  document.body.classList.remove("in-studio");
+}
+
+/* ---------- stepper tabs ---------- */
 function switchTab(name) {
-  document.querySelectorAll(".tab-btn").forEach(b =>
+  openStudio();
+  document.querySelectorAll(".step-btn").forEach(b =>
     b.classList.toggle("on", b.dataset.tab === name));
   document.querySelectorAll(".panel").forEach(p =>
     p.classList.toggle("show", p.id === "panel-" + name));
+  window.scrollTo(0, 0);
+}
+
+function markStepDone(tool) {
+  const btn = document.querySelector(`.step-btn[data-tab="${tool}"]`);
+  if (btn) btn.classList.add("done");
 }
 
 /* ---------- shared run/render plumbing ---------- */
@@ -952,6 +1320,7 @@ function startRun(tool, content) {
       }
       out.innerHTML = mdToHtml(full);
       document.getElementById(`actions-${tool}`).style.display = "flex";
+      markStepDone(tool);
       if (tool === "board") {
         boardView = "full";
         const sb = document.getElementById("split-board");
@@ -1107,6 +1476,62 @@ function toggleBoardView() {
   }
 }
 
+/* ---------- step 4: voice-over (Google Gemini TTS) ---------- */
+let lastWavUrl = null;
+
+function useScriptForVoice() {
+  if (!lastScript) { toast("مفيش سيناريو متولد لسه"); return; }
+  document.getElementById("voice-text").value = lastScript.slice(0, 4000);
+  toast("النص اتحط من آخر سيناريو ✓");
+}
+
+async function runVoice() {
+  const text = document.getElementById("voice-text").value.trim();
+  if (!text) { toast("اكتب النص الأول"); return; }
+
+  const status = document.getElementById("voice-status");
+  const result = document.getElementById("voice-result");
+  const btn = document.getElementById("run-voice");
+  const voice = document.getElementById("voice-name").value;
+  const style = TTS_STYLES[document.getElementById("voice-style").value] || "";
+
+  status.className = "voice-status";
+  status.textContent = "⏳ جاري توليد الصوت… (بياخد ثواني)";
+  result.style.display = "none";
+  btn.disabled = true;
+
+  try {
+    const wav = await ttsGenerate(text, voice, style);
+    if (lastWavUrl) URL.revokeObjectURL(lastWavUrl);
+    lastWavUrl = URL.createObjectURL(wav);
+    document.getElementById("voice-audio").src = lastWavUrl;
+    result.style.display = "block";
+    status.textContent = "✅ الصوت جاهز — اسمعه أو نزّله";
+    markStepDone("voice");
+    document.getElementById("voice-dl").onclick = () => {
+      const a = document.createElement("a");
+      a.href = lastWavUrl;
+      a.download = "filmtrend-voiceover.wav";
+      a.click();
+    };
+  } catch (e) {
+    status.className = "voice-status err";
+    if (e.message === "NO_KEY") {
+      status.textContent = "⚠️ الفويس أوفر محتاج مفتاح Google Gemini — ضيفه من الإعدادات (مجاني من aistudio.google.com)";
+      switchTab("settings");
+      toast("ضيف مفتاح Google Gemini الأول ⚙️");
+    } else if (e.message.startsWith("BAD_KEY")) {
+      status.textContent = "⚠️ مفتاح Google Gemini غير صحيح — راجع الإعدادات";
+    } else if (e.message.startsWith("RATE")) {
+      status.textContent = "⚠️ تجاوزت حد الطلبات المجاني — استنى دقيقة وحاول تاني";
+    } else {
+      status.textContent = "⚠️ حصلت مشكلة: " + e.message;
+    }
+  } finally {
+    btn.disabled = false;
+  }
+}
+
 /* ---------- settings ---------- */
 function fillProviderUI(provider) {
   const P = PROVIDERS[provider];
@@ -1182,8 +1607,12 @@ function toast(msg) {
 
 /* ---------- boot ---------- */
 document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".tab-btn").forEach(b =>
+  document.querySelectorAll(".step-btn").forEach(b =>
     b.addEventListener("click", () => switchTab(b.dataset.tab)));
+
+  // voice-over: populate the voices list
+  document.getElementById("voice-name").innerHTML =
+    TTS_VOICES.map(([id, label]) => `<option value="${id}">${label}</option>`).join("");
 
   // populate provider dropdown from the registry
   const provSel = document.getElementById("set-provider");
@@ -1217,8 +1646,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("pdf-name").textContent = f ? `📄 ${f.name}` : "";
   });
 
+  // returning users land straight in the studio; new visitors see the landing page
   const ready = (mode === "cloud" && cloudToken) || apiKey;
-  if (!ready) switchTab("settings");
+  if (ready) openStudio();
 });
 
 </script>

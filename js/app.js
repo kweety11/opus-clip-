@@ -63,12 +63,28 @@ function mdToHtml(md) {
   return html;
 }
 
-/* ---------- tabs ---------- */
+/* ---------- landing / studio views ---------- */
+function openStudio() {
+  document.body.classList.add("in-studio");
+  window.scrollTo(0, 0);
+}
+function goLanding() {
+  document.body.classList.remove("in-studio");
+}
+
+/* ---------- stepper tabs ---------- */
 function switchTab(name) {
-  document.querySelectorAll(".tab-btn").forEach(b =>
+  openStudio();
+  document.querySelectorAll(".step-btn").forEach(b =>
     b.classList.toggle("on", b.dataset.tab === name));
   document.querySelectorAll(".panel").forEach(p =>
     p.classList.toggle("show", p.id === "panel-" + name));
+  window.scrollTo(0, 0);
+}
+
+function markStepDone(tool) {
+  const btn = document.querySelector(`.step-btn[data-tab="${tool}"]`);
+  if (btn) btn.classList.add("done");
 }
 
 /* ---------- shared run/render plumbing ---------- */
@@ -107,6 +123,7 @@ function startRun(tool, content) {
       }
       out.innerHTML = mdToHtml(full);
       document.getElementById(`actions-${tool}`).style.display = "flex";
+      markStepDone(tool);
       if (tool === "board") {
         boardView = "full";
         const sb = document.getElementById("split-board");
@@ -262,6 +279,62 @@ function toggleBoardView() {
   }
 }
 
+/* ---------- step 4: voice-over (Google Gemini TTS) ---------- */
+let lastWavUrl = null;
+
+function useScriptForVoice() {
+  if (!lastScript) { toast("مفيش سيناريو متولد لسه"); return; }
+  document.getElementById("voice-text").value = lastScript.slice(0, 4000);
+  toast("النص اتحط من آخر سيناريو ✓");
+}
+
+async function runVoice() {
+  const text = document.getElementById("voice-text").value.trim();
+  if (!text) { toast("اكتب النص الأول"); return; }
+
+  const status = document.getElementById("voice-status");
+  const result = document.getElementById("voice-result");
+  const btn = document.getElementById("run-voice");
+  const voice = document.getElementById("voice-name").value;
+  const style = TTS_STYLES[document.getElementById("voice-style").value] || "";
+
+  status.className = "voice-status";
+  status.textContent = "⏳ جاري توليد الصوت… (بياخد ثواني)";
+  result.style.display = "none";
+  btn.disabled = true;
+
+  try {
+    const wav = await ttsGenerate(text, voice, style);
+    if (lastWavUrl) URL.revokeObjectURL(lastWavUrl);
+    lastWavUrl = URL.createObjectURL(wav);
+    document.getElementById("voice-audio").src = lastWavUrl;
+    result.style.display = "block";
+    status.textContent = "✅ الصوت جاهز — اسمعه أو نزّله";
+    markStepDone("voice");
+    document.getElementById("voice-dl").onclick = () => {
+      const a = document.createElement("a");
+      a.href = lastWavUrl;
+      a.download = "filmtrend-voiceover.wav";
+      a.click();
+    };
+  } catch (e) {
+    status.className = "voice-status err";
+    if (e.message === "NO_KEY") {
+      status.textContent = "⚠️ الفويس أوفر محتاج مفتاح Google Gemini — ضيفه من الإعدادات (مجاني من aistudio.google.com)";
+      switchTab("settings");
+      toast("ضيف مفتاح Google Gemini الأول ⚙️");
+    } else if (e.message.startsWith("BAD_KEY")) {
+      status.textContent = "⚠️ مفتاح Google Gemini غير صحيح — راجع الإعدادات";
+    } else if (e.message.startsWith("RATE")) {
+      status.textContent = "⚠️ تجاوزت حد الطلبات المجاني — استنى دقيقة وحاول تاني";
+    } else {
+      status.textContent = "⚠️ حصلت مشكلة: " + e.message;
+    }
+  } finally {
+    btn.disabled = false;
+  }
+}
+
 /* ---------- settings ---------- */
 function fillProviderUI(provider) {
   const P = PROVIDERS[provider];
@@ -337,8 +410,12 @@ function toast(msg) {
 
 /* ---------- boot ---------- */
 document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".tab-btn").forEach(b =>
+  document.querySelectorAll(".step-btn").forEach(b =>
     b.addEventListener("click", () => switchTab(b.dataset.tab)));
+
+  // voice-over: populate the voices list
+  document.getElementById("voice-name").innerHTML =
+    TTS_VOICES.map(([id, label]) => `<option value="${id}">${label}</option>`).join("");
 
   // populate provider dropdown from the registry
   const provSel = document.getElementById("set-provider");
@@ -372,6 +449,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("pdf-name").textContent = f ? `📄 ${f.name}` : "";
   });
 
+  // returning users land straight in the studio; new visitors see the landing page
   const ready = (mode === "cloud" && cloudToken) || apiKey;
-  if (!ready) switchTab("settings");
+  if (ready) openStudio();
 });

@@ -3,195 +3,306 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Film-trend AI — من البريف للاستوري بورد</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23e8b04b'/><text x='16' y='23' text-anchor='middle' font-size='18'>🎬</text></svg>">
+  <title>Film-trend AI — استوديو الإنتاج بالذكاء الاصطناعي</title>
+  <meta name="description" content="خطة سوشيال ميديا، سيناريو، استوري بورد ببرومبتات جاهزة، وفويس أوفر بأصوات جوجل — بأي موديل AI في السوق.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23f2b23e'/><text x='16' y='23' text-anchor='middle' font-size='18'>🎬</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
 
-  <header class="top">
-    <div class="logo">🎬</div>
-    <div>
-      <h1>Film-trend <em>AI</em></h1>
-      <p>خطة سوشيال ميديا · سيناريو · استوري بورد ببرومبتات جاهزة — بأي موديل AI في السوق</p>
+  <!-- ================= HEADER ================= -->
+  <header class="site-header">
+    <div class="wrap">
+      <div class="brand" onclick="goLanding()">
+        <span class="mark">🎬</span>
+        <span>Film-trend <em>AI</em></span>
+      </div>
+      <nav class="head-nav" id="head-nav">
+        <a href="#features" onclick="goLanding()">المميزات</a>
+        <a href="#pricing" onclick="goLanding()">الأسعار</a>
+      </nav>
+      <button class="btn btn-primary btn-sm" onclick="openStudio()">افتح الاستوديو ←</button>
     </div>
   </header>
 
-  <nav class="tabs">
-    <button class="tab-btn on" data-tab="plan">📋 خطة السوشيال ميديا</button>
-    <button class="tab-btn" data-tab="script">✍️ السيناريو</button>
-    <button class="tab-btn" data-tab="board">🎞️ الاستوري بورد</button>
-    <button class="tab-btn" data-tab="settings">⚙️ الإعدادات</button>
-  </nav>
+  <!-- ================= LANDING ================= -->
+  <div id="landing">
 
-  <!-- ============ TOOL 1: SOCIAL PLAN ============ -->
-  <section class="panel show" id="panel-plan">
-    <div class="panel-grid">
-      <div class="card">
-        <h3>من البريف لخطة كاملة</h3>
-        <p class="hint">اكتب البريف أو ارفع ملف PDF — هتاخد خطة شاملة: أهداف، جمهور، استراتيجية منصات، أعمدة محتوى، جدول 30 يوم، هوكس جاهزة، خطة إعلانات وقياس.</p>
-
-        <label class="f">البريف (اختياري لو رفعت PDF)</label>
-        <textarea id="plan-brief" placeholder="مثال: براند قهوة مختصة جديد في القاهرة، الجمهور 20-35 سنة، الهدف نبني وعي وزيارات للمحل، الميزانية محدودة، التون شبابي..."></textarea>
-
-        <label class="f">أو ارفع البريف كـ PDF</label>
-        <label class="upload">
-          📎 اختار ملف PDF
-          <input type="file" id="plan-pdf" accept="application/pdf">
-        </label>
-        <div id="pdf-name"></div>
-
-        <button class="btn btn-primary" id="run-plan" onclick="runPlan()">🚀 اعمل الخطة</button>
-        <button class="btn btn-stop" id="stop-plan" onclick="stopRun('plan')">⏹ إيقاف</button>
+    <section class="hero">
+      <div class="wrap">
+        <span class="kicker">✦ من البريف للفيديو النهائي — في مكان واحد</span>
+        <h1>استوديو إنتاج كامل<br><span class="grad">بالذكاء الاصطناعي</span></h1>
+        <p class="sub">خطة سوشيال ميديا، سيناريو، استوري بورد ببرومبتات جاهزة للتوليد، وفويس أوفر بأصوات جوجل الاحترافية — بأي موديل AI في السوق.</p>
+        <div class="hero-ctas">
+          <button class="btn btn-primary btn-lg" onclick="openStudio()">🚀 ابدأ مجانًا</button>
+          <a class="btn btn-ghost btn-lg" href="#pricing">شوف الأسعار</a>
+        </div>
+        <div class="hero-stats">
+          <div><b>4</b><span>أدوات متكاملة</span></div>
+          <div><b>11</b><span>مزود AI مدعوم</span></div>
+          <div><b>76</b><span>ستايل بصري</span></div>
+          <div><b>16</b><span>صوت فويس أوفر</span></div>
+        </div>
       </div>
+    </section>
 
-      <div class="out-wrap">
-        <div class="out" id="out-plan" data-raw=""></div>
-        <div class="actions" id="actions-plan">
-          <button class="btn btn-ghost" onclick="copyOut('plan')">📋 نسخ</button>
-          <button class="btn btn-ghost" onclick="downloadOut('plan','social-media-plan.md')">⬇️ تحميل .md</button>
+    <section class="section" id="features">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2>كل خطوات الإنتاج</h2>
+          <p>أربع أدوات بتسلّم بعضها — من أول فكرة لحد ملفات جاهزة للنشر.</p>
+        </div>
+        <div class="feat-grid">
+          <div class="feat"><span class="num">01</span><div class="ico">📋</div><h3>خطة السوشيال ميديا</h3><p>بريف مكتوب أو PDF يتحول لخطة كاملة: أهداف، جمهور، جدول 30 يوم، هوكس جاهزة وقياس.</p></div>
+          <div class="feat"><span class="num">02</span><div class="ico">✍️</div><h3>السيناريو</h3><p>فكرتك تبقى سيناريو متقسم مشاهد بهوية بصرية ثابتة للشخصيات وبرومبت ماستر بالإنجليزي.</p></div>
+          <div class="feat"><span class="num">03</span><div class="ico">🎞️</div><h3>الاستوري بورد</h3><p>لكل مشهد برومبت صورة وبرومبت حركة بالإنجليزي جاهزين لأدوات التوليد، مع تقسيم المشاهد لكروت.</p></div>
+          <div class="feat"><span class="num">04</span><div class="ico">🎙️</div><h3>الفويس أوفر</h3><p>أصوات جوجل الاحترافية بالعربي والإنجليزي — من نص السيناريو لملف صوت جاهز للمونتاج.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="wrap">
+        <div class="sec-head"><h2>إزاي بتشتغل؟</h2></div>
+        <div class="how-grid">
+          <div class="how"><p>اكتب البريف أو ارفع PDF</p></div>
+          <div class="how"><p>ولّد السيناريو وعدّل عليه</p></div>
+          <div class="how"><p>خد برومبتات المشاهد وولّد الفيجوال</p></div>
+          <div class="how"><p>سجّل الفويس أوفر ونزّل الملفات</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="pricing">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2>أسعار بسيطة</h2>
+          <p>جرّب كل حاجة ببلاش لمدة شهر — من غير بطاقة ائتمان.</p>
+        </div>
+        <div class="price-grid">
+          <div class="price">
+            <h3>التجربة المجانية</h3>
+            <div class="amount">$0 <small>/ أول شهر</small></div>
+            <ul>
+              <li>40 توليدة كاملة</li>
+              <li>كل الأدوات الأربعة</li>
+              <li>كل الستايلات والأصوات</li>
+              <li>من غير بطاقة ائتمان</li>
+            </ul>
+            <button class="btn btn-ghost" onclick="openStudio()">ابدأ التجربة</button>
+          </div>
+          <div class="price hot">
+            <span class="flag">الأكثر اختيارًا</span>
+            <h3>الاحترافي</h3>
+            <div class="amount">$10 <small>/ شهريًا</small></div>
+            <ul>
+              <li>استخدام غير محدود*</li>
+              <li>أولوية في الموديلات الأقوى</li>
+              <li>كل الستايلات والأصوات</li>
+              <li>دعم مباشر</li>
+            </ul>
+            <button class="btn btn-primary" onclick="openStudio()">ابدأ دلوقتي</button>
+          </div>
+        </div>
+        <p class="price-note">* بحد يومي عادل لمنع إساءة الاستخدام</p>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="wrap">© 2026 Film-trend AI — استوديو الإنتاج بالذكاء الاصطناعي، عربي أولًا.</div>
+    </footer>
+  </div>
+
+  <!-- ================= STUDIO ================= -->
+  <div id="studio">
+
+    <div class="stepper-bar">
+      <div class="wrap">
+        <div class="stepper">
+          <button class="step-btn on" data-tab="plan"><span class="n"><span>1</span></span>الخطة</button>
+          <span class="step-sep"></span>
+          <button class="step-btn" data-tab="script"><span class="n"><span>2</span></span>السيناريو</button>
+          <span class="step-sep"></span>
+          <button class="step-btn" data-tab="board"><span class="n"><span>3</span></span>الاستوري بورد</button>
+          <span class="step-sep"></span>
+          <button class="step-btn" data-tab="voice"><span class="n"><span>4</span></span>الفويس أوفر</button>
+          <button class="step-btn step-gear" data-tab="settings">⚙️ الإعدادات</button>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- ============ TOOL 2: SCRIPT ============ -->
-  <section class="panel" id="panel-script">
-    <div class="panel-grid">
-      <div class="card">
-        <h3>من الفكرة لسيناريو متقسم</h3>
-        <p class="hint">اكتب فكرتك بأي شكل — هتاخد Logline وملخص وشخصيات بهوية بصرية ثابتة وهيكل درامي ومشاهد مرقمة بالحوار والمدة.</p>
+    <!-- STEP 1: PLAN -->
+    <section class="panel show" id="panel-plan">
+      <div class="wrap"><div class="panel-grid">
+        <div class="card">
+          <h3>من البريف لخطة كاملة</h3>
+          <p class="hint">اكتب البريف أو ارفع ملف PDF — هتاخد خطة شاملة: أهداف، جمهور، استراتيجية منصات، جدول 30 يوم، هوكس جاهزة وقياس.</p>
+          <label class="f">البريف (اختياري لو رفعت PDF)</label>
+          <textarea id="plan-brief" placeholder="مثال: براند قهوة مختصة جديد في القاهرة، الجمهور 20-35 سنة، الهدف وعي وزيارات، التون شبابي..."></textarea>
+          <label class="f">أو ارفع البريف كـ PDF</label>
+          <label class="upload">📎 اختار ملف PDF<input type="file" id="plan-pdf" accept="application/pdf"></label>
+          <div id="pdf-name"></div>
+          <button class="btn btn-primary btn-block" id="run-plan" onclick="runPlan()">🚀 اعمل الخطة</button>
+          <button class="btn btn-stop" id="stop-plan" onclick="stopRun('plan')">⏹ إيقاف</button>
+        </div>
+        <div>
+          <div class="out" id="out-plan" data-raw=""></div>
+          <div class="actions" id="actions-plan">
+            <button class="btn btn-ghost btn-sm" onclick="copyOut('plan')">📋 نسخ</button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadOut('plan','social-media-plan.md')">⬇️ تحميل .md</button>
+          </div>
+        </div>
+      </div></div>
+    </section>
 
-        <label class="f">نوع العمل</label>
-        <select id="script-format">
-          <option value="UGC">UGC / فيديو سوشيال</option>
-          <option value="ad">إعلان</option>
-          <option value="film">فيلم قصير</option>
-          <option value="series">حلقة مسلسل</option>
-          <option value="documentary">وثائقي</option>
-          <option value="short">قصة قصيرة</option>
-        </select>
+    <!-- STEP 2: SCRIPT -->
+    <section class="panel" id="panel-script">
+      <div class="wrap"><div class="panel-grid">
+        <div class="card">
+          <h3>من الفكرة لسيناريو متقسم</h3>
+          <p class="hint">اكتب فكرتك بأي شكل — هتاخد Logline وشخصيات بهوية بصرية ثابتة ومشاهد مرقمة بالحوار والمدة، وبرومبت ماستر بالإنجليزي.</p>
+          <label class="f">نوع العمل</label>
+          <select id="script-format">
+            <option value="UGC">UGC / فيديو سوشيال</option>
+            <option value="ad">إعلان</option>
+            <option value="film">فيلم قصير</option>
+            <option value="series">حلقة مسلسل</option>
+            <option value="documentary">وثائقي</option>
+            <option value="short">قصة قصيرة</option>
+          </select>
+          <label class="f">المدة المستهدفة (اختياري)</label>
+          <input type="text" id="script-duration" placeholder="مثال: 60 ثانية / 3 دقائق">
+          <label class="f">الفكرة</label>
+          <textarea id="script-idea" rows="7" placeholder="مثال: إعلان لتطبيق توصيل أكل، البطل موظف مرهق بيرجع البيت متأخر، إحساس دافئ إنساني..."></textarea>
+          <button class="btn btn-primary btn-block" id="run-script" onclick="runScript()">✍️ اكتب السيناريو</button>
+          <button class="btn btn-stop" id="stop-script" onclick="stopRun('script')">⏹ إيقاف</button>
+          <div id="carry-note">✓ السيناريو جاهز — روح لخطوة الاستوري بورد واضغط "استخدم آخر سيناريو"</div>
+        </div>
+        <div>
+          <div class="out" id="out-script" data-raw=""></div>
+          <div class="actions" id="actions-script">
+            <button class="btn btn-ghost btn-sm" onclick="copyOut('script')">📋 نسخ</button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadOut('script','script.md')">⬇️ تحميل .md</button>
+          </div>
+        </div>
+      </div></div>
+    </section>
 
-        <label class="f">المدة المستهدفة (اختياري)</label>
-        <input type="text" id="script-duration" placeholder="مثال: 60 ثانية / 3 دقائق">
+    <!-- STEP 3: STORYBOARD -->
+    <section class="panel" id="panel-board">
+      <div class="wrap"><div class="panel-grid">
+        <div class="card">
+          <h3>من السيناريو لاستوري بورد + برومبتات</h3>
+          <p class="hint">لكل مشهد: وصف الكادر + <b>IMAGE PROMPT</b> لتوليد الصورة + <b>MOTION PROMPT</b> لتحريكها (Runway / Kling / Veo).</p>
+          <button class="btn btn-ghost btn-block" style="margin-top:0" onclick="useLastScript()">↩️ استخدم آخر سيناريو متولد</button>
+          <label class="f">أو الصق السيناريو هنا</label>
+          <textarea id="board-script" rows="6" placeholder="الصق السيناريو المتقسم لمشاهد..."></textarea>
+          <label class="f">نسبة الأبعاد</label>
+          <select id="board-ratio">
+            <option value="9:16">9:16 — ريلز / تيك توك</option>
+            <option value="16:9">16:9 — يوتيوب / سينمائي</option>
+            <option value="1:1">1:1 — مربع</option>
+            <option value="4:5">4:5 — فيد إنستجرام</option>
+          </select>
+          <label class="f">الستايل البصري — كل ستايلات السوق</label>
+          <select id="board-style-sel"></select>
+          <label class="f">أو اكتب ستايل مخصص / إضافي (اختياري)</label>
+          <input type="text" id="board-style" dir="ltr" placeholder="e.g. shot on ARRI Alexa, 85mm lens">
+          <button class="btn btn-primary btn-block" id="run-board" onclick="runBoard()">🎞️ اعمل الاستوري بورد</button>
+          <button class="btn btn-stop" id="stop-board" onclick="stopRun('board')">⏹ إيقاف</button>
+        </div>
+        <div>
+          <div class="out" id="out-board" data-raw=""></div>
+          <div class="actions" id="actions-board">
+            <button class="btn btn-ghost btn-sm" id="split-board" onclick="toggleBoardView()">🗂️ قسّم المشاهد</button>
+            <button class="btn btn-ghost btn-sm" onclick="copyOut('board')">📋 نسخ الكل</button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadOut('board','storyboard.md')">⬇️ تحميل .md</button>
+          </div>
+        </div>
+      </div></div>
+    </section>
 
-        <label class="f">الفكرة</label>
-        <textarea id="script-idea" rows="7" placeholder="مثال: إعلان لتطبيق توصيل أكل، البطل موظف مرهق بيرجع البيت متأخر، عايز إحساس دافئ وإنساني مش بيعي مباشر..."></textarea>
+    <!-- STEP 4: VOICE-OVER -->
+    <section class="panel" id="panel-voice">
+      <div class="wrap"><div class="panel-grid">
+        <div class="card">
+          <h3>الفويس أوفر — أصوات Google</h3>
+          <p class="hint">أصوات Gemini الاحترافية بتتكلم <b>عربي وإنجليزي</b>. بيستخدم مفتاح Google Gemini (المجاني) من الإعدادات.</p>
+          <button class="btn btn-ghost btn-block" style="margin-top:0" onclick="useScriptForVoice()">↩️ هات النص من آخر سيناريو</button>
+          <label class="f">النص</label>
+          <textarea id="voice-text" rows="6" placeholder="اكتب أو الصق النص اللي عايز تسمعه — عربي أو إنجليزي..."></textarea>
+          <label class="f">الصوت</label>
+          <select id="voice-name"></select>
+          <label class="f">أسلوب الأداء</label>
+          <select id="voice-style">
+            <option value="doc">وثائقي دافئ</option>
+            <option value="promo">إعلاني حماسي</option>
+            <option value="story">قصصي هادئ</option>
+            <option value="news">إخباري رسمي</option>
+            <option value="ugc">طبيعي عفوي (UGC)</option>
+            <option value="none">عادي — من غير توجيه</option>
+          </select>
+          <button class="btn btn-primary btn-block" id="run-voice" onclick="runVoice()">🎙️ ولّد الصوت</button>
+        </div>
+        <div>
+          <div class="card">
+            <h3>🎧 النتيجة</h3>
+            <p class="voice-status" id="voice-status">اكتب النص واختار الصوت واضغط "ولّد الصوت"</p>
+            <div class="voice-result" id="voice-result">
+              <audio id="voice-audio" controls></audio>
+              <button class="btn btn-ghost btn-sm" id="voice-dl">⬇️ تحميل WAV</button>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </section>
 
-        <button class="btn btn-primary" id="run-script" onclick="runScript()">✍️ اكتب السيناريو</button>
-        <button class="btn btn-stop" id="stop-script" onclick="stopRun('script')">⏹ إيقاف</button>
+    <!-- SETTINGS -->
+    <section class="panel" id="panel-settings">
+      <div class="wrap">
+        <div class="card settings-card">
+          <h3>⚙️ الإعدادات</h3>
 
-        <div id="carry-note">✓ السيناريو جاهز — روح لتبويب الاستوري بورد واضغط "استخدم آخر سيناريو"</div>
-      </div>
+          <div class="mode-switch" id="mode-switch" style="display:none">
+            <button class="mode-btn" data-mode="cloud" onclick="setMode('cloud')">☁️ حساب Film-trend<small>من غير أي مفتاح — شهر مجاني</small></button>
+            <button class="mode-btn" data-mode="byok" onclick="setMode('byok')">🔑 مفتاحي الخاص<small>استخدم مفتاح API بتاعك</small></button>
+          </div>
 
-      <div class="out-wrap">
-        <div class="out" id="out-script" data-raw=""></div>
-        <div class="actions" id="actions-script">
-          <button class="btn btn-ghost" onclick="copyOut('script')">📋 نسخ</button>
-          <button class="btn btn-ghost" onclick="downloadOut('script','script.md')">⬇️ تحميل .md</button>
+          <div id="cloud-box" style="display:none">
+            <p class="hint">سجّل بإيميلك بس — من غير مفاتيح ولا حسابات عند أي مزود. أول شهر مجاني بالكامل، وبعدها 10$/شهر.</p>
+            <label class="f">الإيميل</label>
+            <input type="text" id="cloud-email" dir="ltr" placeholder="you@example.com" autocomplete="email">
+            <button class="btn btn-primary btn-block" onclick="doCloudSignup()">🚀 ابدأ التجربة المجانية</button>
+            <div class="note" id="cloud-usage" style="display:none"></div>
+          </div>
+
+          <div id="byok-box">
+            <p class="hint">اختار أي مزود AI في السوق — أمريكي أو صيني أو أوروبي. مفتاحك بيتخزن محليًا على جهازك بس.</p>
+            <div class="note">💡 <b>مش عايز تدفع؟</b> اختار <b>Google — Gemini</b> — مفتاحه <b>مجاني بالكامل</b> من <span dir="ltr">aistudio.google.com/apikey</span> وجودته ممتازة (وهو نفسه اللي بيشغّل الفويس أوفر).</div>
+            <label class="f">مزود الذكاء الاصطناعي</label>
+            <select id="set-provider"></select>
+            <label class="f">الموديل</label>
+            <select id="set-model"></select>
+            <label class="f">أو اكتب اسم موديل مخصص (اختياري — لأي موديل جديد ينزل)</label>
+            <input type="text" id="set-custom" dir="ltr" placeholder="e.g. gpt-5.2 / deepseek-v4" autocomplete="off">
+            <label class="f">مفتاح API الخاص بالمزود ده</label>
+            <input type="password" id="set-key" dir="ltr" placeholder="sk-..." autocomplete="off">
+            <button class="btn btn-primary btn-block" onclick="persistSettings()">💾 حفظ</button>
+            <div class="note"><b>منين أجيب المفتاح؟</b> من موقع المزود: <span dir="ltr" id="key-url">platform.claude.com</span> — كل مزود مفتاحه بيتحفظ لوحده فتقدر تنقّل بينهم براحتك.</div>
+            <div class="note" id="pdf-note" style="display:none">ℹ️ رفع ملف <b>PDF</b> متاح حاليًا مع Anthropic (Claude) بس — مع باقي المزودين انسخ نص البريف.</div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- ============ TOOL 3: STORYBOARD ============ -->
-  <section class="panel" id="panel-board">
-    <div class="panel-grid">
-      <div class="card">
-        <h3>من السيناريو لاستوري بورد + برومبتات</h3>
-        <p class="hint">لكل مشهد: وصف الكادر ومواصفات اللقطة + <b>IMAGE PROMPT</b> بالإنجليزي لتوليد الصورة + <b>MOTION PROMPT</b> بالإنجليزي لتحريكها (Runway / Kling / Veo).</p>
-
-        <button class="btn btn-ghost" style="width:100%" onclick="useLastScript()">↩️ استخدم آخر سيناريو متولد</button>
-
-        <label class="f">أو الصق السيناريو هنا</label>
-        <textarea id="board-script" rows="7" placeholder="الصق السيناريو المتقسم لمشاهد..."></textarea>
-
-        <label class="f">نسبة الأبعاد</label>
-        <select id="board-ratio">
-          <option value="9:16">9:16 — ريلز / تيك توك</option>
-          <option value="16:9">16:9 — يوتيوب / سينمائي</option>
-          <option value="1:1">1:1 — مربع</option>
-          <option value="4:5">4:5 — فيد إنستجرام</option>
-        </select>
-
-        <label class="f">الستايل البصري — كل ستايلات السوق</label>
-        <select id="board-style-sel"></select>
-
-        <label class="f">أو اكتب ستايل مخصص / إضافي (اختياري)</label>
-        <input type="text" id="board-style" dir="ltr" placeholder="e.g. shot on ARRI Alexa, 85mm lens">
-
-        <button class="btn btn-primary" id="run-board" onclick="runBoard()">🎞️ اعمل الاستوري بورد</button>
-        <button class="btn btn-stop" id="stop-board" onclick="stopRun('board')">⏹ إيقاف</button>
-      </div>
-
-      <div class="out-wrap">
-        <div class="out" id="out-board" data-raw=""></div>
-        <div class="actions" id="actions-board">
-          <button class="btn btn-ghost" id="split-board" onclick="toggleBoardView()">🗂️ قسّم المشاهد</button>
-          <button class="btn btn-ghost" onclick="copyOut('board')">📋 نسخ الكل</button>
-          <button class="btn btn-ghost" onclick="downloadOut('board','storyboard.md')">⬇️ تحميل .md</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ SETTINGS ============ -->
-  <section class="panel" id="panel-settings">
-    <div class="card settings-card">
-      <h3>⚙️ الإعدادات</h3>
-
-      <div class="mode-switch" id="mode-switch" style="display:none">
-        <button class="mode-btn" data-mode="cloud" onclick="setMode('cloud')">☁️ حساب Film-trend<small>من غير أي مفتاح — شهر مجاني</small></button>
-        <button class="mode-btn" data-mode="byok" onclick="setMode('byok')">🔑 مفتاحي الخاص<small>استخدم مفتاح API بتاعك</small></button>
-      </div>
-
-      <!-- cloud account -->
-      <div id="cloud-box" style="display:none">
-        <p class="hint">سجّل بإيميلك بس — من غير مفاتيح ولا حسابات عند أي مزود. أول شهر مجاني بالكامل، وبعدها 10$/شهر.</p>
-        <label class="f">الإيميل</label>
-        <input type="text" id="cloud-email" dir="ltr" placeholder="you@example.com" autocomplete="email">
-        <button class="btn btn-primary" onclick="doCloudSignup()">🚀 ابدأ التجربة المجانية</button>
-        <div class="note" id="cloud-usage" style="display:none"></div>
-      </div>
-
-      <!-- bring your own key -->
-      <div id="byok-box">
-      <p class="hint">اختار أي مزود AI في السوق — أمريكي أو صيني أو أوروبي. التطبيق بيتصل بالمزود مباشرة من متصفحك ومفتاحك بيتخزن محليًا على جهازك بس.</p>
-
-      <div class="note">
-        💡 <b>مش عايز تدفع؟</b> اختار <b>Google — Gemini</b> — مفتاحه <b>مجاني بالكامل</b> من
-        <span dir="ltr">aistudio.google.com/apikey</span> (تسجيل بحساب جوجل ودقيقة واحدة) وجودته ممتازة.
-      </div>
-
-      <label class="f">مزود الذكاء الاصطناعي</label>
-      <select id="set-provider"></select>
-
-      <label class="f">الموديل</label>
-      <select id="set-model"></select>
-
-      <label class="f">أو اكتب اسم موديل مخصص (اختياري — لأي موديل جديد ينزل)</label>
-      <input type="text" id="set-custom" dir="ltr" placeholder="e.g. gpt-5.2 / deepseek-v4 / gemini-4-pro" autocomplete="off">
-
-      <label class="f">مفتاح API الخاص بالمزود ده</label>
-      <input type="password" id="set-key" dir="ltr" placeholder="sk-..." autocomplete="off">
-
-      <button class="btn btn-primary" onclick="persistSettings()">💾 حفظ</button>
-
-      <div class="note">
-        <b>منين أجيب المفتاح؟</b> من موقع المزود:
-        <span dir="ltr" id="key-url">platform.claude.com</span>
-        — كل مزود ليه مفتاح مستقل، والتطبيق بيحفظ مفتاح كل مزود لوحده فتقدر تنقّل بينهم براحتك.
-      </div>
-      <div class="note" id="pdf-note" style="display:none">
-        ℹ️ ملاحظة: رفع ملف <b>PDF</b> في أداة الخطة متاح حاليًا مع مزود Anthropic (Claude) بس — مع باقي المزودين انسخ نص البريف في الخانة.
-      </div>
-      </div><!-- /byok-box -->
-    </div>
-  </section>
+    </section>
+  </div>
 
   <script src="js/config.js"></script>
   <script src="js/prompt.js"></script>
   <script src="js/styles.js"></script>
+  <script src="js/tts.js"></script>
   <script src="js/api.js"></script>
   <script src="js/app.js"></script>
 </body>
