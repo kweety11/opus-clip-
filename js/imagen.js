@@ -16,9 +16,10 @@ const SKETCH_MODELS = [
 let _sketchModel = null; // remembered after the first success
 
 const SKETCH_STYLE_PREFIX =
-  "Professional film storyboard sketch, black and white pencil and ink drawing, " +
-  "rough expressive linework, clear composition and framing, cinematic staging, " +
-  "monochrome, no color, storyboard panel style. ";
+  "Professional hand-drawn storyboard sketch, graphite pencil and fine ink pen on white paper, " +
+  "loose confident expressive strokes, cross-hatching and soft pencil shading, " +
+  "monochrome black and white, authentic sketchbook look with visible stroke texture, " +
+  "clear cinematic composition and framing, no color. ";
 
 /**
  * sketchGenerate(sceneDescription, refImage?) → Promise<dataURL>

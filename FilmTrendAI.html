@@ -837,6 +837,7 @@ html[data-theme="gold"] {
         <div>
           <div class="out md" id="out-board" data-raw=""></div>
           <div class="actions" id="actions-board">
+            <button class="btn btn-primary btn-sm" id="gen-sketches" onclick="generateSketches()" data-i18n="sk_gen"></button>
             <button class="btn btn-ghost btn-sm" id="split-board" onclick="toggleBoardView()" data-i18n="split"></button>
             <button class="btn btn-ghost btn-sm" onclick="copyOut('board')" data-i18n="copy_all"></button>
             <button class="btn btn-ghost btn-sm" onclick="downloadOut('board','storyboard.md')" data-i18n="dl_md"></button>
@@ -1044,6 +1045,8 @@ const I18N = {
     b_sketch: "✏️ اسكتشات أبيض وأسود لكل مشهد (بترسم بمفتاح Gemini المجاني)",
     sk_draw: "✏️ ارسم الاسكتش", sk_drawing: "⏳ بيرسم…", sk_all: "✏️ ارسم كل الاسكتشات",
     sk_auto: "🎨 بيرسم اسكتشات المشاهد بالترتيب — واحد ورا التاني…",
+    sk_gen: "🎨 ولّد الاسكتشات", sk_gen_busy: "⏳ بيرسم الاسكتشات…", sk_gen_done: "✓ الاسكتشات جاهزة — ارسم تاني؟",
+    sk_dl: "⬇ تحميل الاسكتش",
     sk_prompt: "✏️ SKETCH PROMPT", copied_sk: "برومبت الاسكتش",
     sk_no_key: "الاسكتشات محتاجة مفتاح Google Gemini (مجاني) — ضيفه من الإعدادات",
     sk_rate: "وصلت لحد الرسم المجاني — استنى دقيقة وحاول تاني",
@@ -1055,7 +1058,9 @@ const I18N = {
     v_eleven_key: "مفتاح ElevenLabs",
     v_eleven_note_html: "🎙️ مفتاح <b>مجاني</b> من <span dir=\"ltr\">elevenlabs.io</span> → Profile → API Keys. أصوات ElevenLabs بتنطق العامية المصرية بشكل طبيعي جدًا.",
     v_accent: "اللهجة / النطق", va_eg: "🇪🇬 مصري عامي", va_msa: "عربي فصحى", va_gulf: "خليجي", va_none: "تلقائي — من غير توجيه",
-    v_eleven_loading: "⏳ بجيب الأصوات من حسابك…", v_eleven_bad: "مفتاح ElevenLabs غير صحيح",
+    v_eleven_loading: "⏳ بجيب الأصوات من حسابك…",
+    v_eleven_bad: "مفتاح ElevenLabs اترفض — اتأكد من صفحة API Keys إن المفتاح Enabled (المفاتيح المقفولة بتترفض) وإن معاه صلاحية Text-to-Speech، أو اعمل Create Key جديد بصلاحيات كاملة",
+    v_eleven_fallback: "المفتاح شغال بس من غير صلاحية قراءة أصواتك — حمّلنا الأصوات الجاهزة الافتراضية ✓",
   },
   en: {
     nav_features: "Features", nav_pricing: "Pricing", open_studio: "Open Studio →",
@@ -1138,6 +1143,8 @@ const I18N = {
     b_sketch: "✏️ B/W sketch for every scene (drawn with your free Gemini key)",
     sk_draw: "✏️ Draw sketch", sk_drawing: "⏳ Drawing…", sk_all: "✏️ Draw all sketches",
     sk_auto: "🎨 Drawing the scene sketches in order — one after another…",
+    sk_gen: "🎨 Generate sketches", sk_gen_busy: "⏳ Drawing sketches…", sk_gen_done: "✓ Sketches ready — draw again?",
+    sk_dl: "⬇ Download sketch",
     sk_prompt: "✏️ SKETCH PROMPT", copied_sk: "Sketch prompt",
     sk_no_key: "Sketches need a (free) Google Gemini key — add it in Settings",
     sk_rate: "Free drawing limit reached — wait a minute and retry",
@@ -1149,7 +1156,9 @@ const I18N = {
     v_eleven_key: "ElevenLabs API key",
     v_eleven_note_html: "🎙️ <b>Free</b> key from <span dir=\"ltr\">elevenlabs.io</span> → Profile → API Keys. ElevenLabs voices pronounce Egyptian Arabic very naturally.",
     v_accent: "Dialect / pronunciation", va_eg: "🇪🇬 Egyptian colloquial", va_msa: "Modern Standard Arabic", va_gulf: "Gulf", va_none: "Auto — no steering",
-    v_eleven_loading: "⏳ Fetching voices from your account…", v_eleven_bad: "Invalid ElevenLabs key",
+    v_eleven_loading: "⏳ Fetching voices from your account…",
+    v_eleven_bad: "ElevenLabs key rejected — on the API Keys page make sure the key is Enabled (disabled keys are rejected) and has the Text-to-Speech permission, or Create a new Key with full access",
+    v_eleven_fallback: "Key works but can't list your voices — loaded the default premade voices ✓",
   },
 };
 
@@ -1422,9 +1431,10 @@ const SKETCH_MODELS = [
 let _sketchModel = null; // remembered after the first success
 
 const SKETCH_STYLE_PREFIX =
-  "Professional film storyboard sketch, black and white pencil and ink drawing, " +
-  "rough expressive linework, clear composition and framing, cinematic staging, " +
-  "monochrome, no color, storyboard panel style. ";
+  "Professional hand-drawn storyboard sketch, graphite pencil and fine ink pen on white paper, " +
+  "loose confident expressive strokes, cross-hatching and soft pencil shading, " +
+  "monochrome black and white, authentic sketchbook look with visible stroke texture, " +
+  "clear cinematic composition and framing, no color. ";
 
 /**
  * sketchGenerate(sceneDescription, refImage?) → Promise<dataURL>
@@ -1586,6 +1596,20 @@ async function ttsGenerate(text, voiceName, stylePrefix, accentKey) {
    the text's dialect closely, so Egyptian عامية sounds Egyptian.
    ============================================================ */
 const ELEVEN_MODEL = "eleven_multilingual_v2";
+
+/* premade voices every ElevenLabs account has — used when the key lacks
+   the "read voices" permission (restricted keys) so TTS still works */
+const ELEVEN_DEFAULT_VOICES = [
+  ["21m00Tcm4TlvDq8ikWAM", "Rachel — أنثى · دافئة واضحة"],
+  ["EXAVITQu4vr4xnSDxMaL", "Sarah — أنثى · ناعمة"],
+  ["AZnzlk1XvdvUeBnXmlld", "Domi — أنثى · واثقة"],
+  ["MF3mGyEYCl7XYWbV9V6O", "Elli — أنثى · شابة"],
+  ["pNInz6obpgDQGcFmaJgB", "Adam — ذكر · عميق"],
+  ["ErXwobaYiN019PkySvjV", "Antoni — ذكر · دافئ"],
+  ["TxGEqnHWrfWFTfGW9XjX", "Josh — ذكر · شبابي"],
+  ["VR6AewLTigWG4xSOukaG", "Arnold — ذكر · قوي"],
+  ["yoZ06aMxZJJ28mfd3POQ", "Sam — ذكر · حيوي"],
+];
 
 async function elevenVoices() {
   const key = localStorage.getItem("fta_key_elevenlabs") || "";
@@ -2493,7 +2517,8 @@ function toggleBoardView() {
     const scenes = splitScenes(raw);
     if (!scenes.length) { toast(t("t_no_scenes")); return; }
     window._scenes = scenes;
-    const wantSketches = document.getElementById("board-sketch").checked && scenes.some(s => s.sketch || s.img);
+    // sketch boxes always render — the checkbox only controls auto-drawing
+    const wantSketches = scenes.some(s => s.sketch || s.img);
     out.innerHTML =
       (wantSketches ? `<button class="btn btn-ghost btn-sm" style="margin-bottom:14px" onclick="drawAllSketches()">${t("sk_all")}</button>` : "") +
       scenes.map((s, i) => `
@@ -2533,7 +2558,9 @@ async function drawSketch(i) {
   box.scrollIntoView({ behavior: "smooth", block: "nearest" });
   try {
     const dataUrl = await sketchGenerate(desc, boardCharImage);
-    box.innerHTML = `<img src="${dataUrl}" alt="storyboard sketch">`;
+    const num = String(i + 1).padStart(2, "0");
+    box.innerHTML = `<img src="${dataUrl}" alt="storyboard sketch">
+      <a class="btn btn-ghost btn-xs" style="margin-top:8px" href="${dataUrl}" download="sketch-scene-${num}.png">${t("sk_dl")}</a>`;
     return "done";
   } catch (e) {
     const msg = e.message === "NO_KEY" ? t("sk_no_key")
@@ -2546,6 +2573,18 @@ async function drawSketch(i) {
     if (e.message === "RATE") return "wait"; // free tier: pause then continue
     return "done";
   }
+}
+
+/* the visible one-click entry: split if needed, then draw everything in order */
+async function generateSketches() {
+  const btn = document.getElementById("gen-sketches");
+  if (sketchesRunning) return;
+  if (boardView === "full") toggleBoardView();
+  if (!(window._scenes || []).length) return; // toggleBoardView already toasted
+  if (btn) { btn.disabled = true; btn.textContent = t("sk_gen_busy"); }
+  toast(t("sk_auto"));
+  await drawAllSketches();
+  if (btn) { btn.disabled = false; btn.textContent = t("sk_gen_done"); }
 }
 
 let sketchesRunning = false;
@@ -2611,11 +2650,15 @@ function fillVoiceList() {
     return;
   }
   sel.innerHTML = `<option value="">${t("v_eleven_loading")}</option>`;
+  const fill = vs => { sel.innerHTML = vs.map(([id, label]) => `<option value="${id}">${label}</option>`).join(""); };
   elevenVoices()
-    .then(vs => { sel.innerHTML = vs.map(([id, label]) => `<option value="${id}">${label}</option>`).join(""); })
+    .then(vs => fill(vs.length ? vs : ELEVEN_DEFAULT_VOICES))
     .catch(e => {
-      sel.innerHTML = "";
-      if (e.message !== "NO_KEY") toast(t("v_eleven_bad"));
+      if (e.message === "NO_KEY") { sel.innerHTML = ""; return; }
+      // restricted keys can't list voices but can still speak —
+      // fall back to the premade voices instead of rejecting the key
+      fill(ELEVEN_DEFAULT_VOICES);
+      toast(t("v_eleven_fallback"));
     });
 }
 

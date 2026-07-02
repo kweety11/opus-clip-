@@ -453,7 +453,8 @@ function toggleBoardView() {
     const scenes = splitScenes(raw);
     if (!scenes.length) { toast(t("t_no_scenes")); return; }
     window._scenes = scenes;
-    const wantSketches = document.getElementById("board-sketch").checked && scenes.some(s => s.sketch || s.img);
+    // sketch boxes always render — the checkbox only controls auto-drawing
+    const wantSketches = scenes.some(s => s.sketch || s.img);
     out.innerHTML =
       (wantSketches ? `<button class="btn btn-ghost btn-sm" style="margin-bottom:14px" onclick="drawAllSketches()">${t("sk_all")}</button>` : "") +
       scenes.map((s, i) => `
@@ -493,7 +494,9 @@ async function drawSketch(i) {
   box.scrollIntoView({ behavior: "smooth", block: "nearest" });
   try {
     const dataUrl = await sketchGenerate(desc, boardCharImage);
-    box.innerHTML = `<img src="${dataUrl}" alt="storyboard sketch">`;
+    const num = String(i + 1).padStart(2, "0");
+    box.innerHTML = `<img src="${dataUrl}" alt="storyboard sketch">
+      <a class="btn btn-ghost btn-xs" style="margin-top:8px" href="${dataUrl}" download="sketch-scene-${num}.png">${t("sk_dl")}</a>`;
     return "done";
   } catch (e) {
     const msg = e.message === "NO_KEY" ? t("sk_no_key")
@@ -506,6 +509,18 @@ async function drawSketch(i) {
     if (e.message === "RATE") return "wait"; // free tier: pause then continue
     return "done";
   }
+}
+
+/* the visible one-click entry: split if needed, then draw everything in order */
+async function generateSketches() {
+  const btn = document.getElementById("gen-sketches");
+  if (sketchesRunning) return;
+  if (boardView === "full") toggleBoardView();
+  if (!(window._scenes || []).length) return; // toggleBoardView already toasted
+  if (btn) { btn.disabled = true; btn.textContent = t("sk_gen_busy"); }
+  toast(t("sk_auto"));
+  await drawAllSketches();
+  if (btn) { btn.disabled = false; btn.textContent = t("sk_gen_done"); }
 }
 
 let sketchesRunning = false;
@@ -571,11 +586,15 @@ function fillVoiceList() {
     return;
   }
   sel.innerHTML = `<option value="">${t("v_eleven_loading")}</option>`;
+  const fill = vs => { sel.innerHTML = vs.map(([id, label]) => `<option value="${id}">${label}</option>`).join(""); };
   elevenVoices()
-    .then(vs => { sel.innerHTML = vs.map(([id, label]) => `<option value="${id}">${label}</option>`).join(""); })
+    .then(vs => fill(vs.length ? vs : ELEVEN_DEFAULT_VOICES))
     .catch(e => {
-      sel.innerHTML = "";
-      if (e.message !== "NO_KEY") toast(t("v_eleven_bad"));
+      if (e.message === "NO_KEY") { sel.innerHTML = ""; return; }
+      // restricted keys can't list voices but can still speak —
+      // fall back to the premade voices instead of rejecting the key
+      fill(ELEVEN_DEFAULT_VOICES);
+      toast(t("v_eleven_fallback"));
     });
 }
 

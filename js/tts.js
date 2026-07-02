@@ -99,6 +99,20 @@ async function ttsGenerate(text, voiceName, stylePrefix, accentKey) {
    ============================================================ */
 const ELEVEN_MODEL = "eleven_multilingual_v2";
 
+/* premade voices every ElevenLabs account has — used when the key lacks
+   the "read voices" permission (restricted keys) so TTS still works */
+const ELEVEN_DEFAULT_VOICES = [
+  ["21m00Tcm4TlvDq8ikWAM", "Rachel — أنثى · دافئة واضحة"],
+  ["EXAVITQu4vr4xnSDxMaL", "Sarah — أنثى · ناعمة"],
+  ["AZnzlk1XvdvUeBnXmlld", "Domi — أنثى · واثقة"],
+  ["MF3mGyEYCl7XYWbV9V6O", "Elli — أنثى · شابة"],
+  ["pNInz6obpgDQGcFmaJgB", "Adam — ذكر · عميق"],
+  ["ErXwobaYiN019PkySvjV", "Antoni — ذكر · دافئ"],
+  ["TxGEqnHWrfWFTfGW9XjX", "Josh — ذكر · شبابي"],
+  ["VR6AewLTigWG4xSOukaG", "Arnold — ذكر · قوي"],
+  ["yoZ06aMxZJJ28mfd3POQ", "Sam — ذكر · حيوي"],
+];
+
 async function elevenVoices() {
   const key = localStorage.getItem("fta_key_elevenlabs") || "";
   if (!key) throw new Error("NO_KEY");
