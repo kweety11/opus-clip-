@@ -609,6 +609,25 @@ html[data-theme="gold"] {
   box-shadow: 0 0 14px color-mix(in srgb, var(--acc-deep) 30%, transparent);
 }
 
+/* studio chat layout: chat and output share the panel half/half */
+.chat-grid { grid-template-columns: minmax(0, 46fr) minmax(0, 54fr); }
+@media (max-width: 1020px) { .chat-grid { grid-template-columns: 1fr; } }
+
+/* DeepThink toggle */
+.deepthink {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 16px; border-radius: 999px; cursor: pointer;
+  border: 1.5px solid var(--line); background: rgba(255, 255, 255, .03);
+  color: var(--muted); font: inherit; font-size: 13px; font-weight: 800;
+  transition: all .25s cubic-bezier(.34, 1.56, .64, 1);
+}
+.deepthink:hover { border-color: color-mix(in srgb, var(--accent) 55%, transparent); color: var(--text); transform: translateY(-1px); }
+.deepthink.on {
+  background: var(--accent-grad); background-size: 160% 160%; color: var(--btn-fg);
+  border-color: transparent;
+  animation: gradShift 7s ease infinite, pulseGlow 2.6s ease-in-out infinite;
+}
+
 /* generated b/w sketch inside scene cards */
 .sketch-box { margin-top: 12px; }
 .sketch-box img {
@@ -748,107 +767,22 @@ html[data-theme="gold"] {
       </div>
     </div>
 
-    <!-- STEP 1: SCRIPT (brief + specs in one place) -->
+    <!-- STEP 1: STUDIO CHAT — two agents: strategist (brief) + director (script) -->
     <section class="panel show" id="panel-script">
-      <div class="wrap"><div class="panel-grid">
-        <div class="card">
-          <h3 data-i18n="sc_h"></h3>
-          <p class="hint" data-i18n="sc_hint"></p>
-
-          <label class="f" data-i18n="sc_brief"></label>
-          <label class="upload"><span>📎</span><span data-i18n="sc_brief_up"></span>
-            <input type="file" id="script-brief" accept=".pdf,.docx,.pptx,.txt,.md,image/*" onchange="scriptBriefPicked(this)">
-          </label>
-          <span class="chip" id="script-brief-chip"></span>
-
-          <div class="two-col">
-            <div>
-              <label class="f" data-i18n="sc_fmt"></label>
-              <select id="script-format">
-                <option value="UGC" data-i18n="fmt_ugc"></option>
-                <option value="ad" data-i18n="fmt_ad"></option>
-                <option value="film" data-i18n="fmt_film"></option>
-                <option value="series" data-i18n="fmt_series"></option>
-                <option value="documentary" data-i18n="fmt_doc"></option>
-                <option value="short" data-i18n="fmt_short"></option>
-              </select>
-            </div>
-            <div>
-              <label class="f" data-i18n="sc_genre"></label>
-              <select id="script-genre">
-                <option value="" data-i18n="g_auto"></option>
-                <option value="comedy" data-i18n="g_comedy"></option>
-                <option value="drama" data-i18n="g_drama"></option>
-                <option value="action" data-i18n="g_action"></option>
-                <option value="thriller" data-i18n="g_thriller"></option>
-                <option value="horror" data-i18n="g_horror"></option>
-                <option value="romance" data-i18n="g_romance"></option>
-                <option value="fantasy" data-i18n="g_fantasy"></option>
-                <option value="sci-fi" data-i18n="g_scifi"></option>
-                <option value="mystery" data-i18n="g_mystery"></option>
-              </select>
-            </div>
+      <div class="wrap"><div class="panel-grid chat-grid">
+        <div class="card chat-card">
+          <div class="chat-log" id="chat-log">
+            <div class="msg ai md" data-i18n-html="chat_welcome_html"></div>
           </div>
-
-          <div class="two-col">
-            <div>
-              <label class="f" data-i18n="sc_tone"></label>
-              <select id="script-tone">
-                <option value="" data-i18n="t_auto"></option>
-                <option value="light and humorous" data-i18n="t_fun"></option>
-                <option value="dramatic and moving" data-i18n="t_dram"></option>
-                <option value="inspirational" data-i18n="t_insp"></option>
-                <option value="warm and human" data-i18n="t_warm"></option>
-                <option value="luxurious and refined" data-i18n="t_lux"></option>
-                <option value="bold and direct" data-i18n="t_bold"></option>
-                <option value="formal" data-i18n="t_formal"></option>
-              </select>
-            </div>
-            <div>
-              <label class="f" data-i18n="sc_dialect"></label>
-              <select id="script-dialect">
-                <option value="Egyptian Arabic" data-i18n="d_eg"></option>
-                <option value="Modern Standard Arabic" data-i18n="d_msa"></option>
-                <option value="Gulf Arabic" data-i18n="d_gulf"></option>
-                <option value="Levantine Arabic" data-i18n="d_lev"></option>
-                <option value="Maghrebi Arabic" data-i18n="d_mag"></option>
-                <option value="English" data-i18n="d_en"></option>
-              </select>
-            </div>
+          <div class="chat-input">
+            <label class="attach" title="📎"><span>📎</span><input type="file" id="chat-file" accept=".pdf,.docx,.pptx,.txt,.md,image/*" onchange="chatFilePicked(this)"></label>
+            <textarea id="chat-text" rows="1" data-i18n-ph="chat_ph"></textarea>
+            <button class="btn btn-primary btn-sm" id="chat-send" onclick="chatSend()" data-i18n="chat_send"></button>
           </div>
-
-          <div class="two-col">
-            <div>
-              <label class="f" data-i18n="sc_platform"></label>
-              <select id="script-platform">
-                <option value="" data-i18n="p_any"></option>
-                <option value="TikTok / Reels" data-i18n="p_tiktok"></option>
-                <option value="YouTube" data-i18n="p_yt"></option>
-                <option value="TV / Cinema" data-i18n="p_tv"></option>
-                <option value="Podcast" data-i18n="p_podcast"></option>
-              </select>
-            </div>
-            <div>
-              <label class="f" data-i18n="sc_dur"></label>
-              <input type="text" id="script-duration" data-i18n-ph="sc_dur_ph">
-            </div>
+          <div class="chat-foot">
+            <button class="deepthink" id="deepthink-btn" onclick="toggleDeepthink()" data-i18n-title="dt_tip">🧠 DeepThink</button>
+            <span id="chat-file-chip" class="chip"></span>
           </div>
-
-          <label class="f" data-i18n="sc_aud"></label>
-          <input type="text" id="script-audience" data-i18n-ph="sc_aud_ph">
-
-          <label class="f" data-i18n="sc_chars"></label>
-          <input type="text" id="script-chars" data-i18n-ph="sc_chars_ph">
-
-          <label class="f" data-i18n="sc_cta"></label>
-          <input type="text" id="script-cta" data-i18n-ph="sc_cta_ph">
-
-          <label class="f" data-i18n="sc_idea"></label>
-          <textarea id="script-idea" rows="5" data-i18n-ph="sc_idea_ph"></textarea>
-
-          <button class="btn btn-primary btn-block" id="run-script" onclick="runScript()" data-i18n="sc_run"></button>
-          <button class="btn btn-stop" id="stop-script" onclick="stopRun('script')">⏹</button>
-          <div id="carry-note" data-i18n="sc_carry"></div>
         </div>
         <div>
           <div class="out md" id="out-script" data-raw=""></div>
@@ -856,6 +790,7 @@ html[data-theme="gold"] {
             <button class="btn btn-ghost btn-sm" onclick="copyOut('script')" data-i18n="copy"></button>
             <button class="btn btn-ghost btn-sm" onclick="downloadOut('script','script.md')" data-i18n="dl_md"></button>
           </div>
+          <div id="carry-note" data-i18n="sc_carry"></div>
         </div>
       </div></div>
     </section>
@@ -1030,11 +965,11 @@ const I18N = {
     st_tools: "أدوات متكاملة", st_prov: "مزود AI مدعوم", st_styles: "ستايل بصري", st_voices: "صوت فويس أوفر",
     feat_h: "كل خطوات الإنتاج", feat_p: "أربع أدوات بتسلّم بعضها — من أول فكرة لحد ملفات جاهزة للنشر.",
     f1t: "من البريف مباشرة", f1d: "ارفع بريف العميل (PDF / Word / PPTX — حتى الممسوح ضوئيًا) وهيتقري ويتحلل بالكامل، والسيناريو يتبني على محتواه الحقيقي.",
-    f2t: "السيناريو", f2d: "فكرتك تبقى سيناريو متقسم مشاهد — بالنوع والتون واللهجة والجمهور اللي تختاره، وبرومبت ماستر بالإنجليزي.",
+    f2t: "شات الاستوديو", f2d: "وكيلين ذكاء اصطناعي: استراتيجي بيحوّل مستنداتك لبريف احترافي، ومخرج بيحوّل فكرتك لسيناريو كامل — بزرار DeepThink للتفكير الأعمق.",
     f3t: "الاستوري بورد", f3d: "لكل مشهد كود بلوك جاهز فيه برومبت الصورة وبرومبت الحركة والفويس أوفر — انسخ والصق في أدوات التوليد.",
     f4t: "الفويس أوفر", f4d: "أصوات جوجل الاحترافية بالعربي والإنجليزي — من نص السيناريو لملف صوت جاهز للمونتاج.",
     how_h: "إزاي بتشتغل؟",
-    how1: "ارفع البريف وحدد مواصفات العمل", how2: "ولّد السيناريو المتقسم مشاهد", how3: "خد برومبتات المشاهد وولّد الفيجوال", how4: "سجّل الفويس أوفر ونزّل الملفات",
+    how1: "اتكلم مع الاستوديو — بريف وسيناريو من الشات", how2: "ولّد السيناريو المتقسم مشاهد", how3: "خد برومبتات المشاهد وولّد الفيجوال", how4: "سجّل الفويس أوفر ونزّل الملفات",
     pr_h: "أسعار بسيطة", pr_p: "جرّب كل حاجة ببلاش لمدة شهر — من غير بطاقة ائتمان.",
     pr_free: "التجربة المجانية", pr_free_per: "/ أول شهر",
     pr_f1: "40 توليدة كاملة", pr_f2: "كل الأدوات الأربعة", pr_f3: "كل الستايلات والأصوات", pr_f4: "من غير بطاقة ائتمان",
@@ -1045,24 +980,13 @@ const I18N = {
     // stepper
     s2: "السيناريو", s3: "الاستوري بورد", s4: "الفويس أوفر", s_set: "⚙️ الإعدادات",
     // chat (plan)
-    // script + brief
-    sc_brief: "البريف (اختياري) — ارفع مستند العميل وهيتبني عليه السيناريو",
-    sc_brief_up: "ارفع PDF / Word / PPTX / صورة / نص — حتى الممسوح ضوئيًا",
-    brief_reading: "📄 بقرا البريف…", brief_set: "البريف اتقري ✓ — السيناريو هيتبني على محتواه الحقيقي",
-    sc_h: "من الفكرة لسيناريو متقسم", sc_hint: "حدد مواصفات العمل — هتاخد Logline وشخصيات بهوية بصرية ثابتة ومشاهد مرقمة بالحوار والمدة، وبرومبت ماستر بالإنجليزي.",
-    sc_fmt: "نوع العمل", sc_genre: "النوع الفني (Genre)", sc_tone: "التون", sc_dialect: "اللغة / اللهجة",
-    sc_aud: "الجمهور المستهدف (اختياري)", sc_aud_ph: "مثال: شباب 18-30 مهتمين بالتكنولوجيا",
-    sc_platform: "المنصة", sc_dur: "المدة المستهدفة (اختياري)", sc_dur_ph: "مثال: 60 ثانية / 3 دقائق",
-    sc_chars: "الشخصيات / المكان (اختياري)", sc_chars_ph: "مثال: أب وأم وبنتهم الذكية، فيلا فاخرة",
-    sc_cta: "الـ CTA — الدعوة لاتخاذ إجراء (اختياري)", sc_cta_ph: "مثال: حمّل التطبيق دلوقتي",
-    sc_idea: "الفكرة", sc_idea_ph: "اكتب فكرتك بأي شكل — سطر واحد كفاية...",
-    sc_run: "✍️ اكتب السيناريو",
+    // studio chat (strategist + director)
+    chat_welcome_html: "<p>أهلًا بيك في الاستوديو 🎬 إحنا وكيلين شغالين معاك:</p><p><b>🎯 الاستراتيجي</b> — ارفع البريف أو أي مستند (PDF / Word / PPTX / صورة) أو احكيلي عن المشروع، وهيطلعلك <b>بريف احترافي</b> على اليمين.</p><p><b>🎬 المخرج</b> — اكتب فكرتك بأي شكل وهيسلمك <b>سيناريو احترافي كامل</b> متقسم مشاهد.</p><p>فعّل <b>🧠 DeepThink</b> لما تحب تفكير أعمق وناتج أصقل.</p>",
+    chat_ph: "اكتب فكرتك أو اسأل أي حاجة… (Enter للإرسال)",
+    chat_send: "إرسال",
+    dt_tip: "تفكير أعمق — تحليل زوايا متعددة ونقد ذاتي قبل التسليم",
+    dt_on: "🧠 DeepThink اتفعّل — تفكير أعمق وناتج أصقل", dt_off: "DeepThink اتقفل — ردود أسرع",
     sc_carry: "✓ السيناريو جاهز — روح لخطوة الاستوري بورد واضغط \"استخدم آخر سيناريو\"",
-    fmt_ugc: "UGC / فيديو سوشيال", fmt_ad: "إعلان", fmt_film: "فيلم قصير", fmt_series: "حلقة مسلسل", fmt_doc: "وثائقي", fmt_short: "قصة قصيرة",
-    g_auto: "— تلقائي حسب الفكرة —", g_comedy: "كوميدي", g_drama: "دراما", g_action: "أكشن", g_thriller: "تشويق وإثارة", g_horror: "رعب", g_romance: "رومانسي", g_fantasy: "فانتازيا", g_scifi: "خيال علمي", g_mystery: "غموض",
-    t_auto: "— تلقائي —", t_fun: "خفيف فكاهي", t_dram: "درامي مؤثر", t_insp: "ملهم تحفيزي", t_warm: "دافئ إنساني", t_lux: "فاخر راقي", t_bold: "جريء مباشر", t_formal: "رسمي",
-    d_msa: "عربي فصحى", d_eg: "عامية مصرية", d_gulf: "خليجي", d_lev: "شامي", d_mag: "مغربي", d_en: "English",
-    p_any: "— أي منصة —", p_tiktok: "تيك توك / ريلز", p_yt: "يوتيوب", p_tv: "تلفزيون / سينما", p_podcast: "بودكاست",
     // board
     b_h: "من السيناريو لاستوري بورد + برومبتات", b_hint: "لكل مشهد كود بلوك ماركداون جاهز للنسخ فيه: برومبت الصورة + برومبت الحركة + الفويس أوفر.",
     b_use_last: "↩️ استخدم آخر سيناريو متولد", b_paste: "أو الصق السيناريو هنا", b_paste_ph: "الصق السيناريو المتقسم لمشاهد...",
@@ -1093,7 +1017,7 @@ const I18N = {
     t_copied: "اتنسخ ✓", t_saved_pre: "الإعدادات اتحفظت ✓ — شغال دلوقتي على ",
     t_need_key: "ضيف مفتاح المزود الأول من تبويب الإعدادات ⚙️", t_need_login: "سجّل بإيميلك الأول من تبويب الإعدادات ⚙️",
     t_need_email: "اكتب إيميل صحيح", t_signup_ok: "حسابك جاهز ✓ — ابدأ استخدم الأدوات", t_signup_fail: "حصلت مشكلة في التسجيل — حاول تاني",
-    t_idea: "اكتب الفكرة أو ارفع البريف الأول", t_key_first: "اكتب مفتاح الـ API الخاص بالمزود ده",
+    t_idea: "اكتب رسالة أو ارفق مستند الأول", t_key_first: "اكتب مفتاح الـ API الخاص بالمزود ده",
     t_script_first: "الصق السيناريو أو ولّده الأول من تبويب السيناريو", t_no_script: "مفيش سيناريو متولد لسه", t_script_set: "آخر سيناريو اتحط ✓",
     t_no_scenes: "مش لاقي مشاهد بصيغة ━━━ SCENE — ولّد الاستوري بورد الأول", t_scenes_done: " مشهد اتقسم ✓",
     t_vo_ready: "نص الفويس أوفر اتجهز ✓ — راجعه واضغط ولّد الصوت",
@@ -1139,11 +1063,11 @@ const I18N = {
     st_tools: "integrated tools", st_prov: "AI providers", st_styles: "visual styles", st_voices: "voice-over voices",
     feat_h: "Every production step", feat_p: "Four tools that hand off to each other — from first idea to publish-ready files.",
     f1t: "Straight from the brief", f1d: "Upload the client brief (PDF / Word / PPTX - even scanned): it is fully read and analyzed, and the script is grounded in its real content.",
-    f2t: "Screenplay", f2d: "Your idea becomes a scene-by-scene script — in the genre, tone, dialect and audience you pick, plus an English master prompt.",
+    f2t: "Studio chat", f2d: "Two AI agents: a strategist turns your documents into a professional brief, a director turns your idea into a full script — with a DeepThink toggle for deeper reasoning.",
     f3t: "Storyboard", f3d: "Every scene gets a ready code block: image prompt + motion prompt + voice-over — copy & paste into generation tools.",
     f4t: "Voice-over", f4d: "Google's professional voices in Arabic and English — from script text to an edit-ready audio file.",
     how_h: "How it works",
-    how1: "Upload the brief & set the specs", how2: "Generate the scene-by-scene script", how3: "Take scene prompts & generate visuals", how4: "Record the voice-over & download",
+    how1: "Chat with the studio — brief & script", how2: "Generate the scene-by-scene script", how3: "Take scene prompts & generate visuals", how4: "Record the voice-over & download",
     pr_h: "Simple pricing", pr_p: "Try everything free for a month — no credit card.",
     pr_free: "Free Trial", pr_free_per: "/ first month",
     pr_f1: "40 full generations", pr_f2: "All four tools", pr_f3: "All styles & voices", pr_f4: "No credit card",
@@ -1152,23 +1076,12 @@ const I18N = {
     pr_go: "Get started", pr_note: "* fair daily cap to prevent abuse",
     footer: "© 2026 Film-trend AI — the AI production studio.",
     s2: "Script", s3: "Storyboard", s4: "Voice-over", s_set: "⚙️ Settings",
-    sc_brief: "Brief (optional) — upload the client document; the script is built on it",
-    sc_brief_up: "Upload PDF / Word / PPTX / image / text — even scanned",
-    brief_reading: "📄 Reading the brief…", brief_set: "Brief read ✓ — the script will be grounded in its real content",
-    sc_h: "From idea to structured script", sc_hint: "Set the specs — get a logline, characters with consistent visual identity, numbered scenes with dialogue and timing, and an English master prompt.",
-    sc_fmt: "Format", sc_genre: "Genre", sc_tone: "Tone", sc_dialect: "Language / dialect",
-    sc_aud: "Target audience (optional)", sc_aud_ph: "e.g. tech-savvy 18-30 year olds",
-    sc_platform: "Platform", sc_dur: "Target duration (optional)", sc_dur_ph: "e.g. 60 seconds / 3 minutes",
-    sc_chars: "Characters / setting (optional)", sc_chars_ph: "e.g. a couple and their clever daughter, a luxury villa",
-    sc_cta: "CTA — call to action (optional)", sc_cta_ph: "e.g. Download the app now",
-    sc_idea: "The idea", sc_idea_ph: "Write your idea in any form — one line is enough...",
-    sc_run: "✍️ Write the script",
+    chat_welcome_html: "<p>Welcome to the studio 🎬 Two agents work with you:</p><p><b>🎯 The Strategist</b> — upload the brief or any document (PDF / Word / PPTX / image) or tell me about the project, and he delivers a <b>professional brief</b> in the panel.</p><p><b>🎬 The Director</b> — write your idea in any form and he hands you a <b>complete professional script</b>, scene by scene.</p><p>Turn on <b>🧠 DeepThink</b> for deeper reasoning and a more polished result.</p>",
+    chat_ph: "Write your idea or ask anything… (Enter to send)",
+    chat_send: "Send",
+    dt_tip: "Deeper reasoning — multiple angles and self-critique before delivering",
+    dt_on: "🧠 DeepThink on — deeper reasoning, sharper output", dt_off: "DeepThink off — faster replies",
     sc_carry: "✓ Script ready — go to the Storyboard step and press \"Use last script\"",
-    fmt_ugc: "UGC / social video", fmt_ad: "Commercial", fmt_film: "Short film", fmt_series: "Series episode", fmt_doc: "Documentary", fmt_short: "Short story",
-    g_auto: "— auto by idea —", g_comedy: "Comedy", g_drama: "Drama", g_action: "Action", g_thriller: "Thriller", g_horror: "Horror", g_romance: "Romance", g_fantasy: "Fantasy", g_scifi: "Sci-fi", g_mystery: "Mystery",
-    t_auto: "— auto —", t_fun: "Light & funny", t_dram: "Dramatic & moving", t_insp: "Inspirational", t_warm: "Warm & human", t_lux: "Luxurious & refined", t_bold: "Bold & direct", t_formal: "Formal",
-    d_msa: "Modern Standard Arabic", d_eg: "Egyptian Arabic", d_gulf: "Gulf Arabic", d_lev: "Levantine", d_mag: "Maghrebi", d_en: "English",
-    p_any: "— any platform —", p_tiktok: "TikTok / Reels", p_yt: "YouTube", p_tv: "TV / Cinema", p_podcast: "Podcast",
     b_h: "From script to storyboard + prompts", b_hint: "Every scene gets a copy-ready markdown code block: image prompt + motion prompt + voice-over.",
     b_use_last: "↩️ Use last generated script", b_paste: "Or paste the script here", b_paste_ph: "Paste the scene-by-scene script...",
     b_ratio: "Aspect ratio", b_style: "Visual style — the whole market", b_style_none: "— no specific style (model picks) —",
@@ -1195,7 +1108,7 @@ const I18N = {
     t_copied: "Copied ✓", t_saved_pre: "Settings saved ✓ — now using ",
     t_need_key: "Add the provider's key first in Settings ⚙️", t_need_login: "Sign in with your email first in Settings ⚙️",
     t_need_email: "Enter a valid email", t_signup_ok: "Your account is ready ✓", t_signup_fail: "Signup failed — try again",
-    t_idea: "Write the idea or upload a brief first", t_key_first: "Enter this provider's API key",
+    t_idea: "Write a message or attach a document first", t_key_first: "Enter this provider's API key",
     t_script_first: "Paste or generate a script first", t_no_script: "No generated script yet", t_script_set: "Last script inserted ✓",
     t_no_scenes: "No ━━━ SCENE blocks found — generate the storyboard first", t_scenes_done: " scenes split ✓",
     t_vo_ready: "Voice-over text is ready ✓ — review it and press Generate",
@@ -1244,6 +1157,7 @@ function applyLang() {
   document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
   document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
   document.querySelectorAll("[data-i18n-ph]").forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  document.querySelectorAll("[data-i18n-title]").forEach(el => { el.title = t(el.dataset.i18nTitle); });
   const btn = document.getElementById("lang-btn");
   if (btn) btn.textContent = LANG === "ar" ? "EN" : "عربي";
 }
@@ -2269,12 +2183,23 @@ function downloadOut(tool, name) {
   URL.revokeObjectURL(a.href);
 }
 
-/* agent #2 — screenwriter (Script step) */
-const SCRIPT_AGENT_ADDON = `
+/* the studio chat — two specialist agents behind one conversation */
+const STUDIO_CHAT_ADDON = `
 
-## ACTIVE AGENT — #2 SCREENWRITER (Script step)
-You are now operating as agent #2 of the studio's specialist team: an award-winning screenwriter and script doctor (drama, ads, UGC). Operate ONLY in SCRIPT mode. Honor every spec field strictly.
-STRICT BRIEF GROUNDING: when a BRIEF document is included (as text or as scanned page images), the script must be built on its ACTUAL content — real brand name, real product, real audience, real objectives. Read every word (Arabic or English) and analyze any visuals. NEVER invent or substitute generic information that is not in the brief.`;
+## ACTIVE MODE — CREATIVE STUDIO CHAT (two agents, one conversation)
+You are a two-agent creative studio. In EVERY reply you act as exactly ONE agent and open with its signature:
+- «🎯 الاستراتيجي:» — THE STRATEGIST: a world-class social-media & marketing consultant. Documents, brand questions, analysis, marketing → he answers. His deliverable is a professional BRIEF: brand & product (real facts), business objective, target audience & insight, core message, tone of voice, platforms & formats, creative direction, mandatories/constraints.
+- «🎬 المخرج:» — THE DIRECTOR: an award-winning film director & screenwriter (drama, ads, UGC). Ideas, stories, scripts, scenes → he answers. His deliverable is a full professional SCRIPT following MODE 2 — SCRIPT of your master instructions (logline, synopsis, characters with Visual Identity Lines, structure, numbered scenes with dialogue & timing, MASTER PROMPT).
+Pick the agent from the user's need. When a brief exists and the user asks for the script, the Director builds on that brief. Both are exceptionally professional, creative and inspiring — the user is a filmmaker; elevate every idea, never be generic.
+
+REPLY PROTOCOL — every reply has up to two parts:
+1. CHAT: a short, sharp, inspiring message (1-4 sentences, user's language) — what you did, one brilliant observation, or ONE critical question if something essential is missing. Never dump the deliverable here.
+2. DELIVERABLE: only when you actually produced a brief or a script, add a line containing exactly:
+=== OUTPUT ===
+followed by the COMPLETE deliverable in clean markdown. Nothing after it. Casual conversation gets part 1 only — no marker.
+
+STRICT DOCUMENT GROUNDING: attached documents (text or scanned page images) are the source of truth — real brand, real product, real numbers. Read every word, Arabic or English, analyze the visuals, and never invent facts that are not there.
+DEEPTHINK: when the request contains "DEEPTHINK: on", think much harder before answering — explore multiple angles, draft alternatives, self-critique, keep only the strongest ideas — then deliver ONLY the polished result (never show the reasoning).`;
 
 /* agent #3 — director / storyboard artist (Storyboard step) */
 const BOARD_AGENT_ADDON = `
@@ -2282,56 +2207,147 @@ const BOARD_AGENT_ADDON = `
 ## ACTIVE AGENT — #3 DIRECTOR & STORYBOARD ARTIST (Storyboard step)
 You are now operating as agent #3 of the studio's specialist team: a film director + storyboard artist + AI prompt engineer for image/video generation. Operate ONLY in STORYBOARD mode. Follow the per-scene code-block format exactly and honor INCLUDE VOICE-OVER strictly.`;
 
-/* ---------- step 1: script (brief + specs in one place) ---------- */
-let scriptBrief = null; // {name, text, images:[{mime,b64}]}
+/* ---------- step 1: studio chat (strategist + director) ---------- */
+let studioHistory = [];
+let chatBusy = false;
+let pendingFile = null;
+let deepthink = localStorage.getItem("fta_deepthink") === "1";
+const OUTPUT_MARKER = /\n?\s*={2,}\s*OUTPUT\s*={2,}\s*\n?/i;
 
-async function scriptBriefPicked(input) {
-  const file = input.files[0];
-  const chip = document.getElementById("script-brief-chip");
-  if (!file) { scriptBrief = null; chip.textContent = ""; return; }
-  chip.textContent = t("brief_reading");
-  try {
-    const doc = await extractDocument(file);
-    scriptBrief = { name: file.name, text: doc.text || "", images: doc.images || [] };
-    chip.textContent = `📎 ${file.name} ✓`;
-    toast(t("brief_set"));
-  } catch (e) {
-    scriptBrief = null;
-    input.value = "";
-    chip.textContent = "";
-    toast("⚠️ " + e.message);
+function chatBubble(role, html) {
+  const log = document.getElementById("chat-log");
+  const div = document.createElement("div");
+  div.className = "msg " + role + (role === "ai" ? " md" : "");
+  div.innerHTML = html;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+  return div;
+}
+
+function chatFilePicked(input) {
+  pendingFile = input.files[0] || null;
+  document.getElementById("chat-file-chip").textContent = pendingFile ? `📎 ${pendingFile.name}` : "";
+}
+
+function toggleDeepthink() {
+  deepthink = !deepthink;
+  localStorage.setItem("fta_deepthink", deepthink ? "1" : "0");
+  applyDeepthinkUI();
+  toast(deepthink ? t("dt_on") : t("dt_off"));
+}
+function applyDeepthinkUI() {
+  const b = document.getElementById("deepthink-btn");
+  if (b) { b.classList.toggle("on", deepthink); b.textContent = deepthink ? "🧠 DeepThink ✓" : "🧠 DeepThink"; }
+}
+
+/* the deliverable half of a split reply lands in the output panel */
+function setDeliverable(md) {
+  const out = document.getElementById("out-script");
+  out.dataset.raw = md;
+  out.innerHTML = mdToHtml(md);
+  document.getElementById("actions-script").style.display = "flex";
+  markStepDone("script");
+  if (/SCENE|مشهد|FORMAT:/i.test(md)) {
+    lastScript = md;
+    const carry = document.getElementById("carry-note");
+    if (carry) carry.style.display = "block";
   }
 }
 
-function runScript() {
-  const val = id => document.getElementById(id).value.trim();
-  const idea = val("script-idea");
-  if (!idea && !scriptBrief) { toast(t("t_idea")); return; }
+async function chatSend() {
+  if (chatBusy) return;
+  if (!checkReady()) return;
 
-  const lines = ["MODE: SCRIPT", "FORMAT: " + val("script-format")];
-  const add = (label, v) => { if (v) lines.push(label + ": " + v); };
-  add("TARGET DURATION", val("script-duration"));
-  add("GENRE", val("script-genre"));
-  add("TONE", val("script-tone"));
-  add("DIALECT", val("script-dialect"));
-  add("TARGET AUDIENCE", val("script-audience"));
-  add("PLATFORM", val("script-platform"));
-  add("CHARACTERS/SETTING", val("script-chars"));
-  add("CTA", val("script-cta"));
+  const ta = document.getElementById("chat-text");
+  let text = ta.value.trim();
+  const file = pendingFile;
+  if (!text && !file) { toast(t("t_idea")); return; }
 
-  let req = lines.join("\n");
-  if (idea) req += "\n\nIDEA:\n" + idea;
+  chatBusy = true;
+  document.getElementById("chat-send").disabled = true;
+
+  const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  chatBubble("user", esc(text || "…") + (file ? `<div class="chip">📎 ${esc(file.name)}</div>` : ""));
+  ta.value = "";
+  pendingFile = null;
+  document.getElementById("chat-file-chip").textContent = "";
+  document.getElementById("chat-file").value = "";
+
+  // extract the attached document locally (works with every provider)
   let images = [];
-  if (scriptBrief) {
-    if (scriptBrief.text) {
-      req += `\n\nBRIEF (uploaded client document «${scriptBrief.name}» — ground the script strictly in its real content):\n${scriptBrief.text.slice(0, 60000)}\n===== END OF BRIEF =====`;
-    }
-    if (scriptBrief.images.length) {
-      images = scriptBrief.images;
-      req += `\n\n[BRIEF pages from «${scriptBrief.name}» are attached as images${scriptBrief.text ? " in addition to the text above" : ""}. Read ALL text inside them (Arabic or English), analyze every visual, logo and product shown, and build the script strictly on this real content.]`;
+  if (file) {
+    const extracting = chatBubble("ai", `<p class="thinking">${t("t_reading_doc")}</p>`);
+    try {
+      const doc = await extractDocument(file);
+      if (doc.images && doc.images.length) images.push(...doc.images);
+      if (doc.text) {
+        text += `\n\n===== ATTACHED DOCUMENT «${file.name}» =====\n${doc.text.slice(0, 60000)}\n===== END OF DOCUMENT =====`;
+      }
+      if (images.length) {
+        text += `\n\n[The attached document «${file.name}» ${doc.text ? "also includes" : "is scanned/visual — its pages are attached as"} images. Read ALL text inside them (Arabic or English) and analyze every visual, logo, chart and product shown. Base your work strictly on this real content.]`;
+      }
+      extracting.remove();
+      if (!text.trim()) text = "Analyze this document and produce the professional brief.";
+    } catch (e) {
+      extracting.remove();
+      chatBubble("ai", `<p class="err">⚠️ ${e.message}</p>`);
+      chatBusy = false;
+      document.getElementById("chat-send").disabled = false;
+      return;
     }
   }
-  startRun("script", req, SCRIPT_AGENT_ADDON, images);
+
+  text += `\n\nDEEPTHINK: ${deepthink ? "on" : "off"}`;
+
+  studioHistory.push({ role: "user", text, images });
+  if (studioHistory.length > 16) studioHistory = studioHistory.slice(-16);
+
+  const aiDiv = chatBubble("ai", '<p class="thinking">⏳ …</p>');
+  const out = document.getElementById("out-script");
+  let raw = "";
+
+  // live split: chat part streams into the bubble; once the marker
+  // appears, the deliverable streams into the output panel
+  const renderSplit = final => {
+    const m = raw.split(OUTPUT_MARKER);
+    aiDiv.innerHTML = mdToHtml(m[0].trim() || "…");
+    if (m.length > 1) {
+      out.dataset.raw = m.slice(1).join("\n").trim();
+      out.innerHTML = mdToHtml(out.dataset.raw);
+      if (!final) out.scrollTop = out.scrollHeight;
+    }
+    const log = document.getElementById("chat-log");
+    log.scrollTop = log.scrollHeight;
+  };
+
+  activeController = runLLM(studioHistory, {
+    onRetry(attempt, max) {
+      aiDiv.innerHTML = `<p class="thinking">${t("retrying")} (${attempt}/${max})</p>`;
+    },
+    onText(d) {
+      raw += d;
+      renderSplit(false);
+    },
+    onDone(full) {
+      chatBusy = false;
+      document.getElementById("chat-send").disabled = false;
+      activeController = null;
+      if (!full.trim()) { aiDiv.innerHTML = `<p class="thinking">${t("no_result")}</p>`; return; }
+      raw = full;
+      renderSplit(true);
+      studioHistory.push({ role: "assistant", text: full });
+      const parts = full.split(OUTPUT_MARKER);
+      if (parts.length > 1 && parts.slice(1).join("\n").trim()) {
+        setDeliverable(parts.slice(1).join("\n").trim());
+      }
+    },
+    onError(msg) {
+      chatBusy = false;
+      document.getElementById("chat-send").disabled = false;
+      activeController = null;
+      aiDiv.innerHTML = `<p class="err">⚠️ ${msg}</p>`;
+    },
+  }, { system: SYSTEM_PROMPT + STUDIO_CHAT_ADDON });
 }
 
 /* ---------- step 3: storyboard ---------- */
@@ -2716,6 +2732,13 @@ document.addEventListener("DOMContentLoaded", () => {
       `<optgroup label="${g.group}">` +
       g.styles.map(([val, label]) => `<option value="${val}">${label}</option>`).join("") +
       `</optgroup>`).join("");
+
+  // studio chat: Enter sends, Shift+Enter = new line; restore DeepThink state
+  const chatTa = document.getElementById("chat-text");
+  chatTa.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); chatSend(); }
+  });
+  applyDeepthinkUI();
 
   const { mode, provider, apiKey, cloudToken } = getSettings();
   provSel.value = provider;

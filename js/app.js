@@ -180,12 +180,23 @@ function downloadOut(tool, name) {
   URL.revokeObjectURL(a.href);
 }
 
-/* agent #2 — screenwriter (Script step) */
-const SCRIPT_AGENT_ADDON = `
+/* the studio chat — two specialist agents behind one conversation */
+const STUDIO_CHAT_ADDON = `
 
-## ACTIVE AGENT — #2 SCREENWRITER (Script step)
-You are now operating as agent #2 of the studio's specialist team: an award-winning screenwriter and script doctor (drama, ads, UGC). Operate ONLY in SCRIPT mode. Honor every spec field strictly.
-STRICT BRIEF GROUNDING: when a BRIEF document is included (as text or as scanned page images), the script must be built on its ACTUAL content — real brand name, real product, real audience, real objectives. Read every word (Arabic or English) and analyze any visuals. NEVER invent or substitute generic information that is not in the brief.`;
+## ACTIVE MODE — CREATIVE STUDIO CHAT (two agents, one conversation)
+You are a two-agent creative studio. In EVERY reply you act as exactly ONE agent and open with its signature:
+- «🎯 الاستراتيجي:» — THE STRATEGIST: a world-class social-media & marketing consultant. Documents, brand questions, analysis, marketing → he answers. His deliverable is a professional BRIEF: brand & product (real facts), business objective, target audience & insight, core message, tone of voice, platforms & formats, creative direction, mandatories/constraints.
+- «🎬 المخرج:» — THE DIRECTOR: an award-winning film director & screenwriter (drama, ads, UGC). Ideas, stories, scripts, scenes → he answers. His deliverable is a full professional SCRIPT following MODE 2 — SCRIPT of your master instructions (logline, synopsis, characters with Visual Identity Lines, structure, numbered scenes with dialogue & timing, MASTER PROMPT).
+Pick the agent from the user's need. When a brief exists and the user asks for the script, the Director builds on that brief. Both are exceptionally professional, creative and inspiring — the user is a filmmaker; elevate every idea, never be generic.
+
+REPLY PROTOCOL — every reply has up to two parts:
+1. CHAT: a short, sharp, inspiring message (1-4 sentences, user's language) — what you did, one brilliant observation, or ONE critical question if something essential is missing. Never dump the deliverable here.
+2. DELIVERABLE: only when you actually produced a brief or a script, add a line containing exactly:
+=== OUTPUT ===
+followed by the COMPLETE deliverable in clean markdown. Nothing after it. Casual conversation gets part 1 only — no marker.
+
+STRICT DOCUMENT GROUNDING: attached documents (text or scanned page images) are the source of truth — real brand, real product, real numbers. Read every word, Arabic or English, analyze the visuals, and never invent facts that are not there.
+DEEPTHINK: when the request contains "DEEPTHINK: on", think much harder before answering — explore multiple angles, draft alternatives, self-critique, keep only the strongest ideas — then deliver ONLY the polished result (never show the reasoning).`;
 
 /* agent #3 — director / storyboard artist (Storyboard step) */
 const BOARD_AGENT_ADDON = `
@@ -193,56 +204,147 @@ const BOARD_AGENT_ADDON = `
 ## ACTIVE AGENT — #3 DIRECTOR & STORYBOARD ARTIST (Storyboard step)
 You are now operating as agent #3 of the studio's specialist team: a film director + storyboard artist + AI prompt engineer for image/video generation. Operate ONLY in STORYBOARD mode. Follow the per-scene code-block format exactly and honor INCLUDE VOICE-OVER strictly.`;
 
-/* ---------- step 1: script (brief + specs in one place) ---------- */
-let scriptBrief = null; // {name, text, images:[{mime,b64}]}
+/* ---------- step 1: studio chat (strategist + director) ---------- */
+let studioHistory = [];
+let chatBusy = false;
+let pendingFile = null;
+let deepthink = localStorage.getItem("fta_deepthink") === "1";
+const OUTPUT_MARKER = /\n?\s*={2,}\s*OUTPUT\s*={2,}\s*\n?/i;
 
-async function scriptBriefPicked(input) {
-  const file = input.files[0];
-  const chip = document.getElementById("script-brief-chip");
-  if (!file) { scriptBrief = null; chip.textContent = ""; return; }
-  chip.textContent = t("brief_reading");
-  try {
-    const doc = await extractDocument(file);
-    scriptBrief = { name: file.name, text: doc.text || "", images: doc.images || [] };
-    chip.textContent = `📎 ${file.name} ✓`;
-    toast(t("brief_set"));
-  } catch (e) {
-    scriptBrief = null;
-    input.value = "";
-    chip.textContent = "";
-    toast("⚠️ " + e.message);
+function chatBubble(role, html) {
+  const log = document.getElementById("chat-log");
+  const div = document.createElement("div");
+  div.className = "msg " + role + (role === "ai" ? " md" : "");
+  div.innerHTML = html;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+  return div;
+}
+
+function chatFilePicked(input) {
+  pendingFile = input.files[0] || null;
+  document.getElementById("chat-file-chip").textContent = pendingFile ? `📎 ${pendingFile.name}` : "";
+}
+
+function toggleDeepthink() {
+  deepthink = !deepthink;
+  localStorage.setItem("fta_deepthink", deepthink ? "1" : "0");
+  applyDeepthinkUI();
+  toast(deepthink ? t("dt_on") : t("dt_off"));
+}
+function applyDeepthinkUI() {
+  const b = document.getElementById("deepthink-btn");
+  if (b) { b.classList.toggle("on", deepthink); b.textContent = deepthink ? "🧠 DeepThink ✓" : "🧠 DeepThink"; }
+}
+
+/* the deliverable half of a split reply lands in the output panel */
+function setDeliverable(md) {
+  const out = document.getElementById("out-script");
+  out.dataset.raw = md;
+  out.innerHTML = mdToHtml(md);
+  document.getElementById("actions-script").style.display = "flex";
+  markStepDone("script");
+  if (/SCENE|مشهد|FORMAT:/i.test(md)) {
+    lastScript = md;
+    const carry = document.getElementById("carry-note");
+    if (carry) carry.style.display = "block";
   }
 }
 
-function runScript() {
-  const val = id => document.getElementById(id).value.trim();
-  const idea = val("script-idea");
-  if (!idea && !scriptBrief) { toast(t("t_idea")); return; }
+async function chatSend() {
+  if (chatBusy) return;
+  if (!checkReady()) return;
 
-  const lines = ["MODE: SCRIPT", "FORMAT: " + val("script-format")];
-  const add = (label, v) => { if (v) lines.push(label + ": " + v); };
-  add("TARGET DURATION", val("script-duration"));
-  add("GENRE", val("script-genre"));
-  add("TONE", val("script-tone"));
-  add("DIALECT", val("script-dialect"));
-  add("TARGET AUDIENCE", val("script-audience"));
-  add("PLATFORM", val("script-platform"));
-  add("CHARACTERS/SETTING", val("script-chars"));
-  add("CTA", val("script-cta"));
+  const ta = document.getElementById("chat-text");
+  let text = ta.value.trim();
+  const file = pendingFile;
+  if (!text && !file) { toast(t("t_idea")); return; }
 
-  let req = lines.join("\n");
-  if (idea) req += "\n\nIDEA:\n" + idea;
+  chatBusy = true;
+  document.getElementById("chat-send").disabled = true;
+
+  const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  chatBubble("user", esc(text || "…") + (file ? `<div class="chip">📎 ${esc(file.name)}</div>` : ""));
+  ta.value = "";
+  pendingFile = null;
+  document.getElementById("chat-file-chip").textContent = "";
+  document.getElementById("chat-file").value = "";
+
+  // extract the attached document locally (works with every provider)
   let images = [];
-  if (scriptBrief) {
-    if (scriptBrief.text) {
-      req += `\n\nBRIEF (uploaded client document «${scriptBrief.name}» — ground the script strictly in its real content):\n${scriptBrief.text.slice(0, 60000)}\n===== END OF BRIEF =====`;
-    }
-    if (scriptBrief.images.length) {
-      images = scriptBrief.images;
-      req += `\n\n[BRIEF pages from «${scriptBrief.name}» are attached as images${scriptBrief.text ? " in addition to the text above" : ""}. Read ALL text inside them (Arabic or English), analyze every visual, logo and product shown, and build the script strictly on this real content.]`;
+  if (file) {
+    const extracting = chatBubble("ai", `<p class="thinking">${t("t_reading_doc")}</p>`);
+    try {
+      const doc = await extractDocument(file);
+      if (doc.images && doc.images.length) images.push(...doc.images);
+      if (doc.text) {
+        text += `\n\n===== ATTACHED DOCUMENT «${file.name}» =====\n${doc.text.slice(0, 60000)}\n===== END OF DOCUMENT =====`;
+      }
+      if (images.length) {
+        text += `\n\n[The attached document «${file.name}» ${doc.text ? "also includes" : "is scanned/visual — its pages are attached as"} images. Read ALL text inside them (Arabic or English) and analyze every visual, logo, chart and product shown. Base your work strictly on this real content.]`;
+      }
+      extracting.remove();
+      if (!text.trim()) text = "Analyze this document and produce the professional brief.";
+    } catch (e) {
+      extracting.remove();
+      chatBubble("ai", `<p class="err">⚠️ ${e.message}</p>`);
+      chatBusy = false;
+      document.getElementById("chat-send").disabled = false;
+      return;
     }
   }
-  startRun("script", req, SCRIPT_AGENT_ADDON, images);
+
+  text += `\n\nDEEPTHINK: ${deepthink ? "on" : "off"}`;
+
+  studioHistory.push({ role: "user", text, images });
+  if (studioHistory.length > 16) studioHistory = studioHistory.slice(-16);
+
+  const aiDiv = chatBubble("ai", '<p class="thinking">⏳ …</p>');
+  const out = document.getElementById("out-script");
+  let raw = "";
+
+  // live split: chat part streams into the bubble; once the marker
+  // appears, the deliverable streams into the output panel
+  const renderSplit = final => {
+    const m = raw.split(OUTPUT_MARKER);
+    aiDiv.innerHTML = mdToHtml(m[0].trim() || "…");
+    if (m.length > 1) {
+      out.dataset.raw = m.slice(1).join("\n").trim();
+      out.innerHTML = mdToHtml(out.dataset.raw);
+      if (!final) out.scrollTop = out.scrollHeight;
+    }
+    const log = document.getElementById("chat-log");
+    log.scrollTop = log.scrollHeight;
+  };
+
+  activeController = runLLM(studioHistory, {
+    onRetry(attempt, max) {
+      aiDiv.innerHTML = `<p class="thinking">${t("retrying")} (${attempt}/${max})</p>`;
+    },
+    onText(d) {
+      raw += d;
+      renderSplit(false);
+    },
+    onDone(full) {
+      chatBusy = false;
+      document.getElementById("chat-send").disabled = false;
+      activeController = null;
+      if (!full.trim()) { aiDiv.innerHTML = `<p class="thinking">${t("no_result")}</p>`; return; }
+      raw = full;
+      renderSplit(true);
+      studioHistory.push({ role: "assistant", text: full });
+      const parts = full.split(OUTPUT_MARKER);
+      if (parts.length > 1 && parts.slice(1).join("\n").trim()) {
+        setDeliverable(parts.slice(1).join("\n").trim());
+      }
+    },
+    onError(msg) {
+      chatBusy = false;
+      document.getElementById("chat-send").disabled = false;
+      activeController = null;
+      aiDiv.innerHTML = `<p class="err">⚠️ ${msg}</p>`;
+    },
+  }, { system: SYSTEM_PROMPT + STUDIO_CHAT_ADDON });
 }
 
 /* ---------- step 3: storyboard ---------- */
@@ -627,6 +729,13 @@ document.addEventListener("DOMContentLoaded", () => {
       `<optgroup label="${g.group}">` +
       g.styles.map(([val, label]) => `<option value="${val}">${label}</option>`).join("") +
       `</optgroup>`).join("");
+
+  // studio chat: Enter sends, Shift+Enter = new line; restore DeepThink state
+  const chatTa = document.getElementById("chat-text");
+  chatTa.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); chatSend(); }
+  });
+  applyDeepthinkUI();
 
   const { mode, provider, apiKey, cloudToken } = getSettings();
   provSel.value = provider;

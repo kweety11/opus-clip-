@@ -596,6 +596,25 @@ html[data-theme="gold"] {
   box-shadow: 0 0 14px color-mix(in srgb, var(--acc-deep) 30%, transparent);
 }
 
+/* studio chat layout: chat and output share the panel half/half */
+.chat-grid { grid-template-columns: minmax(0, 46fr) minmax(0, 54fr); }
+@media (max-width: 1020px) { .chat-grid { grid-template-columns: 1fr; } }
+
+/* DeepThink toggle */
+.deepthink {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 16px; border-radius: 999px; cursor: pointer;
+  border: 1.5px solid var(--line); background: rgba(255, 255, 255, .03);
+  color: var(--muted); font: inherit; font-size: 13px; font-weight: 800;
+  transition: all .25s cubic-bezier(.34, 1.56, .64, 1);
+}
+.deepthink:hover { border-color: color-mix(in srgb, var(--accent) 55%, transparent); color: var(--text); transform: translateY(-1px); }
+.deepthink.on {
+  background: var(--accent-grad); background-size: 160% 160%; color: var(--btn-fg);
+  border-color: transparent;
+  animation: gradShift 7s ease infinite, pulseGlow 2.6s ease-in-out infinite;
+}
+
 /* generated b/w sketch inside scene cards */
 .sketch-box { margin-top: 12px; }
 .sketch-box img {

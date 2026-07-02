@@ -140,107 +140,22 @@
       </div>
     </div>
 
-    <!-- STEP 1: SCRIPT (brief + specs in one place) -->
+    <!-- STEP 1: STUDIO CHAT — two agents: strategist (brief) + director (script) -->
     <section class="panel show" id="panel-script">
-      <div class="wrap"><div class="panel-grid">
-        <div class="card">
-          <h3 data-i18n="sc_h"></h3>
-          <p class="hint" data-i18n="sc_hint"></p>
-
-          <label class="f" data-i18n="sc_brief"></label>
-          <label class="upload"><span>📎</span><span data-i18n="sc_brief_up"></span>
-            <input type="file" id="script-brief" accept=".pdf,.docx,.pptx,.txt,.md,image/*" onchange="scriptBriefPicked(this)">
-          </label>
-          <span class="chip" id="script-brief-chip"></span>
-
-          <div class="two-col">
-            <div>
-              <label class="f" data-i18n="sc_fmt"></label>
-              <select id="script-format">
-                <option value="UGC" data-i18n="fmt_ugc"></option>
-                <option value="ad" data-i18n="fmt_ad"></option>
-                <option value="film" data-i18n="fmt_film"></option>
-                <option value="series" data-i18n="fmt_series"></option>
-                <option value="documentary" data-i18n="fmt_doc"></option>
-                <option value="short" data-i18n="fmt_short"></option>
-              </select>
-            </div>
-            <div>
-              <label class="f" data-i18n="sc_genre"></label>
-              <select id="script-genre">
-                <option value="" data-i18n="g_auto"></option>
-                <option value="comedy" data-i18n="g_comedy"></option>
-                <option value="drama" data-i18n="g_drama"></option>
-                <option value="action" data-i18n="g_action"></option>
-                <option value="thriller" data-i18n="g_thriller"></option>
-                <option value="horror" data-i18n="g_horror"></option>
-                <option value="romance" data-i18n="g_romance"></option>
-                <option value="fantasy" data-i18n="g_fantasy"></option>
-                <option value="sci-fi" data-i18n="g_scifi"></option>
-                <option value="mystery" data-i18n="g_mystery"></option>
-              </select>
-            </div>
+      <div class="wrap"><div class="panel-grid chat-grid">
+        <div class="card chat-card">
+          <div class="chat-log" id="chat-log">
+            <div class="msg ai md" data-i18n-html="chat_welcome_html"></div>
           </div>
-
-          <div class="two-col">
-            <div>
-              <label class="f" data-i18n="sc_tone"></label>
-              <select id="script-tone">
-                <option value="" data-i18n="t_auto"></option>
-                <option value="light and humorous" data-i18n="t_fun"></option>
-                <option value="dramatic and moving" data-i18n="t_dram"></option>
-                <option value="inspirational" data-i18n="t_insp"></option>
-                <option value="warm and human" data-i18n="t_warm"></option>
-                <option value="luxurious and refined" data-i18n="t_lux"></option>
-                <option value="bold and direct" data-i18n="t_bold"></option>
-                <option value="formal" data-i18n="t_formal"></option>
-              </select>
-            </div>
-            <div>
-              <label class="f" data-i18n="sc_dialect"></label>
-              <select id="script-dialect">
-                <option value="Egyptian Arabic" data-i18n="d_eg"></option>
-                <option value="Modern Standard Arabic" data-i18n="d_msa"></option>
-                <option value="Gulf Arabic" data-i18n="d_gulf"></option>
-                <option value="Levantine Arabic" data-i18n="d_lev"></option>
-                <option value="Maghrebi Arabic" data-i18n="d_mag"></option>
-                <option value="English" data-i18n="d_en"></option>
-              </select>
-            </div>
+          <div class="chat-input">
+            <label class="attach" title="📎"><span>📎</span><input type="file" id="chat-file" accept=".pdf,.docx,.pptx,.txt,.md,image/*" onchange="chatFilePicked(this)"></label>
+            <textarea id="chat-text" rows="1" data-i18n-ph="chat_ph"></textarea>
+            <button class="btn btn-primary btn-sm" id="chat-send" onclick="chatSend()" data-i18n="chat_send"></button>
           </div>
-
-          <div class="two-col">
-            <div>
-              <label class="f" data-i18n="sc_platform"></label>
-              <select id="script-platform">
-                <option value="" data-i18n="p_any"></option>
-                <option value="TikTok / Reels" data-i18n="p_tiktok"></option>
-                <option value="YouTube" data-i18n="p_yt"></option>
-                <option value="TV / Cinema" data-i18n="p_tv"></option>
-                <option value="Podcast" data-i18n="p_podcast"></option>
-              </select>
-            </div>
-            <div>
-              <label class="f" data-i18n="sc_dur"></label>
-              <input type="text" id="script-duration" data-i18n-ph="sc_dur_ph">
-            </div>
+          <div class="chat-foot">
+            <button class="deepthink" id="deepthink-btn" onclick="toggleDeepthink()" data-i18n-title="dt_tip">🧠 DeepThink</button>
+            <span id="chat-file-chip" class="chip"></span>
           </div>
-
-          <label class="f" data-i18n="sc_aud"></label>
-          <input type="text" id="script-audience" data-i18n-ph="sc_aud_ph">
-
-          <label class="f" data-i18n="sc_chars"></label>
-          <input type="text" id="script-chars" data-i18n-ph="sc_chars_ph">
-
-          <label class="f" data-i18n="sc_cta"></label>
-          <input type="text" id="script-cta" data-i18n-ph="sc_cta_ph">
-
-          <label class="f" data-i18n="sc_idea"></label>
-          <textarea id="script-idea" rows="5" data-i18n-ph="sc_idea_ph"></textarea>
-
-          <button class="btn btn-primary btn-block" id="run-script" onclick="runScript()" data-i18n="sc_run"></button>
-          <button class="btn btn-stop" id="stop-script" onclick="stopRun('script')">⏹</button>
-          <div id="carry-note" data-i18n="sc_carry"></div>
         </div>
         <div>
           <div class="out md" id="out-script" data-raw=""></div>
@@ -248,6 +163,7 @@
             <button class="btn btn-ghost btn-sm" onclick="copyOut('script')" data-i18n="copy"></button>
             <button class="btn btn-ghost btn-sm" onclick="downloadOut('script','script.md')" data-i18n="dl_md"></button>
           </div>
+          <div id="carry-note" data-i18n="sc_carry"></div>
         </div>
       </div></div>
     </section>
