@@ -95,6 +95,11 @@ const I18N = {
     scene_vo: "🎤 VOICE-OVER", scene_img: "🖼 IMAGE PROMPT", scene_mot: "🎥 MOTION PROMPT",
     copied_scene: "المشهد كامل", copied_img: "برومبت الصورة", copied_mot: "برومبت الحركة", copied_vo: "الفويس أوفر",
     hint_script_html: "<p>✍️ <b>الخطة جاهزة!</b> عاوز تحوّلها لسيناريو؟ اكتب كلمة <b>«سيناريو»</b> هنا تحت — وهتتنقل فورًا لصفحة السيناريو تختار النوع والمدة واللهجة وكل حاجة.</p>",
+    err_overload: "⏳ الموديل عليه ضغط عالي دلوقتي (زحمة عند المزود) — جرّبنا تلقائيًا 3 مرات. استنى دقيقة وجرّب تاني، أو بدّل لموديل أخف من الإعدادات (زي gemini-2.5-flash).",
+    err_rate: "تجاوزت حد الطلبات المجاني أو الرصيد خلص — استنى دقيقة وجرّب تاني، أو راجع حسابك عند المزود",
+    err_server: "خطأ من الخادم — جرّب تاني", err_refusal: "الطلب اترفض لأسباب تتعلق بسياسة الاستخدام — جرّب تعيد صياغته",
+    err_conn: "تعذّر الاتصال — اتأكد من الإنترنت والمفتاح",
+    retrying: "⏳ الموديل زحمة دلوقتي — بنحاول تاني تلقائيًا…",
   },
   en: {
     nav_features: "Features", nav_pricing: "Pricing", open_studio: "Open Studio →",
@@ -178,6 +183,11 @@ const I18N = {
     scene_vo: "🎤 VOICE-OVER", scene_img: "🖼 IMAGE PROMPT", scene_mot: "🎥 MOTION PROMPT",
     copied_scene: "Full scene", copied_img: "Image prompt", copied_mot: "Motion prompt", copied_vo: "Voice-over",
     hint_script_html: "<p>✍️ <b>The plan is ready!</b> Want to turn it into a script? Type <b>\"script\"</b> below — you'll jump straight to the Script page to pick format, duration, dialect and more.</p>",
+    err_overload: "⏳ The model is under heavy load right now — we auto-retried 3 times. Wait a minute and try again, or switch to a lighter model in Settings (e.g. gemini-2.5-flash).",
+    err_rate: "Free rate limit reached or credit exhausted — wait a minute and retry, or check your provider account",
+    err_server: "Server error — try again", err_refusal: "The request was refused for usage-policy reasons — try rephrasing it",
+    err_conn: "Connection failed — check your internet and key",
+    retrying: "⏳ The model is busy — retrying automatically…",
   },
 };
 

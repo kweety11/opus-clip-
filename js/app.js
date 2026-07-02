@@ -114,6 +114,9 @@ function startRun(tool, text, sysAddon) {
   stop.style.display = "inline-flex";
 
   activeController = runLLM([{ role: "user", text }], {
+    onRetry(attempt, max) {
+      out.innerHTML = `<p class="thinking">${t("retrying")} (${attempt}/${max})</p>`;
+    },
     onText(delta) {
       out.dataset.raw += delta;
       out.innerHTML = mdToHtml(out.dataset.raw);
@@ -298,6 +301,9 @@ async function chatSend(preset) {
   const aiDiv = chatBubble("ai", '<p class="thinking">⏳ …</p>');
   let raw = "";
   activeController = runLLM(chatHistory, {
+    onRetry(attempt, max) {
+      aiDiv.innerHTML = `<p class="thinking">${t("retrying")} (${attempt}/${max})</p>`;
+    },
     onText(d) {
       raw += d;
       aiDiv.innerHTML = mdToHtml(raw);
@@ -476,6 +482,7 @@ function useScriptForVoice() {
   btn.disabled = true;
 
   runLLM([{ role: "user", text: "SCRIPT:\n" + lastScript.slice(0, 30000) }], {
+    onRetry() { ta.placeholder = t("retrying"); },
     onText(d) { ta.value += d; ta.scrollTop = ta.scrollHeight; },
     onDone(full) {
       btn.disabled = false;

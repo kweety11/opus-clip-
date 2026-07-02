@@ -27,7 +27,7 @@ const PROVIDERS = {
     label: "🇺🇸 Google — Gemini (مفتاح مجاني)",
     protocol: "openai",
     url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-    models: ["gemini-3-pro-preview", "gemini-2.5-pro", "gemini-2.5-flash"],
+    models: ["gemini-2.5-flash", "gemini-3-pro-preview", "gemini-2.5-pro"],
     keyUrl: "aistudio.google.com/apikey",
   },
   xai: {
@@ -204,82 +204,141 @@ function runLLM(messages, handlers, opts = {}) {
     };
   }
 
-  (async () => {
-    let full = "";
-    try {
-      const res = await fetch(url, {
-        method: "POST",
-        signal: controller.signal,
-        headers,
-        body: JSON.stringify(body),
-      });
+  // strings fall back to Arabic when i18n isn't loaded (defensive)
+  const T = k => (typeof t === "function" ? t(k) : ({
+    err_overload: "⏳ الموديل عليه ضغط عالي دلوقتي — استنى دقيقة وجرّب تاني، أو بدّل لموديل أخف من الإعدادات.",
+    err_rate: "تجاوزت حد الطلبات أو الرصيد خلص — استنى دقيقة أو راجع حسابك عند المزود",
+    err_server: "خطأ من الخادم — جرّب تاني",
+    err_refusal: "الطلب اترفض لأسباب تتعلق بسياسة الاستخدام — جرّب تعيد صياغته",
+    err_conn: "تعذّر الاتصال — اتأكد من الإنترنت والمفتاح",
+  })[k] || k);
 
-      if (!res.ok) {
-        let msg = `HTTP ${res.status}`, code = "";
-        try {
-          const err = await res.json();
-          code = typeof err?.error === "string" ? err.error : "";
-          msg = err?.error?.message || code || err?.message || JSON.stringify(err).slice(0, 200);
-        } catch (_) { /* non-JSON error body */ }
-        if (P.protocol === "cloud") {
-          if (code === "trial_over") msg = "التجربة المجانية خلصت 🎬 — فعّل الاشتراك (10$/شهر) عشان تكمل";
-          else if (code === "daily_cap") msg = "وصلت للحد اليومي — كمّل بكرة أو فعّل الاشتراك";
-          else if (res.status === 401) msg = "الجلسة انتهت — سجّل بإيميلك تاني من الإعدادات ⚙️";
-        } else {
-          if (res.status === 401 || res.status === 403) msg = `مفتاح ${P.label.replace(/^[^ ]+ /, "")} غير صحيح — راجع الإعدادات ⚙️`;
-          if (res.status === 429) msg = "تجاوزت حد الطلبات أو الرصيد خلص — راجع حسابك عند المزود";
+  // provider error bodies vary wildly: {error:{message}}, [{error:{…}}], {message}…
+  const extractErrMsg = raw => {
+    const e = Array.isArray(raw) ? raw[0] : raw;
+    const inner = (e && typeof e.error === "object") ? e.error : e;
+    return (inner && inner.message) || (typeof e?.error === "string" ? e.error : "") || "";
+  };
+  const isOverload = (status, msg) =>
+    [500, 502, 503, 504, 529].includes(status) ||
+    /overload|high demand|unavailable|try again later|capacity/i.test(msg || "");
+
+  const MAX_TRIES = 3;
+  const RETRY_WAIT = [2500, 6000];
+
+  (async () => {
+    for (let attempt = 1; attempt <= MAX_TRIES; attempt++) {
+      let full = "";
+      // transient failure before any text arrived → retry automatically
+      const retryOrFail = async msg => {
+        if (attempt < MAX_TRIES) {
+          handlers.onRetry && handlers.onRetry(attempt, MAX_TRIES);
+          await new Promise(r => setTimeout(r, RETRY_WAIT[attempt - 1]));
+          return true;
         }
         handlers.onError(msg);
-        return;
-      }
+        return false;
+      };
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buf = "";
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          signal: controller.signal,
+          headers,
+          body: JSON.stringify(body),
+        });
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buf += decoder.decode(value, { stream: true });
+        if (!res.ok) {
+          let msg = "", code = "";
+          try {
+            const err = await res.json();
+            code = typeof err?.error === "string" ? err.error : "";
+            msg = extractErrMsg(err) || code;
+          } catch (_) { /* non-JSON error body */ }
 
-        const frames = buf.split("\n\n");
-        buf = frames.pop();
-        for (const frame of frames) {
-          for (const line of frame.split("\n")) {
-            if (!line.startsWith("data:")) continue;
-            const payload = line.slice(5).trim();
-            if (payload === "[DONE]") continue;
-            let ev;
-            try { ev = JSON.parse(payload); } catch (_) { continue; }
-
-            let delta = "";
-            if (P.protocol === "anthropic") {
-              if (ev.type === "content_block_delta" && ev.delta?.type === "text_delta") delta = ev.delta.text;
-              else if (ev.type === "message_delta" && ev.delta?.stop_reason === "refusal") {
-                handlers.onError("الطلب اترفض لأسباب تتعلق بسياسة الاستخدام — جرّب تعيد صياغته");
-                return;
-              } else if (ev.type === "error") {
-                handlers.onError(ev.error?.message || "خطأ من الخادم");
-                return;
-              }
-            } else {
-              delta = ev.choices?.[0]?.delta?.content || "";
-              if (ev.error) {
-                handlers.onError(ev.error.message || "خطأ من الخادم");
-                return;
-              }
+          if (P.protocol === "cloud") {
+            if (code === "trial_over") { handlers.onError("التجربة المجانية خلصت 🎬 — فعّل الاشتراك (10$/شهر) عشان تكمل"); return; }
+            if (code === "daily_cap") { handlers.onError("وصلت للحد اليومي — كمّل بكرة أو فعّل الاشتراك"); return; }
+            if (res.status === 401) { handlers.onError("الجلسة انتهت — سجّل بإيميلك تاني من الإعدادات ⚙️"); return; }
+          } else {
+            if (res.status === 401 || res.status === 403) {
+              handlers.onError(`مفتاح ${P.label.replace(/^[^ ]+ /, "")} غير صحيح — راجع الإعدادات ⚙️`);
+              return;
             }
-            if (delta) {
-              full += delta;
-              handlers.onText(delta);
+          }
+          if (isOverload(res.status, msg)) {
+            if (await retryOrFail(T("err_overload"))) continue;
+            return;
+          }
+          if (res.status === 429) {
+            if (await retryOrFail(T("err_rate"))) continue;
+            return;
+          }
+          handlers.onError(msg || `HTTP ${res.status}`);
+          return;
+        }
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buf = "", streamErr = null;
+
+        readloop:
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+
+          const frames = buf.split("\n\n");
+          buf = frames.pop();
+          for (const frame of frames) {
+            for (const line of frame.split("\n")) {
+              if (!line.startsWith("data:")) continue;
+              const payload = line.slice(5).trim();
+              if (payload === "[DONE]") continue;
+              let ev;
+              try { ev = JSON.parse(payload); } catch (_) { continue; }
+
+              let delta = "";
+              if (P.protocol === "anthropic") {
+                if (ev.type === "content_block_delta" && ev.delta?.type === "text_delta") delta = ev.delta.text;
+                else if (ev.type === "message_delta" && ev.delta?.stop_reason === "refusal") {
+                  handlers.onError(T("err_refusal"));
+                  return;
+                } else if (ev.type === "error") {
+                  streamErr = extractErrMsg(ev) || T("err_server");
+                  break readloop;
+                }
+              } else {
+                delta = ev.choices?.[0]?.delta?.content || "";
+                if (ev.error) {
+                  streamErr = extractErrMsg(ev) || T("err_server");
+                  break readloop;
+                }
+              }
+              if (delta) {
+                full += delta;
+                handlers.onText(delta);
+              }
             }
           }
         }
+
+        if (streamErr) {
+          // overload errors can arrive mid-stream with HTTP 200 — retry those too
+          if (!full && isOverload(0, streamErr)) {
+            if (await retryOrFail(T("err_overload"))) continue;
+            return;
+          }
+          handlers.onError(streamErr);
+          return;
+        }
+        handlers.onDone(full);
+        return;
+      } catch (e) {
+        if (e.name === "AbortError") { handlers.onDone(full); return; }
+        if (await retryOrFail(T("err_conn") + " (" + P.label.replace(/^[^ ]+ /, "") + ")")) continue;
+        return;
       }
-      handlers.onDone(full);
-    } catch (e) {
-      if (e.name === "AbortError") handlers.onDone(full);
-      else handlers.onError("تعذّر الاتصال بـ " + P.label.replace(/^[^ ]+ /, "") + " — اتأكد من الإنترنت والمفتاح");
     }
   })();
 
