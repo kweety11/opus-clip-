@@ -1036,11 +1036,14 @@ const I18N = {
     err_server: "خطأ من الخادم — جرّب تاني", err_refusal: "الطلب اترفض لأسباب تتعلق بسياسة الاستخدام — جرّب تعيد صياغته",
     err_conn: "تعذّر الاتصال — اتأكد من الإنترنت والمفتاح",
     retrying: "⏳ الموديل زحمة دلوقتي — بنحاول تاني تلقائيًا…",
+    retrying_rate: "⏳ وصلنا لحد الطلبات المجاني للدقيقة — هنكمل تلقائيًا خلال ~{s} ثانية، سيبنا شغالين…",
+    err_quota_day: "⛔ الحد اليومي المجاني للموديل ده خلص عند Google — هيتجدد بكرة. الحل السريع: بدّل الموديل من الإعدادات (جرب gemini-2.5-flash-lite أو gemini-2.0-flash) أو استخدم مزود تاني.",
     // character reference + sketches
     b_char: "الشخصية الثابتة (اختياري) — ارفع صورة مرجعية",
     b_char_up: "ارفع صورتك أو صورة الشخصية", b_char_name_ph: "اسم الشخصية — مثال: أحمد",
     b_sketch: "✏️ اسكتشات أبيض وأسود لكل مشهد (بترسم بمفتاح Gemini المجاني)",
     sk_draw: "✏️ ارسم الاسكتش", sk_drawing: "⏳ بيرسم…", sk_all: "✏️ ارسم كل الاسكتشات",
+    sk_auto: "🎨 بيرسم اسكتشات المشاهد بالترتيب — واحد ورا التاني…",
     sk_prompt: "✏️ SKETCH PROMPT", copied_sk: "برومبت الاسكتش",
     sk_no_key: "الاسكتشات محتاجة مفتاح Google Gemini (مجاني) — ضيفه من الإعدادات",
     sk_rate: "وصلت لحد الرسم المجاني — استنى دقيقة وحاول تاني",
@@ -1127,11 +1130,14 @@ const I18N = {
     err_server: "Server error — try again", err_refusal: "The request was refused for usage-policy reasons — try rephrasing it",
     err_conn: "Connection failed — check your internet and key",
     retrying: "⏳ The model is busy — retrying automatically…",
+    retrying_rate: "⏳ Hit the free per-minute request limit — continuing automatically in ~{s}s, hang tight…",
+    err_quota_day: "⛔ This model's free daily quota is exhausted at Google — it resets tomorrow. Quick fix: switch the model in Settings (try gemini-2.5-flash-lite or gemini-2.0-flash) or use another provider.",
     // character reference + sketches
     b_char: "Consistent character (optional) — upload a reference photo",
     b_char_up: "Upload your photo or the character's", b_char_name_ph: "Character name — e.g. Ahmed",
     b_sketch: "✏️ B/W sketch for every scene (drawn with your free Gemini key)",
     sk_draw: "✏️ Draw sketch", sk_drawing: "⏳ Drawing…", sk_all: "✏️ Draw all sketches",
+    sk_auto: "🎨 Drawing the scene sketches in order — one after another…",
     sk_prompt: "✏️ SKETCH PROMPT", copied_sk: "Sketch prompt",
     sk_no_key: "Sketches need a (free) Google Gemini key — add it in Settings",
     sk_rate: "Free drawing limit reached — wait a minute and retry",
@@ -1407,7 +1413,13 @@ async function extractPptx(file) {
    keeps the same face/build in every frame.
    ============================================================ */
 
-const SKETCH_MODEL = "gemini-2.5-flash-image";
+/* tried in order — first available image model on the key wins */
+const SKETCH_MODELS = [
+  "gemini-2.5-flash-image",
+  "gemini-2.5-flash-image-preview",
+  "gemini-2.0-flash-preview-image-generation",
+];
+let _sketchModel = null; // remembered after the first success
 
 const SKETCH_STYLE_PREFIX =
   "Professional film storyboard sketch, black and white pencil and ink drawing, " +
@@ -1435,33 +1447,43 @@ async function sketchGenerate(sceneDescription, refImage) {
     parts.push({ text: SKETCH_STYLE_PREFIX + "Draw this scene as a storyboard panel:\n" + sceneDescription });
   }
 
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${SKETCH_MODEL}:generateContent?key=${encodeURIComponent(key)}`,
-    {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts }],
-        generationConfig: { responseModalities: ["IMAGE"] },
-      }),
+  // walk the model list: skip names this key doesn't have (404 / not-found)
+  const models = _sketchModel ? [_sketchModel] : SKETCH_MODELS;
+  let lastErr = "NO_IMAGE";
+  for (const model of models) {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts }],
+          // image models want TEXT+IMAGE — IMAGE alone is rejected by some
+          generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      let msg = "HTTP " + res.status;
+      try { msg = (await res.json())?.error?.message || msg; } catch (_) {}
+      if (res.status === 404 || /not found|is not supported/i.test(msg)) { lastErr = "NO_MODEL"; continue; }
+      if (res.status === 401 || res.status === 403) throw new Error("BAD_KEY");
+      if (res.status === 429) throw new Error("RATE");
+      if (/overload|unavailable|high demand/i.test(msg) || res.status >= 500) throw new Error("BUSY");
+      if (res.status === 400 && /modalit/i.test(msg)) { lastErr = msg; continue; }
+      throw new Error(msg);
     }
-  );
 
-  if (!res.ok) {
-    if (res.status === 400 || res.status === 401 || res.status === 403) throw new Error("BAD_KEY");
-    if (res.status === 429) throw new Error("RATE");
-    let msg = "HTTP " + res.status;
-    try { msg = (await res.json())?.error?.message || msg; } catch (_) {}
-    if (/overload|unavailable|high demand/i.test(msg)) throw new Error("BUSY");
-    throw new Error(msg);
+    const data = await res.json();
+    const blocks = data?.candidates?.[0]?.content?.parts || [];
+    const img = blocks.find(p => p.inlineData || p.inline_data);
+    if (!img) { lastErr = "NO_IMAGE"; continue; }
+    _sketchModel = model;
+    const d = img.inlineData || img.inline_data;
+    return `data:${d.mimeType || d.mime_type || "image/png"};base64,${d.data}`;
   }
-
-  const data = await res.json();
-  const blocks = data?.candidates?.[0]?.content?.parts || [];
-  const img = blocks.find(p => p.inlineData || p.inline_data);
-  if (!img) throw new Error("NO_IMAGE");
-  const d = img.inlineData || img.inline_data;
-  return `data:${d.mimeType || d.mime_type || "image/png"};base64,${d.data}`;
+  throw new Error(lastErr);
 }
 
 /* ============================================================
@@ -1649,7 +1671,7 @@ const PROVIDERS = {
     label: "🇺🇸 Google — Gemini (مفتاح مجاني)",
     protocol: "openai",
     url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-    models: ["gemini-2.5-flash", "gemini-3-pro-preview", "gemini-2.5-pro"],
+    models: ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash", "gemini-3-pro-preview", "gemini-2.5-pro"],
     keyUrl: "aistudio.google.com/apikey",
   },
   xai: {
@@ -1830,6 +1852,7 @@ function runLLM(messages, handlers, opts = {}) {
   const T = k => (typeof t === "function" ? t(k) : ({
     err_overload: "⏳ الموديل عليه ضغط عالي دلوقتي — استنى دقيقة وجرّب تاني، أو بدّل لموديل أخف من الإعدادات.",
     err_rate: "تجاوزت حد الطلبات أو الرصيد خلص — استنى دقيقة أو راجع حسابك عند المزود",
+    err_quota_day: "الحد اليومي المجاني خلص — بدّل الموديل من الإعدادات أو ارجع بكرة",
     err_server: "خطأ من الخادم — جرّب تاني",
     err_refusal: "الطلب اترفض لأسباب تتعلق بسياسة الاستخدام — جرّب تعيد صياغته",
     err_conn: "تعذّر الاتصال — اتأكد من الإنترنت والمفتاح",
@@ -1871,9 +1894,10 @@ function runLLM(messages, handlers, opts = {}) {
         });
 
         if (!res.ok) {
-          let msg = "", code = "";
+          let msg = "", code = "", rawErr = "";
           try {
             const err = await res.json();
+            rawErr = JSON.stringify(err);
             code = typeof err?.error === "string" ? err.error : "";
             msg = extractErrMsg(err) || code;
           } catch (_) { /* non-JSON error body */ }
@@ -1893,7 +1917,20 @@ function runLLM(messages, handlers, opts = {}) {
             return;
           }
           if (res.status === 429) {
-            if (await retryOrFail(T("err_rate"))) continue;
+            // daily free quota is gone → waiting won't help, say so plainly
+            if (/PerDay|per_day|daily/i.test(rawErr + msg)) {
+              handlers.onError(T("err_quota_day"));
+              return;
+            }
+            // per-minute limit → wait the delay Google suggests, then continue
+            const sug = (rawErr.match(/"retryDelay"\s*:\s*"?(\d+)/) || [])[1];
+            const waitMs = Math.min(Math.max((parseInt(sug, 10) || 30), 15), 90) * 1000;
+            if (attempt < MAX_TRIES) {
+              handlers.onRetry && handlers.onRetry(attempt, MAX_TRIES, waitMs);
+              await new Promise(r => setTimeout(r, waitMs));
+              continue;
+            }
+            handlers.onError(T("err_rate"));
             return;
           }
           handlers.onError(msg || `HTTP ${res.status}`);
@@ -2111,6 +2148,14 @@ function setTheme(name) {
   document.querySelectorAll(".tdot").forEach(d => d.classList.toggle("on", d.dataset.theme === name));
 }
 
+/* one line describing an auto-retry, incl. rate-limit countdowns */
+function retryMsg(attempt, max, waitMs) {
+  const base = waitMs && waitMs > 10000
+    ? t("retrying_rate").replace("{s}", Math.round(waitMs / 1000))
+    : t("retrying");
+  return `${base} (${attempt}/${max})`;
+}
+
 function startRun(tool, text, sysAddon, images) {
   if (!checkReady()) return;
   if (activeController) activeController.abort();
@@ -2124,8 +2169,8 @@ function startRun(tool, text, sysAddon, images) {
   stop.style.display = "inline-flex";
 
   activeController = runLLM([{ role: "user", text, images: images || [] }], {
-    onRetry(attempt, max) {
-      out.innerHTML = `<p class="thinking">${t("retrying")} (${attempt}/${max})</p>`;
+    onRetry(attempt, max, waitMs) {
+      out.innerHTML = `<p class="thinking">${retryMsg(attempt, max, waitMs)}</p>`;
     },
     onText(delta) {
       out.dataset.raw += delta;
@@ -2147,6 +2192,17 @@ function startRun(tool, text, sysAddon, images) {
         boardView = "full";
         const sb = document.getElementById("split-board");
         if (sb) sb.textContent = t("split");
+        // auto-pipeline: split into scene cards and draw the b/w
+        // sketches in scene order, one after the other
+        if (document.getElementById("board-sketch").checked) {
+          setTimeout(() => {
+            if (boardView === "full") toggleBoardView();
+            if ((window._scenes || []).length) {
+              toast(t("sk_auto"));
+              drawAllSketches();
+            }
+          }, 80);
+        }
       }
       if (tool === "script") {
         lastScript = full;
@@ -2321,8 +2377,8 @@ async function chatSend() {
   };
 
   activeController = runLLM(studioHistory, {
-    onRetry(attempt, max) {
-      aiDiv.innerHTML = `<p class="thinking">${t("retrying")} (${attempt}/${max})</p>`;
+    onRetry(attempt, max, waitMs) {
+      aiDiv.innerHTML = `<p class="thinking">${retryMsg(attempt, max, waitMs)}</p>`;
     },
     onText(d) {
       raw += d;
@@ -2469,14 +2525,16 @@ function toggleBoardView() {
 /* ---------- storyboard sketches (b/w, drawn by the free Gemini image model) ---------- */
 async function drawSketch(i) {
   const s = window._scenes && window._scenes[i];
-  if (!s) return;
+  if (!s) return "done";
   const box = document.getElementById("sketch-" + i);
-  if (!box) return;
+  if (!box) return "done";
   const desc = s.sketch || s.img || s.header;
   box.innerHTML = `<span class="sketch-status">${t("sk_drawing")}</span>`;
+  box.scrollIntoView({ behavior: "smooth", block: "nearest" });
   try {
     const dataUrl = await sketchGenerate(desc, boardCharImage);
     box.innerHTML = `<img src="${dataUrl}" alt="storyboard sketch">`;
+    return "done";
   } catch (e) {
     const msg = e.message === "NO_KEY" ? t("sk_no_key")
       : e.message === "RATE" ? t("sk_rate")
@@ -2484,15 +2542,30 @@ async function drawSketch(i) {
       : e.message === "BAD_KEY" ? t("v_bad_key")
       : t("sk_fail");
     box.innerHTML = `<button class="btn btn-ghost btn-xs" onclick="drawSketch(${i})">${t("sk_draw")}</button> <span class="sketch-status">⚠️ ${msg}</span>`;
-    if (e.message === "NO_KEY") { switchTab("settings"); toast(t("sk_no_key")); }
+    if (e.message === "NO_KEY") { switchTab("settings"); toast(t("sk_no_key")); return "stop"; }
+    if (e.message === "RATE") return "wait"; // free tier: pause then continue
+    return "done";
   }
 }
 
+let sketchesRunning = false;
 async function drawAllSketches() {
-  const n = (window._scenes || []).length;
-  for (let i = 0; i < n; i++) {
-    // sequential on purpose — the free tier rate-limits parallel image calls
-    await drawSketch(i);
+  if (sketchesRunning) return;
+  sketchesRunning = true;
+  try {
+    const n = (window._scenes || []).length;
+    for (let i = 0; i < n; i++) {
+      // sequential on purpose — the free tier rate-limits parallel image calls
+      const r = await drawSketch(i);
+      if (r === "stop") break;
+      if (r === "wait") {
+        // rate-limited: breathe for a minute, retry the same scene once
+        await new Promise(res => setTimeout(res, 61000));
+        await drawSketch(i);
+      }
+    }
+  } finally {
+    sketchesRunning = false;
   }
 }
 
@@ -2513,7 +2586,7 @@ function useScriptForVoice() {
   btn.disabled = true;
 
   runLLM([{ role: "user", text: "SCRIPT:\n" + lastScript.slice(0, 30000) }], {
-    onRetry() { ta.placeholder = t("retrying"); },
+    onRetry(a, m, w) { ta.placeholder = retryMsg(a, m, w); },
     onText(d) { ta.value += d; ta.scrollTop = ta.scrollHeight; },
     onDone(full) {
       btn.disabled = false;

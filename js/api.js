@@ -27,7 +27,7 @@ const PROVIDERS = {
     label: "🇺🇸 Google — Gemini (مفتاح مجاني)",
     protocol: "openai",
     url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-    models: ["gemini-2.5-flash", "gemini-3-pro-preview", "gemini-2.5-pro"],
+    models: ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash", "gemini-3-pro-preview", "gemini-2.5-pro"],
     keyUrl: "aistudio.google.com/apikey",
   },
   xai: {
@@ -208,6 +208,7 @@ function runLLM(messages, handlers, opts = {}) {
   const T = k => (typeof t === "function" ? t(k) : ({
     err_overload: "⏳ الموديل عليه ضغط عالي دلوقتي — استنى دقيقة وجرّب تاني، أو بدّل لموديل أخف من الإعدادات.",
     err_rate: "تجاوزت حد الطلبات أو الرصيد خلص — استنى دقيقة أو راجع حسابك عند المزود",
+    err_quota_day: "الحد اليومي المجاني خلص — بدّل الموديل من الإعدادات أو ارجع بكرة",
     err_server: "خطأ من الخادم — جرّب تاني",
     err_refusal: "الطلب اترفض لأسباب تتعلق بسياسة الاستخدام — جرّب تعيد صياغته",
     err_conn: "تعذّر الاتصال — اتأكد من الإنترنت والمفتاح",
@@ -249,9 +250,10 @@ function runLLM(messages, handlers, opts = {}) {
         });
 
         if (!res.ok) {
-          let msg = "", code = "";
+          let msg = "", code = "", rawErr = "";
           try {
             const err = await res.json();
+            rawErr = JSON.stringify(err);
             code = typeof err?.error === "string" ? err.error : "";
             msg = extractErrMsg(err) || code;
           } catch (_) { /* non-JSON error body */ }
@@ -271,7 +273,20 @@ function runLLM(messages, handlers, opts = {}) {
             return;
           }
           if (res.status === 429) {
-            if (await retryOrFail(T("err_rate"))) continue;
+            // daily free quota is gone → waiting won't help, say so plainly
+            if (/PerDay|per_day|daily/i.test(rawErr + msg)) {
+              handlers.onError(T("err_quota_day"));
+              return;
+            }
+            // per-minute limit → wait the delay Google suggests, then continue
+            const sug = (rawErr.match(/"retryDelay"\s*:\s*"?(\d+)/) || [])[1];
+            const waitMs = Math.min(Math.max((parseInt(sug, 10) || 30), 15), 90) * 1000;
+            if (attempt < MAX_TRIES) {
+              handlers.onRetry && handlers.onRetry(attempt, MAX_TRIES, waitMs);
+              await new Promise(r => setTimeout(r, waitMs));
+              continue;
+            }
+            handlers.onError(T("err_rate"));
             return;
           }
           handlers.onError(msg || `HTTP ${res.status}`);

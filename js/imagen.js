@@ -7,7 +7,13 @@
    keeps the same face/build in every frame.
    ============================================================ */
 
-const SKETCH_MODEL = "gemini-2.5-flash-image";
+/* tried in order — first available image model on the key wins */
+const SKETCH_MODELS = [
+  "gemini-2.5-flash-image",
+  "gemini-2.5-flash-image-preview",
+  "gemini-2.0-flash-preview-image-generation",
+];
+let _sketchModel = null; // remembered after the first success
 
 const SKETCH_STYLE_PREFIX =
   "Professional film storyboard sketch, black and white pencil and ink drawing, " +
@@ -35,31 +41,41 @@ async function sketchGenerate(sceneDescription, refImage) {
     parts.push({ text: SKETCH_STYLE_PREFIX + "Draw this scene as a storyboard panel:\n" + sceneDescription });
   }
 
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${SKETCH_MODEL}:generateContent?key=${encodeURIComponent(key)}`,
-    {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts }],
-        generationConfig: { responseModalities: ["IMAGE"] },
-      }),
+  // walk the model list: skip names this key doesn't have (404 / not-found)
+  const models = _sketchModel ? [_sketchModel] : SKETCH_MODELS;
+  let lastErr = "NO_IMAGE";
+  for (const model of models) {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts }],
+          // image models want TEXT+IMAGE — IMAGE alone is rejected by some
+          generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      let msg = "HTTP " + res.status;
+      try { msg = (await res.json())?.error?.message || msg; } catch (_) {}
+      if (res.status === 404 || /not found|is not supported/i.test(msg)) { lastErr = "NO_MODEL"; continue; }
+      if (res.status === 401 || res.status === 403) throw new Error("BAD_KEY");
+      if (res.status === 429) throw new Error("RATE");
+      if (/overload|unavailable|high demand/i.test(msg) || res.status >= 500) throw new Error("BUSY");
+      if (res.status === 400 && /modalit/i.test(msg)) { lastErr = msg; continue; }
+      throw new Error(msg);
     }
-  );
 
-  if (!res.ok) {
-    if (res.status === 400 || res.status === 401 || res.status === 403) throw new Error("BAD_KEY");
-    if (res.status === 429) throw new Error("RATE");
-    let msg = "HTTP " + res.status;
-    try { msg = (await res.json())?.error?.message || msg; } catch (_) {}
-    if (/overload|unavailable|high demand/i.test(msg)) throw new Error("BUSY");
-    throw new Error(msg);
+    const data = await res.json();
+    const blocks = data?.candidates?.[0]?.content?.parts || [];
+    const img = blocks.find(p => p.inlineData || p.inline_data);
+    if (!img) { lastErr = "NO_IMAGE"; continue; }
+    _sketchModel = model;
+    const d = img.inlineData || img.inline_data;
+    return `data:${d.mimeType || d.mime_type || "image/png"};base64,${d.data}`;
   }
-
-  const data = await res.json();
-  const blocks = data?.candidates?.[0]?.content?.parts || [];
-  const img = blocks.find(p => p.inlineData || p.inline_data);
-  if (!img) throw new Error("NO_IMAGE");
-  const d = img.inlineData || img.inline_data;
-  return `data:${d.mimeType || d.mime_type || "image/png"};base64,${d.data}`;
+  throw new Error(lastErr);
 }

@@ -108,6 +108,14 @@ function setTheme(name) {
   document.querySelectorAll(".tdot").forEach(d => d.classList.toggle("on", d.dataset.theme === name));
 }
 
+/* one line describing an auto-retry, incl. rate-limit countdowns */
+function retryMsg(attempt, max, waitMs) {
+  const base = waitMs && waitMs > 10000
+    ? t("retrying_rate").replace("{s}", Math.round(waitMs / 1000))
+    : t("retrying");
+  return `${base} (${attempt}/${max})`;
+}
+
 function startRun(tool, text, sysAddon, images) {
   if (!checkReady()) return;
   if (activeController) activeController.abort();
@@ -121,8 +129,8 @@ function startRun(tool, text, sysAddon, images) {
   stop.style.display = "inline-flex";
 
   activeController = runLLM([{ role: "user", text, images: images || [] }], {
-    onRetry(attempt, max) {
-      out.innerHTML = `<p class="thinking">${t("retrying")} (${attempt}/${max})</p>`;
+    onRetry(attempt, max, waitMs) {
+      out.innerHTML = `<p class="thinking">${retryMsg(attempt, max, waitMs)}</p>`;
     },
     onText(delta) {
       out.dataset.raw += delta;
@@ -144,6 +152,17 @@ function startRun(tool, text, sysAddon, images) {
         boardView = "full";
         const sb = document.getElementById("split-board");
         if (sb) sb.textContent = t("split");
+        // auto-pipeline: split into scene cards and draw the b/w
+        // sketches in scene order, one after the other
+        if (document.getElementById("board-sketch").checked) {
+          setTimeout(() => {
+            if (boardView === "full") toggleBoardView();
+            if ((window._scenes || []).length) {
+              toast(t("sk_auto"));
+              drawAllSketches();
+            }
+          }, 80);
+        }
       }
       if (tool === "script") {
         lastScript = full;
@@ -318,8 +337,8 @@ async function chatSend() {
   };
 
   activeController = runLLM(studioHistory, {
-    onRetry(attempt, max) {
-      aiDiv.innerHTML = `<p class="thinking">${t("retrying")} (${attempt}/${max})</p>`;
+    onRetry(attempt, max, waitMs) {
+      aiDiv.innerHTML = `<p class="thinking">${retryMsg(attempt, max, waitMs)}</p>`;
     },
     onText(d) {
       raw += d;
@@ -466,14 +485,16 @@ function toggleBoardView() {
 /* ---------- storyboard sketches (b/w, drawn by the free Gemini image model) ---------- */
 async function drawSketch(i) {
   const s = window._scenes && window._scenes[i];
-  if (!s) return;
+  if (!s) return "done";
   const box = document.getElementById("sketch-" + i);
-  if (!box) return;
+  if (!box) return "done";
   const desc = s.sketch || s.img || s.header;
   box.innerHTML = `<span class="sketch-status">${t("sk_drawing")}</span>`;
+  box.scrollIntoView({ behavior: "smooth", block: "nearest" });
   try {
     const dataUrl = await sketchGenerate(desc, boardCharImage);
     box.innerHTML = `<img src="${dataUrl}" alt="storyboard sketch">`;
+    return "done";
   } catch (e) {
     const msg = e.message === "NO_KEY" ? t("sk_no_key")
       : e.message === "RATE" ? t("sk_rate")
@@ -481,15 +502,30 @@ async function drawSketch(i) {
       : e.message === "BAD_KEY" ? t("v_bad_key")
       : t("sk_fail");
     box.innerHTML = `<button class="btn btn-ghost btn-xs" onclick="drawSketch(${i})">${t("sk_draw")}</button> <span class="sketch-status">⚠️ ${msg}</span>`;
-    if (e.message === "NO_KEY") { switchTab("settings"); toast(t("sk_no_key")); }
+    if (e.message === "NO_KEY") { switchTab("settings"); toast(t("sk_no_key")); return "stop"; }
+    if (e.message === "RATE") return "wait"; // free tier: pause then continue
+    return "done";
   }
 }
 
+let sketchesRunning = false;
 async function drawAllSketches() {
-  const n = (window._scenes || []).length;
-  for (let i = 0; i < n; i++) {
-    // sequential on purpose — the free tier rate-limits parallel image calls
-    await drawSketch(i);
+  if (sketchesRunning) return;
+  sketchesRunning = true;
+  try {
+    const n = (window._scenes || []).length;
+    for (let i = 0; i < n; i++) {
+      // sequential on purpose — the free tier rate-limits parallel image calls
+      const r = await drawSketch(i);
+      if (r === "stop") break;
+      if (r === "wait") {
+        // rate-limited: breathe for a minute, retry the same scene once
+        await new Promise(res => setTimeout(res, 61000));
+        await drawSketch(i);
+      }
+    }
+  } finally {
+    sketchesRunning = false;
   }
 }
 
@@ -510,7 +546,7 @@ function useScriptForVoice() {
   btn.disabled = true;
 
   runLLM([{ role: "user", text: "SCRIPT:\n" + lastScript.slice(0, 30000) }], {
-    onRetry() { ta.placeholder = t("retrying"); },
+    onRetry(a, m, w) { ta.placeholder = retryMsg(a, m, w); },
     onText(d) { ta.value += d; ta.scrollTop = ta.scrollHeight; },
     onDone(full) {
       btn.disabled = false;
