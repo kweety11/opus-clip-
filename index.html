@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Film-trend AI — استوديو الإنتاج بالذكاء الاصطناعي</title>
+  <title>Film-trend AI</title>
   <meta name="description" content="خطة سوشيال ميديا، سيناريو، استوري بورد ببرومبتات جاهزة، وفويس أوفر بأصوات جوجل — بأي موديل AI في السوق.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23f2b23e'/><text x='16' y='23' text-anchor='middle' font-size='18'>🎬</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,10 +21,11 @@
         <span>Film-trend <em>AI</em></span>
       </div>
       <nav class="head-nav" id="head-nav">
-        <a href="#features" onclick="goLanding()">المميزات</a>
-        <a href="#pricing" onclick="goLanding()">الأسعار</a>
+        <a href="#features" onclick="goLanding()" data-i18n="nav_features">المميزات</a>
+        <a href="#pricing" onclick="goLanding()" data-i18n="nav_pricing">الأسعار</a>
       </nav>
-      <button class="btn btn-primary btn-sm" onclick="openStudio()">افتح الاستوديو ←</button>
+      <button class="btn btn-ghost btn-sm" id="lang-btn" onclick="toggleLang()">EN</button>
+      <button class="btn btn-primary btn-sm" onclick="openStudio()" data-i18n="open_studio">افتح الاستوديو ←</button>
     </div>
   </header>
 
@@ -33,18 +34,18 @@
 
     <section class="hero">
       <div class="wrap">
-        <span class="kicker">✦ من البريف للفيديو النهائي — في مكان واحد</span>
-        <h1>استوديو إنتاج كامل<br><span class="grad">بالذكاء الاصطناعي</span></h1>
-        <p class="sub">خطة سوشيال ميديا، سيناريو، استوري بورد ببرومبتات جاهزة للتوليد، وفويس أوفر بأصوات جوجل الاحترافية — بأي موديل AI في السوق.</p>
+        <span class="kicker" data-i18n="hero_kicker">✦ من البريف للفيديو النهائي — في مكان واحد</span>
+        <h1><span data-i18n="hero_h1a">استوديو إنتاج كامل</span><br><span class="grad" data-i18n="hero_h1b">بالذكاء الاصطناعي</span></h1>
+        <p class="sub" data-i18n="hero_sub"></p>
         <div class="hero-ctas">
-          <button class="btn btn-primary btn-lg" onclick="openStudio()">🚀 ابدأ مجانًا</button>
-          <a class="btn btn-ghost btn-lg" href="#pricing">شوف الأسعار</a>
+          <button class="btn btn-primary btn-lg" onclick="openStudio()" data-i18n="hero_cta">🚀 ابدأ مجانًا</button>
+          <a class="btn btn-ghost btn-lg" href="#pricing" data-i18n="hero_cta2">شوف الأسعار</a>
         </div>
         <div class="hero-stats">
-          <div><b>4</b><span>أدوات متكاملة</span></div>
-          <div><b>11</b><span>مزود AI مدعوم</span></div>
-          <div><b>76</b><span>ستايل بصري</span></div>
-          <div><b>16</b><span>صوت فويس أوفر</span></div>
+          <div><b>4</b><span data-i18n="st_tools"></span></div>
+          <div><b>11</b><span data-i18n="st_prov"></span></div>
+          <div><b>76</b><span data-i18n="st_styles"></span></div>
+          <div><b>16</b><span data-i18n="st_voices"></span></div>
         </div>
       </div>
     </section>
@@ -52,26 +53,26 @@
     <section class="section" id="features">
       <div class="wrap">
         <div class="sec-head">
-          <h2>كل خطوات الإنتاج</h2>
-          <p>أربع أدوات بتسلّم بعضها — من أول فكرة لحد ملفات جاهزة للنشر.</p>
+          <h2 data-i18n="feat_h"></h2>
+          <p data-i18n="feat_p"></p>
         </div>
         <div class="feat-grid">
-          <div class="feat"><span class="num">01</span><div class="ico">📋</div><h3>خطة السوشيال ميديا</h3><p>بريف مكتوب أو PDF يتحول لخطة كاملة: أهداف، جمهور، جدول 30 يوم، هوكس جاهزة وقياس.</p></div>
-          <div class="feat"><span class="num">02</span><div class="ico">✍️</div><h3>السيناريو</h3><p>فكرتك تبقى سيناريو متقسم مشاهد بهوية بصرية ثابتة للشخصيات وبرومبت ماستر بالإنجليزي.</p></div>
-          <div class="feat"><span class="num">03</span><div class="ico">🎞️</div><h3>الاستوري بورد</h3><p>لكل مشهد برومبت صورة وبرومبت حركة بالإنجليزي جاهزين لأدوات التوليد، مع تقسيم المشاهد لكروت.</p></div>
-          <div class="feat"><span class="num">04</span><div class="ico">🎙️</div><h3>الفويس أوفر</h3><p>أصوات جوجل الاحترافية بالعربي والإنجليزي — من نص السيناريو لملف صوت جاهز للمونتاج.</p></div>
+          <div class="feat"><span class="num">01</span><div class="ico">📋</div><h3 data-i18n="f1t"></h3><p data-i18n="f1d"></p></div>
+          <div class="feat"><span class="num">02</span><div class="ico">✍️</div><h3 data-i18n="f2t"></h3><p data-i18n="f2d"></p></div>
+          <div class="feat"><span class="num">03</span><div class="ico">🎞️</div><h3 data-i18n="f3t"></h3><p data-i18n="f3d"></p></div>
+          <div class="feat"><span class="num">04</span><div class="ico">🎙️</div><h3 data-i18n="f4t"></h3><p data-i18n="f4d"></p></div>
         </div>
       </div>
     </section>
 
     <section class="section alt">
       <div class="wrap">
-        <div class="sec-head"><h2>إزاي بتشتغل؟</h2></div>
+        <div class="sec-head"><h2 data-i18n="how_h"></h2></div>
         <div class="how-grid">
-          <div class="how"><p>اكتب البريف أو ارفع PDF</p></div>
-          <div class="how"><p>ولّد السيناريو وعدّل عليه</p></div>
-          <div class="how"><p>خد برومبتات المشاهد وولّد الفيجوال</p></div>
-          <div class="how"><p>سجّل الفويس أوفر ونزّل الملفات</p></div>
+          <div class="how"><p data-i18n="how1"></p></div>
+          <div class="how"><p data-i18n="how2"></p></div>
+          <div class="how"><p data-i18n="how3"></p></div>
+          <div class="how"><p data-i18n="how4"></p></div>
         </div>
       </div>
     </section>
@@ -79,40 +80,40 @@
     <section class="section" id="pricing">
       <div class="wrap">
         <div class="sec-head">
-          <h2>أسعار بسيطة</h2>
-          <p>جرّب كل حاجة ببلاش لمدة شهر — من غير بطاقة ائتمان.</p>
+          <h2 data-i18n="pr_h"></h2>
+          <p data-i18n="pr_p"></p>
         </div>
         <div class="price-grid">
           <div class="price">
-            <h3>التجربة المجانية</h3>
-            <div class="amount">$0 <small>/ أول شهر</small></div>
+            <h3 data-i18n="pr_free"></h3>
+            <div class="amount">$0 <small data-i18n="pr_free_per"></small></div>
             <ul>
-              <li>40 توليدة كاملة</li>
-              <li>كل الأدوات الأربعة</li>
-              <li>كل الستايلات والأصوات</li>
-              <li>من غير بطاقة ائتمان</li>
+              <li data-i18n="pr_f1"></li>
+              <li data-i18n="pr_f2"></li>
+              <li data-i18n="pr_f3"></li>
+              <li data-i18n="pr_f4"></li>
             </ul>
-            <button class="btn btn-ghost" onclick="openStudio()">ابدأ التجربة</button>
+            <button class="btn btn-ghost" onclick="openStudio()" data-i18n="pr_try"></button>
           </div>
           <div class="price hot">
-            <span class="flag">الأكثر اختيارًا</span>
-            <h3>الاحترافي</h3>
-            <div class="amount">$10 <small>/ شهريًا</small></div>
+            <span class="flag" data-i18n="pr_flag"></span>
+            <h3 data-i18n="pr_pro"></h3>
+            <div class="amount">$10 <small data-i18n="pr_pro_per"></small></div>
             <ul>
-              <li>استخدام غير محدود*</li>
-              <li>أولوية في الموديلات الأقوى</li>
-              <li>كل الستايلات والأصوات</li>
-              <li>دعم مباشر</li>
+              <li data-i18n="pr_p1"></li>
+              <li data-i18n="pr_p2"></li>
+              <li data-i18n="pr_p3"></li>
+              <li data-i18n="pr_p4"></li>
             </ul>
-            <button class="btn btn-primary" onclick="openStudio()">ابدأ دلوقتي</button>
+            <button class="btn btn-primary" onclick="openStudio()" data-i18n="pr_go"></button>
           </div>
         </div>
-        <p class="price-note">* بحد يومي عادل لمنع إساءة الاستخدام</p>
+        <p class="price-note" data-i18n="pr_note"></p>
       </div>
     </section>
 
     <footer class="site-footer">
-      <div class="wrap">© 2026 Film-trend AI — استوديو الإنتاج بالذكاء الاصطناعي، عربي أولًا.</div>
+      <div class="wrap" data-i18n="footer"></div>
     </footer>
   </div>
 
@@ -122,14 +123,14 @@
     <div class="stepper-bar">
       <div class="wrap">
         <div class="stepper">
-          <button class="step-btn on" data-tab="plan"><span class="n"><span>1</span></span>الخطة</button>
+          <button class="step-btn on" data-tab="plan"><span class="n"><span>1</span></span><span data-i18n="s1"></span></button>
           <span class="step-sep"></span>
-          <button class="step-btn" data-tab="script"><span class="n"><span>2</span></span>السيناريو</button>
+          <button class="step-btn" data-tab="script"><span class="n"><span>2</span></span><span data-i18n="s2"></span></button>
           <span class="step-sep"></span>
-          <button class="step-btn" data-tab="board"><span class="n"><span>3</span></span>الاستوري بورد</button>
+          <button class="step-btn" data-tab="board"><span class="n"><span>3</span></span><span data-i18n="s3"></span></button>
           <span class="step-sep"></span>
-          <button class="step-btn" data-tab="voice"><span class="n"><span>4</span></span>الفويس أوفر</button>
-          <button class="step-btn step-gear" data-tab="settings">⚙️ الإعدادات</button>
+          <button class="step-btn" data-tab="voice"><span class="n"><span>4</span></span><span data-i18n="s4"></span></button>
+          <button class="step-btn step-gear" data-tab="settings" data-i18n="s_set"></button>
         </div>
       </div>
     </div>
@@ -140,24 +141,24 @@
         <div class="chat-shell">
           <div class="chat-card card">
             <div class="chat-log" id="chat-log">
-              <div class="msg ai md">
-                <p>أهلًا 👋 أنا استراتيجي السوشيال ميديا بتاعك.</p>
-                <p>احكيلي عن المشروع أو <b>ارفق البريف</b> (PDF / Word / PowerPoint / صورة / نص) — اسألني أي حاجة، ناقشني، ولما نخلص اضغط <b>"اطلع الخطة النهائية"</b> وهجهزهالك كاملة.</p>
-              </div>
+              <div class="msg ai md" data-i18n-html="chat_welcome_html"></div>
             </div>
             <div class="chat-input">
-              <label class="attach" title="ارفق مستند">📎<input type="file" id="chat-file" accept=".pdf,.docx,.pptx,.txt,.md,image/*" onchange="chatFilePicked(this)"></label>
-              <textarea id="chat-text" rows="1" placeholder="اكتب رسالتك أو اسأل أي حاجة… (Enter للإرسال)"></textarea>
-              <button class="btn btn-primary btn-sm" id="chat-send" onclick="chatSend()">إرسال</button>
+              <label class="attach" title="📎"><span>📎</span><input type="file" id="chat-file" accept=".pdf,.docx,.pptx,.txt,.md,image/*" onchange="chatFilePicked(this)"></label>
+              <textarea id="chat-text" rows="1" data-i18n-ph="chat_ph"></textarea>
+              <button class="btn btn-primary btn-sm" id="chat-send" onclick="chatSend()" data-i18n="chat_send"></button>
             </div>
             <div class="chat-foot">
               <span id="chat-file-chip" class="chip"></span>
-              <button class="btn btn-ghost btn-sm" onclick="chatFinalize()">🚀 اطلع الخطة النهائية</button>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-ghost btn-sm" id="go-script" style="display:none" onclick="goToScriptStep()" data-i18n="chat_to_script"></button>
+                <button class="btn btn-ghost btn-sm" onclick="chatFinalize()" data-i18n="chat_final"></button>
+              </div>
             </div>
           </div>
           <div class="actions" id="actions-plan" style="justify-content:center">
-            <button class="btn btn-ghost btn-sm" onclick="copyPlan()">📋 نسخ آخر رد</button>
-            <button class="btn btn-ghost btn-sm" onclick="downloadPlan()">⬇️ تحميل الخطة .md</button>
+            <button class="btn btn-ghost btn-sm" onclick="copyPlan()" data-i18n="copy_last"></button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadPlan()" data-i18n="dl_plan"></button>
           </div>
         </div>
       </div>
@@ -167,30 +168,104 @@
     <section class="panel" id="panel-script">
       <div class="wrap"><div class="panel-grid">
         <div class="card">
-          <h3>من الفكرة لسيناريو متقسم</h3>
-          <p class="hint">اكتب فكرتك بأي شكل — هتاخد Logline وشخصيات بهوية بصرية ثابتة ومشاهد مرقمة بالحوار والمدة، وبرومبت ماستر بالإنجليزي.</p>
-          <label class="f">نوع العمل</label>
-          <select id="script-format">
-            <option value="UGC">UGC / فيديو سوشيال</option>
-            <option value="ad">إعلان</option>
-            <option value="film">فيلم قصير</option>
-            <option value="series">حلقة مسلسل</option>
-            <option value="documentary">وثائقي</option>
-            <option value="short">قصة قصيرة</option>
-          </select>
-          <label class="f">المدة المستهدفة (اختياري)</label>
-          <input type="text" id="script-duration" placeholder="مثال: 60 ثانية / 3 دقائق">
-          <label class="f">الفكرة</label>
-          <textarea id="script-idea" rows="7" placeholder="مثال: إعلان لتطبيق توصيل أكل، البطل موظف مرهق بيرجع البيت متأخر، إحساس دافئ إنساني..."></textarea>
-          <button class="btn btn-primary btn-block" id="run-script" onclick="runScript()">✍️ اكتب السيناريو</button>
-          <button class="btn btn-stop" id="stop-script" onclick="stopRun('script')">⏹ إيقاف</button>
-          <div id="carry-note">✓ السيناريو جاهز — روح لخطوة الاستوري بورد واضغط "استخدم آخر سيناريو"</div>
+          <h3 data-i18n="sc_h"></h3>
+          <p class="hint" data-i18n="sc_hint"></p>
+          <div class="chip" id="plan-link" style="display:none" data-i18n="sc_linked"></div>
+
+          <div class="two-col">
+            <div>
+              <label class="f" data-i18n="sc_fmt"></label>
+              <select id="script-format">
+                <option value="UGC" data-i18n="fmt_ugc"></option>
+                <option value="ad" data-i18n="fmt_ad"></option>
+                <option value="film" data-i18n="fmt_film"></option>
+                <option value="series" data-i18n="fmt_series"></option>
+                <option value="documentary" data-i18n="fmt_doc"></option>
+                <option value="short" data-i18n="fmt_short"></option>
+              </select>
+            </div>
+            <div>
+              <label class="f" data-i18n="sc_genre"></label>
+              <select id="script-genre">
+                <option value="" data-i18n="g_auto"></option>
+                <option value="comedy" data-i18n="g_comedy"></option>
+                <option value="drama" data-i18n="g_drama"></option>
+                <option value="action" data-i18n="g_action"></option>
+                <option value="thriller" data-i18n="g_thriller"></option>
+                <option value="horror" data-i18n="g_horror"></option>
+                <option value="romance" data-i18n="g_romance"></option>
+                <option value="fantasy" data-i18n="g_fantasy"></option>
+                <option value="sci-fi" data-i18n="g_scifi"></option>
+                <option value="mystery" data-i18n="g_mystery"></option>
+              </select>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div>
+              <label class="f" data-i18n="sc_tone"></label>
+              <select id="script-tone">
+                <option value="" data-i18n="t_auto"></option>
+                <option value="light and humorous" data-i18n="t_fun"></option>
+                <option value="dramatic and moving" data-i18n="t_dram"></option>
+                <option value="inspirational" data-i18n="t_insp"></option>
+                <option value="warm and human" data-i18n="t_warm"></option>
+                <option value="luxurious and refined" data-i18n="t_lux"></option>
+                <option value="bold and direct" data-i18n="t_bold"></option>
+                <option value="formal" data-i18n="t_formal"></option>
+              </select>
+            </div>
+            <div>
+              <label class="f" data-i18n="sc_dialect"></label>
+              <select id="script-dialect">
+                <option value="Egyptian Arabic" data-i18n="d_eg"></option>
+                <option value="Modern Standard Arabic" data-i18n="d_msa"></option>
+                <option value="Gulf Arabic" data-i18n="d_gulf"></option>
+                <option value="Levantine Arabic" data-i18n="d_lev"></option>
+                <option value="Maghrebi Arabic" data-i18n="d_mag"></option>
+                <option value="English" data-i18n="d_en"></option>
+              </select>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div>
+              <label class="f" data-i18n="sc_platform"></label>
+              <select id="script-platform">
+                <option value="" data-i18n="p_any"></option>
+                <option value="TikTok / Reels" data-i18n="p_tiktok"></option>
+                <option value="YouTube" data-i18n="p_yt"></option>
+                <option value="TV / Cinema" data-i18n="p_tv"></option>
+                <option value="Podcast" data-i18n="p_podcast"></option>
+              </select>
+            </div>
+            <div>
+              <label class="f" data-i18n="sc_dur"></label>
+              <input type="text" id="script-duration" data-i18n-ph="sc_dur_ph">
+            </div>
+          </div>
+
+          <label class="f" data-i18n="sc_aud"></label>
+          <input type="text" id="script-audience" data-i18n-ph="sc_aud_ph">
+
+          <label class="f" data-i18n="sc_chars"></label>
+          <input type="text" id="script-chars" data-i18n-ph="sc_chars_ph">
+
+          <label class="f" data-i18n="sc_cta"></label>
+          <input type="text" id="script-cta" data-i18n-ph="sc_cta_ph">
+
+          <label class="f" data-i18n="sc_idea"></label>
+          <textarea id="script-idea" rows="5" data-i18n-ph="sc_idea_ph"></textarea>
+
+          <button class="btn btn-primary btn-block" id="run-script" onclick="runScript()" data-i18n="sc_run"></button>
+          <button class="btn btn-stop" id="stop-script" onclick="stopRun('script')">⏹</button>
+          <div id="carry-note" data-i18n="sc_carry"></div>
         </div>
         <div>
           <div class="out md" id="out-script" data-raw=""></div>
           <div class="actions" id="actions-script">
-            <button class="btn btn-ghost btn-sm" onclick="copyOut('script')">📋 نسخ</button>
-            <button class="btn btn-ghost btn-sm" onclick="downloadOut('script','script.md')">⬇️ تحميل .md</button>
+            <button class="btn btn-ghost btn-sm" onclick="copyOut('script')" data-i18n="copy"></button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadOut('script','script.md')" data-i18n="dl_md"></button>
           </div>
         </div>
       </div></div>
@@ -200,31 +275,35 @@
     <section class="panel" id="panel-board">
       <div class="wrap"><div class="panel-grid">
         <div class="card">
-          <h3>من السيناريو لاستوري بورد + برومبتات</h3>
-          <p class="hint">لكل مشهد: وصف الكادر + <b>IMAGE PROMPT</b> لتوليد الصورة + <b>MOTION PROMPT</b> لتحريكها (Runway / Kling / Veo).</p>
-          <button class="btn btn-ghost btn-block" style="margin-top:0" onclick="useLastScript()">↩️ استخدم آخر سيناريو متولد</button>
-          <label class="f">أو الصق السيناريو هنا</label>
-          <textarea id="board-script" rows="6" placeholder="الصق السيناريو المتقسم لمشاهد..."></textarea>
-          <label class="f">نسبة الأبعاد</label>
+          <h3 data-i18n="b_h"></h3>
+          <p class="hint" data-i18n="b_hint"></p>
+          <button class="btn btn-ghost btn-block" style="margin-top:0" onclick="useLastScript()" data-i18n="b_use_last"></button>
+          <label class="f" data-i18n="b_paste"></label>
+          <textarea id="board-script" rows="5" data-i18n-ph="b_paste_ph"></textarea>
+          <label class="f" data-i18n="b_ratio"></label>
           <select id="board-ratio">
-            <option value="9:16">9:16 — ريلز / تيك توك</option>
-            <option value="16:9">16:9 — يوتيوب / سينمائي</option>
-            <option value="1:1">1:1 — مربع</option>
-            <option value="4:5">4:5 — فيد إنستجرام</option>
+            <option value="9:16" data-i18n="r_reels"></option>
+            <option value="16:9" data-i18n="r_wide"></option>
+            <option value="1:1" data-i18n="r_sq"></option>
+            <option value="4:5" data-i18n="r_feed"></option>
           </select>
-          <label class="f">الستايل البصري — كل ستايلات السوق</label>
+          <label class="f" data-i18n="b_style"></label>
           <select id="board-style-sel"></select>
-          <label class="f">أو اكتب ستايل مخصص / إضافي (اختياري)</label>
+          <label class="f" data-i18n="b_custom"></label>
           <input type="text" id="board-style" dir="ltr" placeholder="e.g. shot on ARRI Alexa, 85mm lens">
-          <button class="btn btn-primary btn-block" id="run-board" onclick="runBoard()">🎞️ اعمل الاستوري بورد</button>
-          <button class="btn btn-stop" id="stop-board" onclick="stopRun('board')">⏹ إيقاف</button>
+          <label class="check">
+            <input type="checkbox" id="board-vo" checked>
+            <span data-i18n="b_vo"></span>
+          </label>
+          <button class="btn btn-primary btn-block" id="run-board" onclick="runBoard()" data-i18n="b_run"></button>
+          <button class="btn btn-stop" id="stop-board" onclick="stopRun('board')">⏹</button>
         </div>
         <div>
           <div class="out md" id="out-board" data-raw=""></div>
           <div class="actions" id="actions-board">
-            <button class="btn btn-ghost btn-sm" id="split-board" onclick="toggleBoardView()">🗂️ قسّم المشاهد</button>
-            <button class="btn btn-ghost btn-sm" onclick="copyOut('board')">📋 نسخ الكل</button>
-            <button class="btn btn-ghost btn-sm" onclick="downloadOut('board','storyboard.md')">⬇️ تحميل .md</button>
+            <button class="btn btn-ghost btn-sm" id="split-board" onclick="toggleBoardView()" data-i18n="split"></button>
+            <button class="btn btn-ghost btn-sm" onclick="copyOut('board')" data-i18n="copy_all"></button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadOut('board','storyboard.md')" data-i18n="dl_md"></button>
           </div>
         </div>
       </div></div>
@@ -234,31 +313,31 @@
     <section class="panel" id="panel-voice">
       <div class="wrap"><div class="panel-grid">
         <div class="card">
-          <h3>الفويس أوفر — أصوات Google</h3>
-          <p class="hint">أصوات Gemini الاحترافية بتتكلم <b>عربي وإنجليزي</b>. بيستخدم مفتاح Google Gemini (المجاني) من الإعدادات.</p>
-          <button class="btn btn-ghost btn-block" style="margin-top:0" id="voice-pull" onclick="useScriptForVoice()">🪄 استخرج نص الفويس أوفر من آخر سيناريو</button>
-          <label class="f">النص</label>
-          <textarea id="voice-text" rows="6" placeholder="اكتب أو الصق النص اللي عايز تسمعه — عربي أو إنجليزي..."></textarea>
-          <label class="f">الصوت</label>
+          <h3 data-i18n="v_h"></h3>
+          <p class="hint" data-i18n-html="v_hint_html"></p>
+          <button class="btn btn-ghost btn-block" style="margin-top:0" id="voice-pull" onclick="useScriptForVoice()" data-i18n="v_pull"></button>
+          <label class="f" data-i18n="v_text"></label>
+          <textarea id="voice-text" rows="6" data-i18n-ph="v_text_ph"></textarea>
+          <label class="f" data-i18n="v_voice"></label>
           <select id="voice-name"></select>
-          <label class="f">أسلوب الأداء</label>
+          <label class="f" data-i18n="v_style"></label>
           <select id="voice-style">
-            <option value="doc">وثائقي دافئ</option>
-            <option value="promo">إعلاني حماسي</option>
-            <option value="story">قصصي هادئ</option>
-            <option value="news">إخباري رسمي</option>
-            <option value="ugc">طبيعي عفوي (UGC)</option>
-            <option value="none">عادي — من غير توجيه</option>
+            <option value="doc" data-i18n="vs_doc"></option>
+            <option value="promo" data-i18n="vs_promo"></option>
+            <option value="story" data-i18n="vs_story"></option>
+            <option value="news" data-i18n="vs_news"></option>
+            <option value="ugc" data-i18n="vs_ugc"></option>
+            <option value="none" data-i18n="vs_none"></option>
           </select>
-          <button class="btn btn-primary btn-block" id="run-voice" onclick="runVoice()">🎙️ ولّد الصوت</button>
+          <button class="btn btn-primary btn-block" id="run-voice" onclick="runVoice()" data-i18n="v_run"></button>
         </div>
         <div>
           <div class="card">
-            <h3>🎧 النتيجة</h3>
-            <p class="voice-status" id="voice-status">اكتب النص واختار الصوت واضغط "ولّد الصوت"</p>
+            <h3 data-i18n="v_res"></h3>
+            <p class="voice-status" id="voice-status" data-i18n="v_idle"></p>
             <div class="voice-result" id="voice-result">
               <audio id="voice-audio" controls></audio>
-              <button class="btn btn-ghost btn-sm" id="voice-dl">⬇️ تحميل WAV</button>
+              <button class="btn btn-ghost btn-sm" id="voice-dl" data-i18n="v_dl"></button>
             </div>
           </div>
         </div>
@@ -269,35 +348,35 @@
     <section class="panel" id="panel-settings">
       <div class="wrap">
         <div class="card settings-card">
-          <h3>⚙️ الإعدادات</h3>
+          <h3 data-i18n="set_h"></h3>
 
           <div class="mode-switch" id="mode-switch" style="display:none">
-            <button class="mode-btn" data-mode="cloud" onclick="setMode('cloud')">☁️ حساب Film-trend<small>من غير أي مفتاح — شهر مجاني</small></button>
-            <button class="mode-btn" data-mode="byok" onclick="setMode('byok')">🔑 مفتاحي الخاص<small>استخدم مفتاح API بتاعك</small></button>
+            <button class="mode-btn" data-mode="cloud" onclick="setMode('cloud')"><span data-i18n="m_cloud"></span><small data-i18n="m_cloud_s"></small></button>
+            <button class="mode-btn" data-mode="byok" onclick="setMode('byok')"><span data-i18n="m_byok"></span><small data-i18n="m_byok_s"></small></button>
           </div>
 
           <div id="cloud-box" style="display:none">
-            <p class="hint">سجّل بإيميلك بس — من غير مفاتيح ولا حسابات عند أي مزود. أول شهر مجاني بالكامل، وبعدها 10$/شهر.</p>
-            <label class="f">الإيميل</label>
+            <p class="hint" data-i18n="cl_hint"></p>
+            <label class="f" data-i18n="cl_email"></label>
             <input type="text" id="cloud-email" dir="ltr" placeholder="you@example.com" autocomplete="email">
-            <button class="btn btn-primary btn-block" onclick="doCloudSignup()">🚀 ابدأ التجربة المجانية</button>
+            <button class="btn btn-primary btn-block" onclick="doCloudSignup()" data-i18n="cl_start"></button>
             <div class="note" id="cloud-usage" style="display:none"></div>
           </div>
 
           <div id="byok-box">
-            <p class="hint">اختار أي مزود AI في السوق — أمريكي أو صيني أو أوروبي. مفتاحك بيتخزن محليًا على جهازك بس.</p>
-            <div class="note">💡 <b>مش عايز تدفع؟</b> اختار <b>Google — Gemini</b> — مفتاحه <b>مجاني بالكامل</b> من <span dir="ltr">aistudio.google.com/apikey</span> وجودته ممتازة (وهو نفسه اللي بيشغّل الفويس أوفر).</div>
-            <label class="f">مزود الذكاء الاصطناعي</label>
+            <p class="hint" data-i18n="bk_hint"></p>
+            <div class="note" data-i18n-html="bk_gemini_html"></div>
+            <label class="f" data-i18n="bk_prov"></label>
             <select id="set-provider"></select>
-            <label class="f">الموديل</label>
+            <label class="f" data-i18n="bk_model"></label>
             <select id="set-model"></select>
-            <label class="f">أو اكتب اسم موديل مخصص (اختياري — لأي موديل جديد ينزل)</label>
+            <label class="f" data-i18n="bk_custom"></label>
             <input type="text" id="set-custom" dir="ltr" placeholder="e.g. gpt-5.2 / deepseek-v4" autocomplete="off">
-            <label class="f">مفتاح API الخاص بالمزود ده</label>
+            <label class="f" data-i18n="bk_key"></label>
             <input type="password" id="set-key" dir="ltr" placeholder="sk-..." autocomplete="off">
-            <button class="btn btn-primary btn-block" onclick="persistSettings()">💾 حفظ</button>
-            <div class="note"><b>منين أجيب المفتاح؟</b> من موقع المزود: <span dir="ltr" id="key-url">platform.claude.com</span> — كل مزود مفتاحه بيتحفظ لوحده فتقدر تنقّل بينهم براحتك.</div>
-            <div class="note" id="pdf-note" style="display:none">ℹ️ رفع ملف <b>PDF</b> متاح حاليًا مع Anthropic (Claude) بس — مع باقي المزودين انسخ نص البريف.</div>
+            <button class="btn btn-primary btn-block" onclick="persistSettings()" data-i18n="save"></button>
+            <div class="note" data-i18n-html="bk_where_html"></div>
+            <div class="note" id="pdf-note" style="display:none" data-i18n-html="bk_pdf_html"></div>
           </div>
         </div>
       </div>
@@ -305,6 +384,7 @@
   </div>
 
   <script src="js/config.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/prompt.js"></script>
   <script src="js/styles.js"></script>
   <script src="js/docs.js"></script>

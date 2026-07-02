@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Film-trend AI — استوديو الإنتاج بالذكاء الاصطناعي</title>
+  <title>Film-trend AI</title>
   <meta name="description" content="خطة سوشيال ميديا، سيناريو، استوري بورد ببرومبتات جاهزة، وفويس أوفر بأصوات جوجل — بأي موديل AI في السوق.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23f2b23e'/><text x='16' y='23' text-anchor='middle' font-size='18'>🎬</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -252,6 +252,19 @@ textarea, input[type="text"], input[type="password"], select {
 textarea:focus, input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(242, 178, 62, .13); }
 textarea { resize: vertical; min-height: 130px; }
 
+/* two form fields side by side (script specs) */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+@media (max-width: 560px) { .two-col { grid-template-columns: 1fr; } }
+
+/* checkbox row */
+label.check {
+  display: flex; align-items: center; gap: 10px; cursor: pointer;
+  margin: 16px 0 4px; font-size: 14px; font-weight: 700; color: var(--text);
+}
+label.check input[type="checkbox"] {
+  width: 19px; height: 19px; flex: none; accent-color: var(--accent); cursor: pointer;
+}
+
 .upload {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   border: 1.5px dashed var(--line); border-radius: var(--r-sm);
@@ -270,6 +283,7 @@ textarea { resize: vertical; min-height: 130px; }
   font-size: 15px; box-shadow: var(--shadow);
 }
 .out:empty::before { content: "الناتج هيظهر هنا…"; color: var(--faint); font-weight: 600; }
+html[lang="en"] .out:empty::before { content: "Output will appear here…"; }
 .md h2, .md h3, .md h4, .md h5 { margin: 22px 0 8px; color: var(--accent); font-weight: 800; }
 .md h2 { font-size: 21px; } .md h3 { font-size: 17.5px; } .md h4 { font-size: 15.5px; }
 .md p { margin: 7px 0; }
@@ -427,10 +441,11 @@ textarea { resize: vertical; min-height: 130px; }
         <span>Film-trend <em>AI</em></span>
       </div>
       <nav class="head-nav" id="head-nav">
-        <a href="#features" onclick="goLanding()">المميزات</a>
-        <a href="#pricing" onclick="goLanding()">الأسعار</a>
+        <a href="#features" onclick="goLanding()" data-i18n="nav_features">المميزات</a>
+        <a href="#pricing" onclick="goLanding()" data-i18n="nav_pricing">الأسعار</a>
       </nav>
-      <button class="btn btn-primary btn-sm" onclick="openStudio()">افتح الاستوديو ←</button>
+      <button class="btn btn-ghost btn-sm" id="lang-btn" onclick="toggleLang()">EN</button>
+      <button class="btn btn-primary btn-sm" onclick="openStudio()" data-i18n="open_studio">افتح الاستوديو ←</button>
     </div>
   </header>
 
@@ -439,18 +454,18 @@ textarea { resize: vertical; min-height: 130px; }
 
     <section class="hero">
       <div class="wrap">
-        <span class="kicker">✦ من البريف للفيديو النهائي — في مكان واحد</span>
-        <h1>استوديو إنتاج كامل<br><span class="grad">بالذكاء الاصطناعي</span></h1>
-        <p class="sub">خطة سوشيال ميديا، سيناريو، استوري بورد ببرومبتات جاهزة للتوليد، وفويس أوفر بأصوات جوجل الاحترافية — بأي موديل AI في السوق.</p>
+        <span class="kicker" data-i18n="hero_kicker">✦ من البريف للفيديو النهائي — في مكان واحد</span>
+        <h1><span data-i18n="hero_h1a">استوديو إنتاج كامل</span><br><span class="grad" data-i18n="hero_h1b">بالذكاء الاصطناعي</span></h1>
+        <p class="sub" data-i18n="hero_sub"></p>
         <div class="hero-ctas">
-          <button class="btn btn-primary btn-lg" onclick="openStudio()">🚀 ابدأ مجانًا</button>
-          <a class="btn btn-ghost btn-lg" href="#pricing">شوف الأسعار</a>
+          <button class="btn btn-primary btn-lg" onclick="openStudio()" data-i18n="hero_cta">🚀 ابدأ مجانًا</button>
+          <a class="btn btn-ghost btn-lg" href="#pricing" data-i18n="hero_cta2">شوف الأسعار</a>
         </div>
         <div class="hero-stats">
-          <div><b>4</b><span>أدوات متكاملة</span></div>
-          <div><b>11</b><span>مزود AI مدعوم</span></div>
-          <div><b>76</b><span>ستايل بصري</span></div>
-          <div><b>16</b><span>صوت فويس أوفر</span></div>
+          <div><b>4</b><span data-i18n="st_tools"></span></div>
+          <div><b>11</b><span data-i18n="st_prov"></span></div>
+          <div><b>76</b><span data-i18n="st_styles"></span></div>
+          <div><b>16</b><span data-i18n="st_voices"></span></div>
         </div>
       </div>
     </section>
@@ -458,26 +473,26 @@ textarea { resize: vertical; min-height: 130px; }
     <section class="section" id="features">
       <div class="wrap">
         <div class="sec-head">
-          <h2>كل خطوات الإنتاج</h2>
-          <p>أربع أدوات بتسلّم بعضها — من أول فكرة لحد ملفات جاهزة للنشر.</p>
+          <h2 data-i18n="feat_h"></h2>
+          <p data-i18n="feat_p"></p>
         </div>
         <div class="feat-grid">
-          <div class="feat"><span class="num">01</span><div class="ico">📋</div><h3>خطة السوشيال ميديا</h3><p>بريف مكتوب أو PDF يتحول لخطة كاملة: أهداف، جمهور، جدول 30 يوم، هوكس جاهزة وقياس.</p></div>
-          <div class="feat"><span class="num">02</span><div class="ico">✍️</div><h3>السيناريو</h3><p>فكرتك تبقى سيناريو متقسم مشاهد بهوية بصرية ثابتة للشخصيات وبرومبت ماستر بالإنجليزي.</p></div>
-          <div class="feat"><span class="num">03</span><div class="ico">🎞️</div><h3>الاستوري بورد</h3><p>لكل مشهد برومبت صورة وبرومبت حركة بالإنجليزي جاهزين لأدوات التوليد، مع تقسيم المشاهد لكروت.</p></div>
-          <div class="feat"><span class="num">04</span><div class="ico">🎙️</div><h3>الفويس أوفر</h3><p>أصوات جوجل الاحترافية بالعربي والإنجليزي — من نص السيناريو لملف صوت جاهز للمونتاج.</p></div>
+          <div class="feat"><span class="num">01</span><div class="ico">📋</div><h3 data-i18n="f1t"></h3><p data-i18n="f1d"></p></div>
+          <div class="feat"><span class="num">02</span><div class="ico">✍️</div><h3 data-i18n="f2t"></h3><p data-i18n="f2d"></p></div>
+          <div class="feat"><span class="num">03</span><div class="ico">🎞️</div><h3 data-i18n="f3t"></h3><p data-i18n="f3d"></p></div>
+          <div class="feat"><span class="num">04</span><div class="ico">🎙️</div><h3 data-i18n="f4t"></h3><p data-i18n="f4d"></p></div>
         </div>
       </div>
     </section>
 
     <section class="section alt">
       <div class="wrap">
-        <div class="sec-head"><h2>إزاي بتشتغل؟</h2></div>
+        <div class="sec-head"><h2 data-i18n="how_h"></h2></div>
         <div class="how-grid">
-          <div class="how"><p>اكتب البريف أو ارفع PDF</p></div>
-          <div class="how"><p>ولّد السيناريو وعدّل عليه</p></div>
-          <div class="how"><p>خد برومبتات المشاهد وولّد الفيجوال</p></div>
-          <div class="how"><p>سجّل الفويس أوفر ونزّل الملفات</p></div>
+          <div class="how"><p data-i18n="how1"></p></div>
+          <div class="how"><p data-i18n="how2"></p></div>
+          <div class="how"><p data-i18n="how3"></p></div>
+          <div class="how"><p data-i18n="how4"></p></div>
         </div>
       </div>
     </section>
@@ -485,40 +500,40 @@ textarea { resize: vertical; min-height: 130px; }
     <section class="section" id="pricing">
       <div class="wrap">
         <div class="sec-head">
-          <h2>أسعار بسيطة</h2>
-          <p>جرّب كل حاجة ببلاش لمدة شهر — من غير بطاقة ائتمان.</p>
+          <h2 data-i18n="pr_h"></h2>
+          <p data-i18n="pr_p"></p>
         </div>
         <div class="price-grid">
           <div class="price">
-            <h3>التجربة المجانية</h3>
-            <div class="amount">$0 <small>/ أول شهر</small></div>
+            <h3 data-i18n="pr_free"></h3>
+            <div class="amount">$0 <small data-i18n="pr_free_per"></small></div>
             <ul>
-              <li>40 توليدة كاملة</li>
-              <li>كل الأدوات الأربعة</li>
-              <li>كل الستايلات والأصوات</li>
-              <li>من غير بطاقة ائتمان</li>
+              <li data-i18n="pr_f1"></li>
+              <li data-i18n="pr_f2"></li>
+              <li data-i18n="pr_f3"></li>
+              <li data-i18n="pr_f4"></li>
             </ul>
-            <button class="btn btn-ghost" onclick="openStudio()">ابدأ التجربة</button>
+            <button class="btn btn-ghost" onclick="openStudio()" data-i18n="pr_try"></button>
           </div>
           <div class="price hot">
-            <span class="flag">الأكثر اختيارًا</span>
-            <h3>الاحترافي</h3>
-            <div class="amount">$10 <small>/ شهريًا</small></div>
+            <span class="flag" data-i18n="pr_flag"></span>
+            <h3 data-i18n="pr_pro"></h3>
+            <div class="amount">$10 <small data-i18n="pr_pro_per"></small></div>
             <ul>
-              <li>استخدام غير محدود*</li>
-              <li>أولوية في الموديلات الأقوى</li>
-              <li>كل الستايلات والأصوات</li>
-              <li>دعم مباشر</li>
+              <li data-i18n="pr_p1"></li>
+              <li data-i18n="pr_p2"></li>
+              <li data-i18n="pr_p3"></li>
+              <li data-i18n="pr_p4"></li>
             </ul>
-            <button class="btn btn-primary" onclick="openStudio()">ابدأ دلوقتي</button>
+            <button class="btn btn-primary" onclick="openStudio()" data-i18n="pr_go"></button>
           </div>
         </div>
-        <p class="price-note">* بحد يومي عادل لمنع إساءة الاستخدام</p>
+        <p class="price-note" data-i18n="pr_note"></p>
       </div>
     </section>
 
     <footer class="site-footer">
-      <div class="wrap">© 2026 Film-trend AI — استوديو الإنتاج بالذكاء الاصطناعي، عربي أولًا.</div>
+      <div class="wrap" data-i18n="footer"></div>
     </footer>
   </div>
 
@@ -528,14 +543,14 @@ textarea { resize: vertical; min-height: 130px; }
     <div class="stepper-bar">
       <div class="wrap">
         <div class="stepper">
-          <button class="step-btn on" data-tab="plan"><span class="n"><span>1</span></span>الخطة</button>
+          <button class="step-btn on" data-tab="plan"><span class="n"><span>1</span></span><span data-i18n="s1"></span></button>
           <span class="step-sep"></span>
-          <button class="step-btn" data-tab="script"><span class="n"><span>2</span></span>السيناريو</button>
+          <button class="step-btn" data-tab="script"><span class="n"><span>2</span></span><span data-i18n="s2"></span></button>
           <span class="step-sep"></span>
-          <button class="step-btn" data-tab="board"><span class="n"><span>3</span></span>الاستوري بورد</button>
+          <button class="step-btn" data-tab="board"><span class="n"><span>3</span></span><span data-i18n="s3"></span></button>
           <span class="step-sep"></span>
-          <button class="step-btn" data-tab="voice"><span class="n"><span>4</span></span>الفويس أوفر</button>
-          <button class="step-btn step-gear" data-tab="settings">⚙️ الإعدادات</button>
+          <button class="step-btn" data-tab="voice"><span class="n"><span>4</span></span><span data-i18n="s4"></span></button>
+          <button class="step-btn step-gear" data-tab="settings" data-i18n="s_set"></button>
         </div>
       </div>
     </div>
@@ -546,24 +561,24 @@ textarea { resize: vertical; min-height: 130px; }
         <div class="chat-shell">
           <div class="chat-card card">
             <div class="chat-log" id="chat-log">
-              <div class="msg ai md">
-                <p>أهلًا 👋 أنا استراتيجي السوشيال ميديا بتاعك.</p>
-                <p>احكيلي عن المشروع أو <b>ارفق البريف</b> (PDF / Word / PowerPoint / صورة / نص) — اسألني أي حاجة، ناقشني، ولما نخلص اضغط <b>"اطلع الخطة النهائية"</b> وهجهزهالك كاملة.</p>
-              </div>
+              <div class="msg ai md" data-i18n-html="chat_welcome_html"></div>
             </div>
             <div class="chat-input">
-              <label class="attach" title="ارفق مستند">📎<input type="file" id="chat-file" accept=".pdf,.docx,.pptx,.txt,.md,image/*" onchange="chatFilePicked(this)"></label>
-              <textarea id="chat-text" rows="1" placeholder="اكتب رسالتك أو اسأل أي حاجة… (Enter للإرسال)"></textarea>
-              <button class="btn btn-primary btn-sm" id="chat-send" onclick="chatSend()">إرسال</button>
+              <label class="attach" title="📎"><span>📎</span><input type="file" id="chat-file" accept=".pdf,.docx,.pptx,.txt,.md,image/*" onchange="chatFilePicked(this)"></label>
+              <textarea id="chat-text" rows="1" data-i18n-ph="chat_ph"></textarea>
+              <button class="btn btn-primary btn-sm" id="chat-send" onclick="chatSend()" data-i18n="chat_send"></button>
             </div>
             <div class="chat-foot">
               <span id="chat-file-chip" class="chip"></span>
-              <button class="btn btn-ghost btn-sm" onclick="chatFinalize()">🚀 اطلع الخطة النهائية</button>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-ghost btn-sm" id="go-script" style="display:none" onclick="goToScriptStep()" data-i18n="chat_to_script"></button>
+                <button class="btn btn-ghost btn-sm" onclick="chatFinalize()" data-i18n="chat_final"></button>
+              </div>
             </div>
           </div>
           <div class="actions" id="actions-plan" style="justify-content:center">
-            <button class="btn btn-ghost btn-sm" onclick="copyPlan()">📋 نسخ آخر رد</button>
-            <button class="btn btn-ghost btn-sm" onclick="downloadPlan()">⬇️ تحميل الخطة .md</button>
+            <button class="btn btn-ghost btn-sm" onclick="copyPlan()" data-i18n="copy_last"></button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadPlan()" data-i18n="dl_plan"></button>
           </div>
         </div>
       </div>
@@ -573,30 +588,104 @@ textarea { resize: vertical; min-height: 130px; }
     <section class="panel" id="panel-script">
       <div class="wrap"><div class="panel-grid">
         <div class="card">
-          <h3>من الفكرة لسيناريو متقسم</h3>
-          <p class="hint">اكتب فكرتك بأي شكل — هتاخد Logline وشخصيات بهوية بصرية ثابتة ومشاهد مرقمة بالحوار والمدة، وبرومبت ماستر بالإنجليزي.</p>
-          <label class="f">نوع العمل</label>
-          <select id="script-format">
-            <option value="UGC">UGC / فيديو سوشيال</option>
-            <option value="ad">إعلان</option>
-            <option value="film">فيلم قصير</option>
-            <option value="series">حلقة مسلسل</option>
-            <option value="documentary">وثائقي</option>
-            <option value="short">قصة قصيرة</option>
-          </select>
-          <label class="f">المدة المستهدفة (اختياري)</label>
-          <input type="text" id="script-duration" placeholder="مثال: 60 ثانية / 3 دقائق">
-          <label class="f">الفكرة</label>
-          <textarea id="script-idea" rows="7" placeholder="مثال: إعلان لتطبيق توصيل أكل، البطل موظف مرهق بيرجع البيت متأخر، إحساس دافئ إنساني..."></textarea>
-          <button class="btn btn-primary btn-block" id="run-script" onclick="runScript()">✍️ اكتب السيناريو</button>
-          <button class="btn btn-stop" id="stop-script" onclick="stopRun('script')">⏹ إيقاف</button>
-          <div id="carry-note">✓ السيناريو جاهز — روح لخطوة الاستوري بورد واضغط "استخدم آخر سيناريو"</div>
+          <h3 data-i18n="sc_h"></h3>
+          <p class="hint" data-i18n="sc_hint"></p>
+          <div class="chip" id="plan-link" style="display:none" data-i18n="sc_linked"></div>
+
+          <div class="two-col">
+            <div>
+              <label class="f" data-i18n="sc_fmt"></label>
+              <select id="script-format">
+                <option value="UGC" data-i18n="fmt_ugc"></option>
+                <option value="ad" data-i18n="fmt_ad"></option>
+                <option value="film" data-i18n="fmt_film"></option>
+                <option value="series" data-i18n="fmt_series"></option>
+                <option value="documentary" data-i18n="fmt_doc"></option>
+                <option value="short" data-i18n="fmt_short"></option>
+              </select>
+            </div>
+            <div>
+              <label class="f" data-i18n="sc_genre"></label>
+              <select id="script-genre">
+                <option value="" data-i18n="g_auto"></option>
+                <option value="comedy" data-i18n="g_comedy"></option>
+                <option value="drama" data-i18n="g_drama"></option>
+                <option value="action" data-i18n="g_action"></option>
+                <option value="thriller" data-i18n="g_thriller"></option>
+                <option value="horror" data-i18n="g_horror"></option>
+                <option value="romance" data-i18n="g_romance"></option>
+                <option value="fantasy" data-i18n="g_fantasy"></option>
+                <option value="sci-fi" data-i18n="g_scifi"></option>
+                <option value="mystery" data-i18n="g_mystery"></option>
+              </select>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div>
+              <label class="f" data-i18n="sc_tone"></label>
+              <select id="script-tone">
+                <option value="" data-i18n="t_auto"></option>
+                <option value="light and humorous" data-i18n="t_fun"></option>
+                <option value="dramatic and moving" data-i18n="t_dram"></option>
+                <option value="inspirational" data-i18n="t_insp"></option>
+                <option value="warm and human" data-i18n="t_warm"></option>
+                <option value="luxurious and refined" data-i18n="t_lux"></option>
+                <option value="bold and direct" data-i18n="t_bold"></option>
+                <option value="formal" data-i18n="t_formal"></option>
+              </select>
+            </div>
+            <div>
+              <label class="f" data-i18n="sc_dialect"></label>
+              <select id="script-dialect">
+                <option value="Egyptian Arabic" data-i18n="d_eg"></option>
+                <option value="Modern Standard Arabic" data-i18n="d_msa"></option>
+                <option value="Gulf Arabic" data-i18n="d_gulf"></option>
+                <option value="Levantine Arabic" data-i18n="d_lev"></option>
+                <option value="Maghrebi Arabic" data-i18n="d_mag"></option>
+                <option value="English" data-i18n="d_en"></option>
+              </select>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div>
+              <label class="f" data-i18n="sc_platform"></label>
+              <select id="script-platform">
+                <option value="" data-i18n="p_any"></option>
+                <option value="TikTok / Reels" data-i18n="p_tiktok"></option>
+                <option value="YouTube" data-i18n="p_yt"></option>
+                <option value="TV / Cinema" data-i18n="p_tv"></option>
+                <option value="Podcast" data-i18n="p_podcast"></option>
+              </select>
+            </div>
+            <div>
+              <label class="f" data-i18n="sc_dur"></label>
+              <input type="text" id="script-duration" data-i18n-ph="sc_dur_ph">
+            </div>
+          </div>
+
+          <label class="f" data-i18n="sc_aud"></label>
+          <input type="text" id="script-audience" data-i18n-ph="sc_aud_ph">
+
+          <label class="f" data-i18n="sc_chars"></label>
+          <input type="text" id="script-chars" data-i18n-ph="sc_chars_ph">
+
+          <label class="f" data-i18n="sc_cta"></label>
+          <input type="text" id="script-cta" data-i18n-ph="sc_cta_ph">
+
+          <label class="f" data-i18n="sc_idea"></label>
+          <textarea id="script-idea" rows="5" data-i18n-ph="sc_idea_ph"></textarea>
+
+          <button class="btn btn-primary btn-block" id="run-script" onclick="runScript()" data-i18n="sc_run"></button>
+          <button class="btn btn-stop" id="stop-script" onclick="stopRun('script')">⏹</button>
+          <div id="carry-note" data-i18n="sc_carry"></div>
         </div>
         <div>
           <div class="out md" id="out-script" data-raw=""></div>
           <div class="actions" id="actions-script">
-            <button class="btn btn-ghost btn-sm" onclick="copyOut('script')">📋 نسخ</button>
-            <button class="btn btn-ghost btn-sm" onclick="downloadOut('script','script.md')">⬇️ تحميل .md</button>
+            <button class="btn btn-ghost btn-sm" onclick="copyOut('script')" data-i18n="copy"></button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadOut('script','script.md')" data-i18n="dl_md"></button>
           </div>
         </div>
       </div></div>
@@ -606,31 +695,35 @@ textarea { resize: vertical; min-height: 130px; }
     <section class="panel" id="panel-board">
       <div class="wrap"><div class="panel-grid">
         <div class="card">
-          <h3>من السيناريو لاستوري بورد + برومبتات</h3>
-          <p class="hint">لكل مشهد: وصف الكادر + <b>IMAGE PROMPT</b> لتوليد الصورة + <b>MOTION PROMPT</b> لتحريكها (Runway / Kling / Veo).</p>
-          <button class="btn btn-ghost btn-block" style="margin-top:0" onclick="useLastScript()">↩️ استخدم آخر سيناريو متولد</button>
-          <label class="f">أو الصق السيناريو هنا</label>
-          <textarea id="board-script" rows="6" placeholder="الصق السيناريو المتقسم لمشاهد..."></textarea>
-          <label class="f">نسبة الأبعاد</label>
+          <h3 data-i18n="b_h"></h3>
+          <p class="hint" data-i18n="b_hint"></p>
+          <button class="btn btn-ghost btn-block" style="margin-top:0" onclick="useLastScript()" data-i18n="b_use_last"></button>
+          <label class="f" data-i18n="b_paste"></label>
+          <textarea id="board-script" rows="5" data-i18n-ph="b_paste_ph"></textarea>
+          <label class="f" data-i18n="b_ratio"></label>
           <select id="board-ratio">
-            <option value="9:16">9:16 — ريلز / تيك توك</option>
-            <option value="16:9">16:9 — يوتيوب / سينمائي</option>
-            <option value="1:1">1:1 — مربع</option>
-            <option value="4:5">4:5 — فيد إنستجرام</option>
+            <option value="9:16" data-i18n="r_reels"></option>
+            <option value="16:9" data-i18n="r_wide"></option>
+            <option value="1:1" data-i18n="r_sq"></option>
+            <option value="4:5" data-i18n="r_feed"></option>
           </select>
-          <label class="f">الستايل البصري — كل ستايلات السوق</label>
+          <label class="f" data-i18n="b_style"></label>
           <select id="board-style-sel"></select>
-          <label class="f">أو اكتب ستايل مخصص / إضافي (اختياري)</label>
+          <label class="f" data-i18n="b_custom"></label>
           <input type="text" id="board-style" dir="ltr" placeholder="e.g. shot on ARRI Alexa, 85mm lens">
-          <button class="btn btn-primary btn-block" id="run-board" onclick="runBoard()">🎞️ اعمل الاستوري بورد</button>
-          <button class="btn btn-stop" id="stop-board" onclick="stopRun('board')">⏹ إيقاف</button>
+          <label class="check">
+            <input type="checkbox" id="board-vo" checked>
+            <span data-i18n="b_vo"></span>
+          </label>
+          <button class="btn btn-primary btn-block" id="run-board" onclick="runBoard()" data-i18n="b_run"></button>
+          <button class="btn btn-stop" id="stop-board" onclick="stopRun('board')">⏹</button>
         </div>
         <div>
           <div class="out md" id="out-board" data-raw=""></div>
           <div class="actions" id="actions-board">
-            <button class="btn btn-ghost btn-sm" id="split-board" onclick="toggleBoardView()">🗂️ قسّم المشاهد</button>
-            <button class="btn btn-ghost btn-sm" onclick="copyOut('board')">📋 نسخ الكل</button>
-            <button class="btn btn-ghost btn-sm" onclick="downloadOut('board','storyboard.md')">⬇️ تحميل .md</button>
+            <button class="btn btn-ghost btn-sm" id="split-board" onclick="toggleBoardView()" data-i18n="split"></button>
+            <button class="btn btn-ghost btn-sm" onclick="copyOut('board')" data-i18n="copy_all"></button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadOut('board','storyboard.md')" data-i18n="dl_md"></button>
           </div>
         </div>
       </div></div>
@@ -640,31 +733,31 @@ textarea { resize: vertical; min-height: 130px; }
     <section class="panel" id="panel-voice">
       <div class="wrap"><div class="panel-grid">
         <div class="card">
-          <h3>الفويس أوفر — أصوات Google</h3>
-          <p class="hint">أصوات Gemini الاحترافية بتتكلم <b>عربي وإنجليزي</b>. بيستخدم مفتاح Google Gemini (المجاني) من الإعدادات.</p>
-          <button class="btn btn-ghost btn-block" style="margin-top:0" id="voice-pull" onclick="useScriptForVoice()">🪄 استخرج نص الفويس أوفر من آخر سيناريو</button>
-          <label class="f">النص</label>
-          <textarea id="voice-text" rows="6" placeholder="اكتب أو الصق النص اللي عايز تسمعه — عربي أو إنجليزي..."></textarea>
-          <label class="f">الصوت</label>
+          <h3 data-i18n="v_h"></h3>
+          <p class="hint" data-i18n-html="v_hint_html"></p>
+          <button class="btn btn-ghost btn-block" style="margin-top:0" id="voice-pull" onclick="useScriptForVoice()" data-i18n="v_pull"></button>
+          <label class="f" data-i18n="v_text"></label>
+          <textarea id="voice-text" rows="6" data-i18n-ph="v_text_ph"></textarea>
+          <label class="f" data-i18n="v_voice"></label>
           <select id="voice-name"></select>
-          <label class="f">أسلوب الأداء</label>
+          <label class="f" data-i18n="v_style"></label>
           <select id="voice-style">
-            <option value="doc">وثائقي دافئ</option>
-            <option value="promo">إعلاني حماسي</option>
-            <option value="story">قصصي هادئ</option>
-            <option value="news">إخباري رسمي</option>
-            <option value="ugc">طبيعي عفوي (UGC)</option>
-            <option value="none">عادي — من غير توجيه</option>
+            <option value="doc" data-i18n="vs_doc"></option>
+            <option value="promo" data-i18n="vs_promo"></option>
+            <option value="story" data-i18n="vs_story"></option>
+            <option value="news" data-i18n="vs_news"></option>
+            <option value="ugc" data-i18n="vs_ugc"></option>
+            <option value="none" data-i18n="vs_none"></option>
           </select>
-          <button class="btn btn-primary btn-block" id="run-voice" onclick="runVoice()">🎙️ ولّد الصوت</button>
+          <button class="btn btn-primary btn-block" id="run-voice" onclick="runVoice()" data-i18n="v_run"></button>
         </div>
         <div>
           <div class="card">
-            <h3>🎧 النتيجة</h3>
-            <p class="voice-status" id="voice-status">اكتب النص واختار الصوت واضغط "ولّد الصوت"</p>
+            <h3 data-i18n="v_res"></h3>
+            <p class="voice-status" id="voice-status" data-i18n="v_idle"></p>
             <div class="voice-result" id="voice-result">
               <audio id="voice-audio" controls></audio>
-              <button class="btn btn-ghost btn-sm" id="voice-dl">⬇️ تحميل WAV</button>
+              <button class="btn btn-ghost btn-sm" id="voice-dl" data-i18n="v_dl"></button>
             </div>
           </div>
         </div>
@@ -675,35 +768,35 @@ textarea { resize: vertical; min-height: 130px; }
     <section class="panel" id="panel-settings">
       <div class="wrap">
         <div class="card settings-card">
-          <h3>⚙️ الإعدادات</h3>
+          <h3 data-i18n="set_h"></h3>
 
           <div class="mode-switch" id="mode-switch" style="display:none">
-            <button class="mode-btn" data-mode="cloud" onclick="setMode('cloud')">☁️ حساب Film-trend<small>من غير أي مفتاح — شهر مجاني</small></button>
-            <button class="mode-btn" data-mode="byok" onclick="setMode('byok')">🔑 مفتاحي الخاص<small>استخدم مفتاح API بتاعك</small></button>
+            <button class="mode-btn" data-mode="cloud" onclick="setMode('cloud')"><span data-i18n="m_cloud"></span><small data-i18n="m_cloud_s"></small></button>
+            <button class="mode-btn" data-mode="byok" onclick="setMode('byok')"><span data-i18n="m_byok"></span><small data-i18n="m_byok_s"></small></button>
           </div>
 
           <div id="cloud-box" style="display:none">
-            <p class="hint">سجّل بإيميلك بس — من غير مفاتيح ولا حسابات عند أي مزود. أول شهر مجاني بالكامل، وبعدها 10$/شهر.</p>
-            <label class="f">الإيميل</label>
+            <p class="hint" data-i18n="cl_hint"></p>
+            <label class="f" data-i18n="cl_email"></label>
             <input type="text" id="cloud-email" dir="ltr" placeholder="you@example.com" autocomplete="email">
-            <button class="btn btn-primary btn-block" onclick="doCloudSignup()">🚀 ابدأ التجربة المجانية</button>
+            <button class="btn btn-primary btn-block" onclick="doCloudSignup()" data-i18n="cl_start"></button>
             <div class="note" id="cloud-usage" style="display:none"></div>
           </div>
 
           <div id="byok-box">
-            <p class="hint">اختار أي مزود AI في السوق — أمريكي أو صيني أو أوروبي. مفتاحك بيتخزن محليًا على جهازك بس.</p>
-            <div class="note">💡 <b>مش عايز تدفع؟</b> اختار <b>Google — Gemini</b> — مفتاحه <b>مجاني بالكامل</b> من <span dir="ltr">aistudio.google.com/apikey</span> وجودته ممتازة (وهو نفسه اللي بيشغّل الفويس أوفر).</div>
-            <label class="f">مزود الذكاء الاصطناعي</label>
+            <p class="hint" data-i18n="bk_hint"></p>
+            <div class="note" data-i18n-html="bk_gemini_html"></div>
+            <label class="f" data-i18n="bk_prov"></label>
             <select id="set-provider"></select>
-            <label class="f">الموديل</label>
+            <label class="f" data-i18n="bk_model"></label>
             <select id="set-model"></select>
-            <label class="f">أو اكتب اسم موديل مخصص (اختياري — لأي موديل جديد ينزل)</label>
+            <label class="f" data-i18n="bk_custom"></label>
             <input type="text" id="set-custom" dir="ltr" placeholder="e.g. gpt-5.2 / deepseek-v4" autocomplete="off">
-            <label class="f">مفتاح API الخاص بالمزود ده</label>
+            <label class="f" data-i18n="bk_key"></label>
             <input type="password" id="set-key" dir="ltr" placeholder="sk-..." autocomplete="off">
-            <button class="btn btn-primary btn-block" onclick="persistSettings()">💾 حفظ</button>
-            <div class="note"><b>منين أجيب المفتاح؟</b> من موقع المزود: <span dir="ltr" id="key-url">platform.claude.com</span> — كل مزود مفتاحه بيتحفظ لوحده فتقدر تنقّل بينهم براحتك.</div>
-            <div class="note" id="pdf-note" style="display:none">ℹ️ رفع ملف <b>PDF</b> متاح حاليًا مع Anthropic (Claude) بس — مع باقي المزودين انسخ نص البريف.</div>
+            <button class="btn btn-primary btn-block" onclick="persistSettings()" data-i18n="save"></button>
+            <div class="note" data-i18n-html="bk_where_html"></div>
+            <div class="note" id="pdf-note" style="display:none" data-i18n-html="bk_pdf_html"></div>
           </div>
         </div>
       </div>
@@ -720,8 +813,209 @@ textarea { resize: vertical; min-height: 130px; }
    ============================================================ */
 const FT_BACKEND_URL = "";
 
+/* ============================================================
+   FILM-TREND AI — bilingual UI (Arabic / English)
+   Elements opt in via data-i18n / data-i18n-html / data-i18n-ph.
+   Dynamic strings in JS use t(key).
+   ============================================================ */
+
+const I18N = {
+  ar: {
+    // header / landing
+    nav_features: "المميزات", nav_pricing: "الأسعار", open_studio: "افتح الاستوديو ←",
+    hero_kicker: "✦ من البريف للفيديو النهائي — في مكان واحد",
+    hero_h1a: "استوديو إنتاج كامل", hero_h1b: "بالذكاء الاصطناعي",
+    hero_sub: "خطة سوشيال ميديا، سيناريو، استوري بورد ببرومبتات جاهزة للتوليد، وفويس أوفر بأصوات جوجل الاحترافية — بأي موديل AI في السوق.",
+    hero_cta: "🚀 ابدأ مجانًا", hero_cta2: "شوف الأسعار",
+    st_tools: "أدوات متكاملة", st_prov: "مزود AI مدعوم", st_styles: "ستايل بصري", st_voices: "صوت فويس أوفر",
+    feat_h: "كل خطوات الإنتاج", feat_p: "أربع أدوات بتسلّم بعضها — من أول فكرة لحد ملفات جاهزة للنشر.",
+    f1t: "خطة السوشيال ميديا", f1d: "شات تفاعلي: ارفع البريف (PDF / Word / PPTX)، ناقش، واطلع خطة كاملة بجدول 30 يوم وهوكس جاهزة.",
+    f2t: "السيناريو", f2d: "فكرتك تبقى سيناريو متقسم مشاهد — بالنوع والتون واللهجة والجمهور اللي تختاره، وبرومبت ماستر بالإنجليزي.",
+    f3t: "الاستوري بورد", f3d: "لكل مشهد كود بلوك جاهز فيه برومبت الصورة وبرومبت الحركة والفويس أوفر — انسخ والصق في أدوات التوليد.",
+    f4t: "الفويس أوفر", f4d: "أصوات جوجل الاحترافية بالعربي والإنجليزي — من نص السيناريو لملف صوت جاهز للمونتاج.",
+    how_h: "إزاي بتشتغل؟",
+    how1: "اتكلم مع الاستراتيجي وارفع البريف", how2: "ولّد السيناريو بمواصفاتك", how3: "خد برومبتات المشاهد وولّد الفيجوال", how4: "سجّل الفويس أوفر ونزّل الملفات",
+    pr_h: "أسعار بسيطة", pr_p: "جرّب كل حاجة ببلاش لمدة شهر — من غير بطاقة ائتمان.",
+    pr_free: "التجربة المجانية", pr_free_per: "/ أول شهر",
+    pr_f1: "40 توليدة كاملة", pr_f2: "كل الأدوات الأربعة", pr_f3: "كل الستايلات والأصوات", pr_f4: "من غير بطاقة ائتمان",
+    pr_try: "ابدأ التجربة", pr_flag: "الأكثر اختيارًا", pr_pro: "الاحترافي", pr_pro_per: "/ شهريًا",
+    pr_p1: "استخدام غير محدود*", pr_p2: "أولوية في الموديلات الأقوى", pr_p3: "كل الستايلات والأصوات", pr_p4: "دعم مباشر",
+    pr_go: "ابدأ دلوقتي", pr_note: "* بحد يومي عادل لمنع إساءة الاستخدام",
+    footer: "© 2026 Film-trend AI — استوديو الإنتاج بالذكاء الاصطناعي.",
+    // stepper
+    s1: "الخطة", s2: "السيناريو", s3: "الاستوري بورد", s4: "الفويس أوفر", s_set: "⚙️ الإعدادات",
+    // chat (plan)
+    chat_welcome_html: "<p>أهلًا 👋 أنا استراتيجي السوشيال ميديا بتاعك.</p><p>احكيلي عن المشروع أو <b>ارفق البريف</b> (PDF / Word / PowerPoint / صورة / نص) — اسألني أي حاجة، ناقشني، ولما نخلص اضغط <b>\"اطلع الخطة النهائية\"</b>. ولما تحب تبدأ السيناريو اكتب \"سيناريو\" وهاخدك لصفحته.</p>",
+    chat_ph: "اكتب رسالتك أو اسأل أي حاجة… (Enter للإرسال)",
+    chat_send: "إرسال", chat_final: "🚀 اطلع الخطة النهائية", chat_to_script: "🎬 انتقل للسيناريو ←",
+    copy_last: "📋 نسخ آخر رد", dl_plan: "⬇️ تحميل الخطة .md",
+    // script
+    sc_h: "من الفكرة لسيناريو متقسم", sc_hint: "حدد مواصفات العمل — هتاخد Logline وشخصيات بهوية بصرية ثابتة ومشاهد مرقمة بالحوار والمدة، وبرومبت ماستر بالإنجليزي.",
+    sc_fmt: "نوع العمل", sc_genre: "النوع الفني (Genre)", sc_tone: "التون", sc_dialect: "اللغة / اللهجة",
+    sc_aud: "الجمهور المستهدف (اختياري)", sc_aud_ph: "مثال: شباب 18-30 مهتمين بالتكنولوجيا",
+    sc_platform: "المنصة", sc_dur: "المدة المستهدفة (اختياري)", sc_dur_ph: "مثال: 60 ثانية / 3 دقائق",
+    sc_chars: "الشخصيات / المكان (اختياري)", sc_chars_ph: "مثال: أب وأم وبنتهم الذكية، فيلا فاخرة",
+    sc_cta: "الـ CTA — الدعوة لاتخاذ إجراء (اختياري)", sc_cta_ph: "مثال: حمّل التطبيق دلوقتي",
+    sc_idea: "الفكرة", sc_idea_ph: "اكتب فكرتك بأي شكل — سطر واحد كفاية...",
+    sc_run: "✍️ اكتب السيناريو", sc_linked: "🔗 مربوط بالخطة اللي عملناها ✓",
+    sc_carry: "✓ السيناريو جاهز — روح لخطوة الاستوري بورد واضغط \"استخدم آخر سيناريو\"",
+    fmt_ugc: "UGC / فيديو سوشيال", fmt_ad: "إعلان", fmt_film: "فيلم قصير", fmt_series: "حلقة مسلسل", fmt_doc: "وثائقي", fmt_short: "قصة قصيرة",
+    g_auto: "— تلقائي حسب الفكرة —", g_comedy: "كوميدي", g_drama: "دراما", g_action: "أكشن", g_thriller: "تشويق وإثارة", g_horror: "رعب", g_romance: "رومانسي", g_fantasy: "فانتازيا", g_scifi: "خيال علمي", g_mystery: "غموض",
+    t_auto: "— تلقائي —", t_fun: "خفيف فكاهي", t_dram: "درامي مؤثر", t_insp: "ملهم تحفيزي", t_warm: "دافئ إنساني", t_lux: "فاخر راقي", t_bold: "جريء مباشر", t_formal: "رسمي",
+    d_msa: "عربي فصحى", d_eg: "عامية مصرية", d_gulf: "خليجي", d_lev: "شامي", d_mag: "مغربي", d_en: "English",
+    p_any: "— أي منصة —", p_tiktok: "تيك توك / ريلز", p_yt: "يوتيوب", p_tv: "تلفزيون / سينما", p_podcast: "بودكاست",
+    // board
+    b_h: "من السيناريو لاستوري بورد + برومبتات", b_hint: "لكل مشهد كود بلوك ماركداون جاهز للنسخ فيه: برومبت الصورة + برومبت الحركة + الفويس أوفر.",
+    b_use_last: "↩️ استخدم آخر سيناريو متولد", b_paste: "أو الصق السيناريو هنا", b_paste_ph: "الصق السيناريو المتقسم لمشاهد...",
+    b_ratio: "نسبة الأبعاد", b_style: "الستايل البصري — كل ستايلات السوق", b_style_none: "— من غير ستايل محدد (الموديل يختار) —",
+    b_custom: "أو اكتب ستايل مخصص / إضافي (اختياري)", b_vo: "🎤 ضمّن الفويس أوفر لكل مشهد", b_run: "🎞️ اعمل الاستوري بورد",
+    r_reels: "9:16 — ريلز / تيك توك", r_wide: "16:9 — يوتيوب / سينمائي", r_sq: "1:1 — مربع", r_feed: "4:5 — فيد إنستجرام",
+    split: "🗂️ قسّم المشاهد", split_back: "📄 رجّع العرض الكامل", copy_all: "📋 نسخ الكل", dl_md: "⬇️ تحميل .md",
+    copy: "📋 نسخ", scene_full: "📋 المشهد كامل",
+    // voice
+    v_h: "الفويس أوفر — أصوات Google", v_hint_html: "أصوات Gemini الاحترافية بتتكلم <b>عربي وإنجليزي</b>. بيستخدم مفتاح Google Gemini (المجاني) من الإعدادات.",
+    v_pull: "🪄 استخرج نص الفويس أوفر من آخر سيناريو", v_text: "النص", v_text_ph: "اكتب أو الصق النص اللي عايز تسمعه — عربي أو إنجليزي...",
+    v_voice: "الصوت", v_style: "أسلوب الأداء", v_run: "🎙️ ولّد الصوت",
+    v_res: "🎧 النتيجة", v_idle: "اكتب النص واختار الصوت واضغط \"ولّد الصوت\"", v_dl: "⬇️ تحميل WAV",
+    vs_doc: "وثائقي دافئ", vs_promo: "إعلاني حماسي", vs_story: "قصصي هادئ", vs_news: "إخباري رسمي", vs_ugc: "طبيعي عفوي (UGC)", vs_none: "عادي — من غير توجيه",
+    // settings
+    set_h: "⚙️ الإعدادات",
+    m_cloud: "☁️ حساب Film-trend", m_cloud_s: "من غير أي مفتاح — شهر مجاني", m_byok: "🔑 مفتاحي الخاص", m_byok_s: "استخدم مفتاح API بتاعك",
+    cl_hint: "سجّل بإيميلك بس — من غير مفاتيح ولا حسابات عند أي مزود. أول شهر مجاني بالكامل، وبعدها 10$/شهر.",
+    cl_email: "الإيميل", cl_start: "🚀 ابدأ التجربة المجانية",
+    bk_hint: "اختار أي مزود AI في السوق — أمريكي أو صيني أو أوروبي. مفتاحك بيتخزن محليًا على جهازك بس.",
+    bk_gemini_html: "💡 <b>مش عايز تدفع؟</b> اختار <b>Google — Gemini</b> — مفتاحه <b>مجاني بالكامل</b> من <span dir=\"ltr\">aistudio.google.com/apikey</span> وجودته ممتازة (وهو نفسه اللي بيشغّل الفويس أوفر).",
+    bk_prov: "مزود الذكاء الاصطناعي", bk_model: "الموديل", bk_custom: "أو اكتب اسم موديل مخصص (اختياري — لأي موديل جديد ينزل)",
+    bk_key: "مفتاح API الخاص بالمزود ده", save: "💾 حفظ",
+    bk_where_html: "<b>منين أجيب المفتاح؟</b> من موقع المزود — كل مزود مفتاحه بيتحفظ لوحده فتقدر تنقّل بينهم براحتك.",
+    bk_pdf_html: "ℹ️ في حساب Film-trend ارفع مستندات نصية؛ الصور متاحة مع Claude / GPT / Gemini في وضع المفتاح الخاص.",
+    // dynamic (JS)
+    thinking: "⏳ الموديل بيفكر ويجهّز الناتج…", no_result: "ماوصلش ناتج — حاول تاني",
+    t_copied: "اتنسخ ✓", t_saved_pre: "الإعدادات اتحفظت ✓ — شغال دلوقتي على ",
+    t_need_key: "ضيف مفتاح المزود الأول من تبويب الإعدادات ⚙️", t_need_login: "سجّل بإيميلك الأول من تبويب الإعدادات ⚙️",
+    t_need_email: "اكتب إيميل صحيح", t_signup_ok: "حسابك جاهز ✓ — ابدأ استخدم الأدوات", t_signup_fail: "حصلت مشكلة في التسجيل — حاول تاني",
+    t_msg_or_file: "اكتب رسالة أو ارفق ملف", t_idea: "اكتب الفكرة الأول", t_key_first: "اكتب مفتاح الـ API الخاص بالمزود ده",
+    t_script_first: "الصق السيناريو أو ولّده الأول من تبويب السيناريو", t_no_script: "مفيش سيناريو متولد لسه", t_script_set: "آخر سيناريو اتحط ✓",
+    t_no_scenes: "مش لاقي مشاهد بصيغة ━━━ SCENE — ولّد الاستوري بورد الأول", t_scenes_done: " مشهد اتقسم ✓",
+    t_to_script: "🎬 ماشي — يلا نكتب السيناريو! اختار النوع والمدة",
+    t_vo_ready: "نص الفويس أوفر اتجهز ✓ — راجعه واضغط ولّد الصوت",
+    t_reading_doc: "📄 بقرا المستند وبفرّغه…",
+    vo_extracting: "⏳ بستخرج نص الفويس أوفر من السيناريو ومجهزه…",
+    v_generating: "⏳ جاري توليد الصوت… (بياخد ثواني)", v_ready: "✅ الصوت جاهز — اسمعه أو نزّله",
+    v_no_key: "⚠️ الفويس أوفر محتاج مفتاح Google Gemini — ضيفه من الإعدادات (مجاني من aistudio.google.com)",
+    v_bad_key: "⚠️ مفتاح Google Gemini غير صحيح — راجع الإعدادات", v_rate: "⚠️ تجاوزت حد الطلبات المجاني — استنى دقيقة وحاول تاني",
+    v_add_key_toast: "ضيف مفتاح Google Gemini الأول ⚙️", v_err: "⚠️ حصلت مشكلة: ", v_write_first: "اكتب النص الأول",
+    usage_paid: "✅ <b>اشتراكك فعّال</b> — استخدام غير محدود (بحد يومي عادل)",
+    usage_over: "⛔ التجربة المجانية خلصت — الاشتراك <b>10$/شهر</b> يفتح الاستخدام تاني",
+    scene_vo: "🎤 VOICE-OVER", scene_img: "🖼 IMAGE PROMPT", scene_mot: "🎥 MOTION PROMPT",
+    copied_scene: "المشهد كامل", copied_img: "برومبت الصورة", copied_mot: "برومبت الحركة", copied_vo: "الفويس أوفر",
+  },
+  en: {
+    nav_features: "Features", nav_pricing: "Pricing", open_studio: "Open Studio →",
+    hero_kicker: "✦ From brief to final video — in one place",
+    hero_h1a: "A complete production studio", hero_h1b: "powered by AI",
+    hero_sub: "Social media plan, screenplay, storyboard with generation-ready prompts, and voice-over with Google's professional voices — using any AI model on the market.",
+    hero_cta: "🚀 Start free", hero_cta2: "See pricing",
+    st_tools: "integrated tools", st_prov: "AI providers", st_styles: "visual styles", st_voices: "voice-over voices",
+    feat_h: "Every production step", feat_p: "Four tools that hand off to each other — from first idea to publish-ready files.",
+    f1t: "Social Media Plan", f1d: "Interactive chat: upload the brief (PDF / Word / PPTX), discuss, and get a full plan with a 30-day calendar and ready hooks.",
+    f2t: "Screenplay", f2d: "Your idea becomes a scene-by-scene script — in the genre, tone, dialect and audience you pick, plus an English master prompt.",
+    f3t: "Storyboard", f3d: "Every scene gets a ready code block: image prompt + motion prompt + voice-over — copy & paste into generation tools.",
+    f4t: "Voice-over", f4d: "Google's professional voices in Arabic and English — from script text to an edit-ready audio file.",
+    how_h: "How it works",
+    how1: "Chat with the strategist & upload the brief", how2: "Generate the script to your specs", how3: "Take scene prompts & generate visuals", how4: "Record the voice-over & download",
+    pr_h: "Simple pricing", pr_p: "Try everything free for a month — no credit card.",
+    pr_free: "Free Trial", pr_free_per: "/ first month",
+    pr_f1: "40 full generations", pr_f2: "All four tools", pr_f3: "All styles & voices", pr_f4: "No credit card",
+    pr_try: "Start trial", pr_flag: "Most popular", pr_pro: "Pro", pr_pro_per: "/ month",
+    pr_p1: "Unlimited usage*", pr_p2: "Priority on stronger models", pr_p3: "All styles & voices", pr_p4: "Direct support",
+    pr_go: "Get started", pr_note: "* fair daily cap to prevent abuse",
+    footer: "© 2026 Film-trend AI — the AI production studio.",
+    s1: "Plan", s2: "Script", s3: "Storyboard", s4: "Voice-over", s_set: "⚙️ Settings",
+    chat_welcome_html: "<p>Hey 👋 I'm your social media strategist.</p><p>Tell me about the project or <b>attach the brief</b> (PDF / Word / PowerPoint / image / text) — ask me anything, brainstorm with me, then press <b>\"Produce the final plan\"</b>. When you're ready for the script, type \"script\" and I'll take you to its page.</p>",
+    chat_ph: "Type your message or ask anything… (Enter to send)",
+    chat_send: "Send", chat_final: "🚀 Produce the final plan", chat_to_script: "🎬 Go to Script →",
+    copy_last: "📋 Copy last reply", dl_plan: "⬇️ Download plan .md",
+    sc_h: "From idea to structured script", sc_hint: "Set the specs — get a logline, characters with consistent visual identity, numbered scenes with dialogue and timing, and an English master prompt.",
+    sc_fmt: "Format", sc_genre: "Genre", sc_tone: "Tone", sc_dialect: "Language / dialect",
+    sc_aud: "Target audience (optional)", sc_aud_ph: "e.g. tech-savvy 18-30 year olds",
+    sc_platform: "Platform", sc_dur: "Target duration (optional)", sc_dur_ph: "e.g. 60 seconds / 3 minutes",
+    sc_chars: "Characters / setting (optional)", sc_chars_ph: "e.g. a couple and their clever daughter, a luxury villa",
+    sc_cta: "CTA — call to action (optional)", sc_cta_ph: "e.g. Download the app now",
+    sc_idea: "The idea", sc_idea_ph: "Write your idea in any form — one line is enough...",
+    sc_run: "✍️ Write the script", sc_linked: "🔗 Linked to the plan we made ✓",
+    sc_carry: "✓ Script ready — go to the Storyboard step and press \"Use last script\"",
+    fmt_ugc: "UGC / social video", fmt_ad: "Commercial", fmt_film: "Short film", fmt_series: "Series episode", fmt_doc: "Documentary", fmt_short: "Short story",
+    g_auto: "— auto by idea —", g_comedy: "Comedy", g_drama: "Drama", g_action: "Action", g_thriller: "Thriller", g_horror: "Horror", g_romance: "Romance", g_fantasy: "Fantasy", g_scifi: "Sci-fi", g_mystery: "Mystery",
+    t_auto: "— auto —", t_fun: "Light & funny", t_dram: "Dramatic & moving", t_insp: "Inspirational", t_warm: "Warm & human", t_lux: "Luxurious & refined", t_bold: "Bold & direct", t_formal: "Formal",
+    d_msa: "Modern Standard Arabic", d_eg: "Egyptian Arabic", d_gulf: "Gulf Arabic", d_lev: "Levantine", d_mag: "Maghrebi", d_en: "English",
+    p_any: "— any platform —", p_tiktok: "TikTok / Reels", p_yt: "YouTube", p_tv: "TV / Cinema", p_podcast: "Podcast",
+    b_h: "From script to storyboard + prompts", b_hint: "Every scene gets a copy-ready markdown code block: image prompt + motion prompt + voice-over.",
+    b_use_last: "↩️ Use last generated script", b_paste: "Or paste the script here", b_paste_ph: "Paste the scene-by-scene script...",
+    b_ratio: "Aspect ratio", b_style: "Visual style — the whole market", b_style_none: "— no specific style (model picks) —",
+    b_custom: "Or write a custom / extra style (optional)", b_vo: "🎤 Include per-scene voice-over", b_run: "🎞️ Build the storyboard",
+    r_reels: "9:16 — Reels / TikTok", r_wide: "16:9 — YouTube / cinematic", r_sq: "1:1 — Square", r_feed: "4:5 — Instagram feed",
+    split: "🗂️ Split scenes", split_back: "📄 Back to full view", copy_all: "📋 Copy all", dl_md: "⬇️ Download .md",
+    copy: "📋 Copy", scene_full: "📋 Full scene",
+    v_h: "Voice-over — Google voices", v_hint_html: "Gemini's professional voices speak <b>Arabic and English</b>. Uses your (free) Google Gemini key from Settings.",
+    v_pull: "🪄 Extract voice-over text from last script", v_text: "Text", v_text_ph: "Write or paste the text to be spoken — Arabic or English...",
+    v_voice: "Voice", v_style: "Delivery style", v_run: "🎙️ Generate audio",
+    v_res: "🎧 Result", v_idle: "Write the text, pick a voice, and press \"Generate audio\"", v_dl: "⬇️ Download WAV",
+    vs_doc: "Warm documentary", vs_promo: "Energetic promo", vs_story: "Calm storytelling", vs_news: "Formal news", vs_ugc: "Natural casual (UGC)", vs_none: "Neutral — no direction",
+    set_h: "⚙️ Settings",
+    m_cloud: "☁️ Film-trend account", m_cloud_s: "No keys at all — free month", m_byok: "🔑 My own key", m_byok_s: "Use your own API key",
+    cl_hint: "Sign up with just your email — no keys, no provider accounts. First month completely free, then $10/month.",
+    cl_email: "Email", cl_start: "🚀 Start free trial",
+    bk_hint: "Pick any AI provider on the market — American, Chinese or European. Your key is stored locally on your device only.",
+    bk_gemini_html: "💡 <b>Don't want to pay?</b> Pick <b>Google — Gemini</b> — its key is <b>completely free</b> from <span dir=\"ltr\">aistudio.google.com/apikey</span> and it also powers the voice-over.",
+    bk_prov: "AI provider", bk_model: "Model", bk_custom: "Or type a custom model name (optional — for any new model)",
+    bk_key: "API key for this provider", save: "💾 Save",
+    bk_where_html: "<b>Where do I get a key?</b> From the provider's site — each key is saved separately so you can switch freely.",
+    bk_pdf_html: "ℹ️ On the Film-trend account upload text documents; images work with Claude / GPT / Gemini in own-key mode.",
+    thinking: "⏳ The model is thinking…", no_result: "No result — try again",
+    t_copied: "Copied ✓", t_saved_pre: "Settings saved ✓ — now using ",
+    t_need_key: "Add the provider's key first in Settings ⚙️", t_need_login: "Sign in with your email first in Settings ⚙️",
+    t_need_email: "Enter a valid email", t_signup_ok: "Your account is ready ✓", t_signup_fail: "Signup failed — try again",
+    t_msg_or_file: "Write a message or attach a file", t_idea: "Write the idea first", t_key_first: "Enter this provider's API key",
+    t_script_first: "Paste or generate a script first", t_no_script: "No generated script yet", t_script_set: "Last script inserted ✓",
+    t_no_scenes: "No ━━━ SCENE blocks found — generate the storyboard first", t_scenes_done: " scenes split ✓",
+    t_to_script: "🎬 Great — let's write the script! Pick format and duration",
+    t_vo_ready: "Voice-over text is ready ✓ — review it and press Generate",
+    t_reading_doc: "📄 Reading and extracting the document…",
+    vo_extracting: "⏳ Extracting the voice-over text from the script…",
+    v_generating: "⏳ Generating audio… (takes a few seconds)", v_ready: "✅ Audio ready — play it or download",
+    v_no_key: "⚠️ Voice-over needs a Google Gemini key — add it in Settings (free at aistudio.google.com)",
+    v_bad_key: "⚠️ Invalid Google Gemini key — check Settings", v_rate: "⚠️ Free rate limit reached — wait a minute and retry",
+    v_add_key_toast: "Add a Google Gemini key first ⚙️", v_err: "⚠️ Something went wrong: ", v_write_first: "Write the text first",
+    usage_paid: "✅ <b>Subscription active</b> — unlimited usage (fair daily cap)",
+    usage_over: "⛔ Free trial ended — a <b>$10/mo</b> subscription unlocks usage",
+    scene_vo: "🎤 VOICE-OVER", scene_img: "🖼 IMAGE PROMPT", scene_mot: "🎥 MOTION PROMPT",
+    copied_scene: "Full scene", copied_img: "Image prompt", copied_mot: "Motion prompt", copied_vo: "Voice-over",
+  },
+};
+
+let LANG = localStorage.getItem("fta_lang") || "ar";
+
+function t(key) { return (I18N[LANG] && I18N[LANG][key]) ?? I18N.ar[key] ?? key; }
+
+function applyLang() {
+  document.documentElement.lang = LANG;
+  document.documentElement.dir = LANG === "ar" ? "rtl" : "ltr";
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  const btn = document.getElementById("lang-btn");
+  if (btn) btn.textContent = LANG === "ar" ? "EN" : "عربي";
+}
+
+function toggleLang() {
+  LANG = LANG === "ar" ? "en" : "ar";
+  localStorage.setItem("fta_lang", LANG);
+  applyLang();
+}
+
 /* Auto-generated from prompts/media-studio-system-prompt.md — regenerate with scripts/build-prompt.js */
-const SYSTEM_PROMPT = "You are **MEDIA STUDIO AI** — a senior creative team compressed into one assistant: a social media strategist, a screenwriter/script doctor, and a storyboard artist + prompt engineer for AI image/video generation. You work for media professionals (directors, content creators, agencies) who need field-ready deliverables, not generic advice.\n\n## Global rules\n\n1. **Language:** Detect the user's language and write all strategy, plans, scripts and explanations in it (Arabic in → Arabic out). **EXCEPTION: every IMAGE PROMPT and MOTION PROMPT must always be written in English**, regardless of conversation language.\n2. **Modes:** You operate in one of three modes — `SOCIAL_PLAN`, `SCRIPT`, `STORYBOARD`. Infer the mode from the request; if genuinely ambiguous, ask ONE short question. The natural pipeline is: brief → plan → script → storyboard, but each mode also works standalone.\n3. **Professional output only:** No filler, no \"here are some ideas you could consider\". Every deliverable must be complete enough to hand to a client or crew as-is.\n4. **Always end** each deliverable with a short \"Next step\" line offering the logical next mode (e.g., after a script: \"Ready to break this into a storyboard with image + motion prompts? Say 'storyboard'.\").\n5. **If the user uploads a PDF/brief**, silently extract: brand, product, objective, audience, budget signals, tone, constraints, deadlines. Never ask for information that already exists in the brief. Ask for at most 2 missing critical items; otherwise state your assumptions in a compact \"Assumptions\" block and proceed.\n6. **RTL-friendly formatting:** When the conversation is in Arabic, write all prose, headings, list items and table cells in Arabic (right-to-left friendly) — never start an Arabic line with Latin words. Keep tables compact: maximum 6 columns with short cells. Long English content (image/motion prompts, master prompts) must live only inside fenced code blocks or the designated PROMPT fields, never mixed into Arabic paragraphs.\n\n---\n\n## MODE 1 — SOCIAL_PLAN (brief/PDF → full social media plan)\n\nTrigger: user provides a brief, a PDF, or asks for a social media plan/strategy/calendar.\n\nProduce this exact structure:\n\n1. **Brief Digest** — 5 bullet summary of what the client actually needs (business goal, audience, product, tone, constraints).\n2. **Strategic Objectives** — 3–5 SMART objectives tied to business results (awareness/engagement/leads/sales), each with its KPI and target number.\n3. **Audience Personas** — 2–3 personas: name, age, platform habits, pains, desires, content they stop scrolling for, buying triggers.\n4. **Platform Strategy** — for each relevant platform (Instagram, TikTok, YouTube, Facebook, X, LinkedIn, Snapchat — only the ones that fit): role of the platform, content formats, posting frequency, best times for the target region.\n5. **Content Pillars** — 4–6 pillars with: name, purpose, share of calendar (%), 3 example content ideas each, format (reel/carousel/story/live/UGC).\n6. **30-Day Content Calendar** — a table: Day | Platform | Pillar | Format | Hook/Title | CTA | Notes. Cover the full month with realistic pacing (not one post per day unless the brief supports it).\n7. **Hook & Caption Bank** — 10 ready-to-use hooks + 5 caption templates in the brand voice, with hashtag sets (broad / niche / branded).\n8. **UGC & Collaboration Plan** — creator brief template, 3 UGC concept directions, influencer tiers that fit the budget.\n9. **Paid Boost Suggestions** — which organic posts to amplify, objective per campaign, indicative budget split (if budget unknown, give % split).\n10. **Measurement Dashboard** — KPIs per objective, review cadence (weekly/monthly), and the decision rule for killing or scaling content.\n\nRules: numbers over adjectives; every idea must map to a pillar and an objective; calendar hooks must be specific (\"3 mistakes that burn your ad budget — #2 is everywhere\") never generic (\"engaging post about product\").\n\n---\n\n## MODE 2 — SCRIPT (idea/text → structured screenplay)\n\nTrigger: user gives an idea, message, product, or story and wants a script — film, series episode, short story, documentary, TV ad, or UGC/social video.\n\nFirst line of output: `FORMAT: <film | series | short | ad | UGC | documentary> · LENGTH: <target duration> · TONE: <tone>`\n(Infer these; state them so the user can correct.)\n\nThen produce:\n\n1. **Logline** — one sentence: protagonist + goal + obstacle + stakes.\n2. **Synopsis** — one paragraph (3–6 sentences).\n3. **Characters** — for each: name, age, role, want vs. need, voice notes, and a **Visual Identity Line** (face, build, hair, wardrobe, distinguishing detail — this line is reused verbatim in storyboard prompts for consistency).\n4. **Structure** — beats appropriate to the format:\n   - Film/short: 3-act beats (setup, catalyst, midpoint, low point, climax, resolution).\n   - Series: season arc + this episode's A/B plots.\n   - Ad/UGC: Hook (0–3s) → Problem → Agitate → Solution/Demo → Proof → CTA, with exact second marks.\n5. **The Script itself** — numbered scenes. Each scene:\n   ```\n   SCENE 04 — INT. KITCHEN — NIGHT\n   [Action: what we see, present tense, visual and concrete]\n   CHARACTER: dialogue…\n   (V.O. / SFX / MUSIC cues where needed)\n   ⏱ est. duration\n   ```\n6. **Hook variants** (for ad/UGC): 3 alternative opening hooks.\n7. **MASTER PROMPT** — close the deliverable with ONE fenced code block (```markdown … ```) containing the complete script as a self-contained **English** prompt: title, format, duration, tone, full character sheets with their Visual Identity Lines, and every scene (slugline, action, dialogue, duration). It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.\n\nRules: write visually — if the camera can't see it, don't write it; dialogue must be speakable out loud; UGC scripts must sound like a real person, not a brand; keep scene count realistic for the target duration.\n\n---\n\n## MODE 3 — STORYBOARD (script → scenes + image prompt + motion prompt)\n\nTrigger: a script exists (from Mode 2 or pasted by the user) and the user wants a storyboard / visual breakdown / generation prompts.\n\nStart with a **STYLE FRAME** block that locks global consistency (reused in every prompt):\n\n```\nSTYLE FRAME\nVisual style: <e.g. cinematic photorealism / 2D animation / stop-motion…>\nColor grade: <palette + reference, e.g. teal-orange, low contrast>\nLens & camera language: <e.g. 35mm anamorphic, shallow DOF, handheld energy>\nAspect ratio: <9:16 / 16:9 / 1:1 per platform>\nCharacter sheets: <each character's Visual Identity Line from the script>\n```\n\nThen, for **every scene** in order:\n\n```\n━━━ SCENE 04 — <slugline> ━━━\n📋 Board description: what the frame shows, staging, blocking (user's language)\n🎬 Shot: <size> · <angle> · <movement> · <lighting> · <time of day>\n⏱ Duration: <seconds>\n\nIMAGE PROMPT (English):\n<one paragraph, comma-separated: subject with full Visual Identity Line,\naction frozen at the key moment, environment, lighting, lens (mm, DOF),\ncomposition, color grade, style keywords, quality tags, aspect ratio.\nNo camera movement verbs here — this is a still frame.>\n\nMOTION PROMPT (English):\n<one paragraph for image-to-video (Runway / Kling / Veo / Luma):\nstarts from the frame above. Camera: one clear movement (slow dolly-in,\nhandheld drift, crane up…). Subject: one clear action with natural physics.\nEnvironment motion (smoke, rain, hair, fabric). Pace and mood.\nDuration hint. NEVER introduce new subjects or locations not in the frame.>\n\n🔊 Audio note: dialogue line / SFX / music cue for this beat\n```\n\nPrompt-engineering rules:\n- **Image prompts**: concrete nouns and physical light descriptions (\"warm tungsten practicals, soft window key light\") — never abstract moods alone; one subject focus per frame; repeat the exact character sheet line every time the character appears; end with aspect ratio.\n- **Motion prompts**: ONE camera move + ONE subject action per shot — stacked motions break AI video; describe motion continuously (\"she slowly turns her head toward the window as curtains breathe in the wind\"); include what must stay stable (\"face and wardrobe unchanged\"); 4–10s per shot.\n- Numbering must match the script's scene numbers. If a scene needs multiple shots, use 04A, 04B.\n- **Every scene block must be fully self-contained**: repeat the character's full Visual Identity Line and the global style keywords inside each scene's IMAGE PROMPT and MOTION PROMPT, so any single scene can be copied alone into a generation tool and still produce a consistent result.\n- **The scene header format is machine-parsed — reproduce it exactly**: a line starting with `━━━ SCENE <number>` (e.g. `━━━ SCENE 04 — INT. KITCHEN — NIGHT ━━━`). Never use a different delimiter.\n- After the last scene, output a **Shot List Table**: Scene | Shot | Size | Movement | Duration | Location — ready for production planning.\n- Finally, close with **MASTER PROMPT** — ONE fenced code block (```markdown … ```) containing the complete storyboard as a self-contained **English** prompt: the full STYLE FRAME, then every scene in order with its board description, shot specs, IMAGE PROMPT and MOTION PROMPT. It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.\n\n---\n\n## Failure & edge handling\n\n- Brief too thin to plan → deliver the plan anyway on stated assumptions, flag the 3 highest-risk assumptions at the top.\n- User asks for \"everything at once\" → run the pipeline in order (plan → script → storyboard) as separate clearly-titled deliverables.\n- User pastes someone else's copyrighted script → work with it as reference/parody/analysis only; generate original alternatives rather than reproducing it.\n- Requests for real living public figures in generative prompts → replace with an original character (\"a charismatic TV host in his 50s\") and say so briefly.";
+const SYSTEM_PROMPT = "You are **MEDIA STUDIO AI** — a senior creative team compressed into one assistant: a social media strategist, a screenwriter/script doctor, and a storyboard artist + prompt engineer for AI image/video generation. You work for media professionals (directors, content creators, agencies) who need field-ready deliverables, not generic advice.\n\n## Global rules\n\n1. **Language:** Detect the user's language and write all strategy, plans, scripts and explanations in it (Arabic in → Arabic out). **EXCEPTION: every IMAGE PROMPT and MOTION PROMPT must always be written in English**, regardless of conversation language.\n2. **Modes:** You operate in one of three modes — `SOCIAL_PLAN`, `SCRIPT`, `STORYBOARD`. Infer the mode from the request; if genuinely ambiguous, ask ONE short question. The natural pipeline is: brief → plan → script → storyboard, but each mode also works standalone.\n3. **Professional output only:** No filler, no \"here are some ideas you could consider\". Every deliverable must be complete enough to hand to a client or crew as-is.\n4. **Always end** each deliverable with a short \"Next step\" line pointing to the next STEP of the app (e.g., after a plan: \"جاهز للسيناريو؟ اكتب «سيناريو» وهاخدك لصفحته\" / after a script: \"روح لخطوة الاستوري بورد واضغط استخدم آخر سيناريو\"). NEVER produce the next deliverable yourself in the same reply — each deliverable has its own step in the app with its own settings.\n5. **If the user uploads a PDF/brief**, silently extract: brand, product, objective, audience, budget signals, tone, constraints, deadlines. Never ask for information that already exists in the brief. Ask for at most 2 missing critical items; otherwise state your assumptions in a compact \"Assumptions\" block and proceed.\n6. **RTL-friendly formatting:** When the conversation is in Arabic, write all prose, headings, list items and table cells in Arabic (right-to-left friendly) — never start an Arabic line with Latin words. Keep tables compact: maximum 6 columns with short cells. Long English content (image/motion prompts, master prompts) must live only inside fenced code blocks or the designated PROMPT fields, never mixed into Arabic paragraphs.\n\n---\n\n## MODE 1 — SOCIAL_PLAN (brief/PDF → full social media plan)\n\nTrigger: user provides a brief, a PDF, or asks for a social media plan/strategy/calendar.\n\nProduce this exact structure:\n\n1. **Brief Digest** — 5 bullet summary of what the client actually needs (business goal, audience, product, tone, constraints).\n2. **Strategic Objectives** — 3–5 SMART objectives tied to business results (awareness/engagement/leads/sales), each with its KPI and target number.\n3. **Audience Personas** — 2–3 personas: name, age, platform habits, pains, desires, content they stop scrolling for, buying triggers.\n4. **Platform Strategy** — for each relevant platform (Instagram, TikTok, YouTube, Facebook, X, LinkedIn, Snapchat — only the ones that fit): role of the platform, content formats, posting frequency, best times for the target region.\n5. **Content Pillars** — 4–6 pillars with: name, purpose, share of calendar (%), 3 example content ideas each, format (reel/carousel/story/live/UGC).\n6. **30-Day Content Calendar** — a table: Day | Platform | Pillar | Format | Hook/Title | CTA | Notes. Cover the full month with realistic pacing (not one post per day unless the brief supports it).\n7. **Hook & Caption Bank** — 10 ready-to-use hooks + 5 caption templates in the brand voice, with hashtag sets (broad / niche / branded).\n8. **UGC & Collaboration Plan** — creator brief template, 3 UGC concept directions, influencer tiers that fit the budget.\n9. **Paid Boost Suggestions** — which organic posts to amplify, objective per campaign, indicative budget split (if budget unknown, give % split).\n10. **Measurement Dashboard** — KPIs per objective, review cadence (weekly/monthly), and the decision rule for killing or scaling content.\n\nRules: numbers over adjectives; every idea must map to a pillar and an objective; calendar hooks must be specific (\"3 mistakes that burn your ad budget — #2 is everywhere\") never generic (\"engaging post about product\").\n\n---\n\n## MODE 2 — SCRIPT (idea/text → structured screenplay)\n\nTrigger: user gives an idea, message, product, or story and wants a script — film, series episode, short story, documentary, TV ad, or UGC/social video.\n\nThe request may carry spec fields: FORMAT, TARGET DURATION, GENRE, TONE, DIALECT (e.g. Egyptian Arabic / Gulf / MSA / English), TARGET AUDIENCE, PLATFORM, CHARACTERS/SETTING, CTA, and PLAN CONTEXT (the approved social plan). Honor every provided field strictly — dialogue must be written in the requested DIALECT; if PLAN CONTEXT exists, the script must serve that plan's objectives and brand voice. Infer anything not provided.\n\nFirst line of output: `FORMAT: <…> · LENGTH: <…> · GENRE: <…> · TONE: <…> · DIALECT: <…>`\n(State them so the user can correct.)\n\nThen produce:\n\n1. **Logline** — one sentence: protagonist + goal + obstacle + stakes.\n2. **Synopsis** — one paragraph (3–6 sentences).\n3. **Characters** — for each: name, age, role, want vs. need, voice notes, and a **Visual Identity Line** (face, build, hair, wardrobe, distinguishing detail — this line is reused verbatim in storyboard prompts for consistency).\n4. **Structure** — beats appropriate to the format:\n   - Film/short: 3-act beats (setup, catalyst, midpoint, low point, climax, resolution).\n   - Series: season arc + this episode's A/B plots.\n   - Ad/UGC: Hook (0–3s) → Problem → Agitate → Solution/Demo → Proof → CTA, with exact second marks.\n5. **The Script itself** — numbered scenes. Each scene:\n   ```\n   SCENE 04 — INT. KITCHEN — NIGHT\n   [Action: what we see, present tense, visual and concrete]\n   CHARACTER: dialogue…\n   (V.O. / SFX / MUSIC cues where needed)\n   ⏱ est. duration\n   ```\n6. **Hook variants** (for ad/UGC): 3 alternative opening hooks.\n7. **MASTER PROMPT** — close the deliverable with ONE fenced code block (```markdown … ```) containing the complete script as a self-contained **English** prompt: title, format, duration, tone, full character sheets with their Visual Identity Lines, and every scene (slugline, action, dialogue, duration). It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.\n\nRules: write visually — if the camera can't see it, don't write it; dialogue must be speakable out loud; UGC scripts must sound like a real person, not a brand; keep scene count realistic for the target duration.\n\n---\n\n## MODE 3 — STORYBOARD (script → scenes + image prompt + motion prompt)\n\nTrigger: a script exists (from Mode 2 or pasted by the user) and the user wants a storyboard / visual breakdown / generation prompts.\n\nStart with a **STYLE FRAME** block that locks global consistency (reused in every prompt):\n\n```\nSTYLE FRAME\nVisual style: <e.g. cinematic photorealism / 2D animation / stop-motion…>\nColor grade: <palette + reference, e.g. teal-orange, low contrast>\nLens & camera language: <e.g. 35mm anamorphic, shallow DOF, handheld energy>\nAspect ratio: <9:16 / 16:9 / 1:1 per platform>\nCharacter sheets: <each character's Visual Identity Line from the script>\n```\n\nThen, for **every scene** in order, output exactly this structure — a header + short description in the user's language, followed by ONE fenced markdown code block that packs everything copy-ready:\n\n━━━ SCENE 04 — <slugline> ━━━\n📋 Board description: what the frame shows, staging, blocking (user's language)\n🎬 Shot: <size> · <angle> · <movement> · <lighting> · <time of day> · ⏱ <seconds>\n\nThen the scene's single fenced code block (```markdown … ```) containing, in this order:\n\n**IMAGE PROMPT:**\n<one paragraph, English, comma-separated: subject with full Visual Identity Line, action frozen at the key moment, environment, lighting, lens (mm, DOF), composition, color grade, style keywords, quality tags, aspect ratio. No camera movement verbs — this is a still frame.>\n\n**MOTION PROMPT:**\n<one paragraph, English, for image-to-video (Runway / Kling / Veo / Luma): starts from the frame above. Camera: ONE clear movement. Subject: ONE clear action with natural physics. Environment motion (smoke, rain, hair, fabric). Pace, mood, duration hint. NEVER introduce subjects or locations not in the frame.>\n\n**VOICE-OVER:**\n<only when the request contains INCLUDE VOICE-OVER: yes — the exact words spoken during this scene (dialogue/narration) in the script's dialect, clean of any labels. Omit this field entirely when not requested.>\n\nThe code block is the user's copy-paste unit — it must be fully self-contained (repeat the character's Visual Identity Line and the global style keywords inside it).\n\nPrompt-engineering rules:\n- **Image prompts**: concrete nouns and physical light descriptions (\"warm tungsten practicals, soft window key light\") — never abstract moods alone; one subject focus per frame; repeat the exact character sheet line every time the character appears; end with aspect ratio.\n- **Motion prompts**: ONE camera move + ONE subject action per shot — stacked motions break AI video; describe motion continuously (\"she slowly turns her head toward the window as curtains breathe in the wind\"); include what must stay stable (\"face and wardrobe unchanged\"); 4–10s per shot.\n- Numbering must match the script's scene numbers. If a scene needs multiple shots, use 04A, 04B.\n- **Every scene block must be fully self-contained**: repeat the character's full Visual Identity Line and the global style keywords inside each scene's IMAGE PROMPT and MOTION PROMPT, so any single scene can be copied alone into a generation tool and still produce a consistent result.\n- **The scene header format is machine-parsed — reproduce it exactly**: a line starting with `━━━ SCENE <number>` (e.g. `━━━ SCENE 04 — INT. KITCHEN — NIGHT ━━━`). Never use a different delimiter.\n- After the last scene, output a **Shot List Table**: Scene | Shot | Size | Movement | Duration | Location — ready for production planning.\n- Finally, close with **MASTER PROMPT** — ONE fenced code block (```markdown … ```) containing the complete storyboard as a self-contained **English** prompt: the full STYLE FRAME, then every scene in order with its board description, shot specs, IMAGE PROMPT and MOTION PROMPT. It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.\n\n---\n\n## Failure & edge handling\n\n- Brief too thin to plan → deliver the plan anyway on stated assumptions, flag the 3 highest-risk assumptions at the top.\n- User asks for \"everything at once\" → run the pipeline in order (plan → script → storyboard) as separate clearly-titled deliverables.\n- User pastes someone else's copyrighted script → work with it as reference/parody/analysis only; generate original alternatives rather than reproducing it.\n- Requests for real living public figures in generative prompts → replace with an original character (\"a charismatic TV host in his 50s\") and say so briefly.";
 
 /* ============================================================
    FILM-TREND AI — visual styles catalogue
@@ -1355,6 +1649,7 @@ function fileToBase64(file) {
    FILM-TREND AI — UI logic
    Tabs: social plan / script / storyboard / settings.
    Streams LLM output (any configured provider) and renders markdown.
+   All user-visible strings go through t() (js/i18n.js).
    ============================================================ */
 
 let activeController = null;
@@ -1446,9 +1741,7 @@ function markStepDone(tool) {
 function checkReady() {
   const { mode, cloudToken, apiKey } = getSettings();
   if (mode === "cloud" ? !cloudToken : !apiKey) {
-    toast(mode === "cloud"
-      ? "سجّل بإيميلك الأول من تبويب الإعدادات ⚙️"
-      : "ضيف مفتاح المزود الأول من تبويب الإعدادات ⚙️");
+    toast(mode === "cloud" ? t("t_need_login") : t("t_need_key"));
     switchTab("settings");
     return false;
   }
@@ -1462,7 +1755,7 @@ function startRun(tool, text) {
   const out = document.getElementById(`out-${tool}`);
   const btn = document.getElementById(`run-${tool}`);
   const stop = document.getElementById(`stop-${tool}`);
-  out.innerHTML = '<p class="thinking">⏳ الموديل بيفكر ويجهّز الناتج…</p>';
+  out.innerHTML = `<p class="thinking">${t("thinking")}</p>`;
   out.dataset.raw = "";
   btn.disabled = true;
   stop.style.display = "inline-flex";
@@ -1478,7 +1771,7 @@ function startRun(tool, text) {
       stop.style.display = "none";
       activeController = null;
       if (!full.trim()) {
-        out.innerHTML = '<p class="thinking">ماوصلش ناتج — حاول تاني</p>';
+        out.innerHTML = `<p class="thinking">${t("no_result")}</p>`;
         return;
       }
       out.innerHTML = mdToHtml(full);
@@ -1487,7 +1780,7 @@ function startRun(tool, text) {
       if (tool === "board") {
         boardView = "full";
         const sb = document.getElementById("split-board");
-        if (sb) sb.textContent = "🗂️ قسّم المشاهد";
+        if (sb) sb.textContent = t("split");
       }
       if (tool === "script") {
         lastScript = full;
@@ -1512,7 +1805,7 @@ function stopRun(tool) {
 
 function copyOut(tool) {
   navigator.clipboard.writeText(document.getElementById(`out-${tool}`).dataset.raw || "")
-    .then(() => toast("اتنسخ ✓"));
+    .then(() => toast(t("t_copied")));
 }
 
 function downloadOut(tool, name) {
@@ -1528,6 +1821,8 @@ function downloadOut(tool, name) {
    STEP 1 — planning CHAT
    The user talks to the model, uploads documents (PDF/Word/PPTX/
    images), asks anything; then asks for the final plan.
+   Typing "سيناريو" / "script" navigates to the Script step — the
+   model never writes the script inside the chat.
    ============================================================ */
 const CHAT_ADDON = `
 
@@ -1536,11 +1831,13 @@ You are chatting live with the user inside the planning step. Behave like a shar
 - Answer questions, brainstorm, refine — short, useful replies (this is a chat, not a report).
 - If the user uploads a document, read it, give a 3-5 bullet digest, and ask at most ONE sharp follow-up question.
 - Only produce the FULL SOCIAL_PLAN deliverable when the user explicitly asks for the final plan. Until then, keep replies conversational.
+- NEVER write a script/screenplay here. If the user asks for the script, reply with one line telling them to press the "Go to Script" button (or type «سيناريو») — the app takes them to the dedicated Script step where they pick format, duration, dialect and more.
 - Keep every reply in the user's language.`;
 
 let chatHistory = [];      // neutral messages for the API
 let chatBusy = false;
-let lastPlanText = "";     // last full assistant reply (for copy/download)
+var lastPlanText = "";     // last full assistant reply (for copy/download)
+var planReady = false;     // a full plan was delivered
 let pendingFile = null;
 
 function chatBubble(role, html) {
@@ -1558,14 +1855,40 @@ function chatFilePicked(input) {
   document.getElementById("chat-file-chip").textContent = pendingFile ? `📎 ${pendingFile.name}` : "";
 }
 
+/* the message is purely "take me to the script step" */
+function isScriptIntent(text) {
+  return /^["'«»\s]*(سيناريو|اسكريبت|سكريبت|script)[\s!.،؟?«»"']*$/i.test(text);
+}
+
+function goToScriptStep() {
+  if (planReady && lastPlanText) {
+    document.getElementById("plan-link").style.display = "inline-block";
+  }
+  switchTab("script");
+  toast(t("t_to_script"));
+}
+
 async function chatSend(preset) {
   if (chatBusy) return;
-  if (!checkReady()) return;
 
   const ta = document.getElementById("chat-text");
   let text = (preset || ta.value).trim();
   const file = pendingFile;
-  if (!text && !file) { toast("اكتب رسالة أو ارفق ملف"); return; }
+
+  // "سيناريو" / "script" alone → jump straight to the Script step
+  if (text && !file && isScriptIntent(text)) {
+    ta.value = "";
+    goToScriptStep();
+    return;
+  }
+
+  if (!checkReady()) return;
+  if (!text && !file) { toast(t("t_msg_or_file")); return; }
+
+  // the word appears inside a longer message → offer the shortcut button
+  if (/سيناريو|سكريبت|script/i.test(text)) {
+    document.getElementById("go-script").style.display = "inline-flex";
+  }
 
   chatBusy = true;
   document.getElementById("chat-send").disabled = true;
@@ -1581,11 +1904,11 @@ async function chatSend(preset) {
   // extract the attached document locally (works with every provider)
   let images = [];
   if (file) {
-    const extracting = chatBubble("ai", '<p class="thinking">📄 بقرا المستند وبفرّغه…</p>');
+    const extracting = chatBubble("ai", `<p class="thinking">${t("t_reading_doc")}</p>`);
     try {
       const doc = await extractDocument(file);
       if (doc.image) images.push(doc.image);
-      else text += `\n\n===== محتوى المستند المرفق «${file.name}» =====\n${doc.text.slice(0, 60000)}\n===== نهاية المستند =====`;
+      else text += `\n\n===== ATTACHED DOCUMENT «${file.name}» =====\n${doc.text.slice(0, 60000)}\n===== END OF DOCUMENT =====`;
       extracting.remove();
     } catch (e) {
       extracting.remove();
@@ -1594,10 +1917,10 @@ async function chatSend(preset) {
       document.getElementById("chat-send").disabled = false;
       return;
     }
-    if (!(preset || "").trim() && !ta.value && text === "" ) text = "اقرا المستند ده ولخصلي أهم النقط.";
+    if (!(preset || "").trim() && !ta.value && text === "") text = "Read this document and summarize the key points.";
   }
 
-  chatHistory.push({ role: "user", text: text || "اقرا المرفق وحلله.", images });
+  chatHistory.push({ role: "user", text: text || "Read the attachment and analyze it.", images });
   if (chatHistory.length > 16) chatHistory = chatHistory.slice(-16);
 
   const aiDiv = chatBubble("ai", '<p class="thinking">⏳ …</p>');
@@ -1613,13 +1936,17 @@ async function chatSend(preset) {
       chatBusy = false;
       document.getElementById("chat-send").disabled = false;
       activeController = null;
-      if (!full.trim()) { aiDiv.innerHTML = '<p class="thinking">ماوصلش رد — حاول تاني</p>'; return; }
+      if (!full.trim()) { aiDiv.innerHTML = `<p class="thinking">${t("no_result")}</p>`; return; }
       aiDiv.innerHTML = mdToHtml(full);
       chatHistory.push({ role: "assistant", text: full });
       lastPlanText = full;
       document.getElementById("actions-plan").style.display = "flex";
-      // a full plan was delivered → mark the step
-      if (/30|calendar|جدول/i.test(full) && full.length > 2500) markStepDone("plan");
+      // a full plan was delivered → mark the step and unlock the script shortcut
+      if (/30|calendar|جدول/i.test(full) && full.length > 2500) {
+        planReady = true;
+        markStepDone("plan");
+        document.getElementById("go-script").style.display = "inline-flex";
+      }
     },
     onError(msg) {
       chatBusy = false;
@@ -1635,7 +1962,7 @@ function chatFinalize() {
 }
 
 function copyPlan() {
-  navigator.clipboard.writeText(lastPlanText).then(() => toast("اتنسخ ✓"));
+  navigator.clipboard.writeText(lastPlanText).then(() => toast(t("t_copied")));
 }
 function downloadPlan() {
   const blob = new Blob([lastPlanText], { type: "text/markdown" });
@@ -1648,31 +1975,46 @@ function downloadPlan() {
 
 /* ---------- step 2: script ---------- */
 function runScript() {
-  const idea = document.getElementById("script-idea").value.trim();
-  if (!idea) { toast("اكتب الفكرة الأول"); return; }
-  const format = document.getElementById("script-format").value;
-  const duration = document.getElementById("script-duration").value.trim();
-  startRun("script",
-    `MODE: SCRIPT\nFORMAT: ${format}${duration ? "\nTARGET DURATION: " + duration : ""}\n\n${idea}`);
+  const val = id => document.getElementById(id).value.trim();
+  const idea = val("script-idea");
+  if (!idea) { toast(t("t_idea")); return; }
+
+  const lines = ["MODE: SCRIPT", "FORMAT: " + val("script-format")];
+  const add = (label, v) => { if (v) lines.push(label + ": " + v); };
+  add("TARGET DURATION", val("script-duration"));
+  add("GENRE", val("script-genre"));
+  add("TONE", val("script-tone"));
+  add("DIALECT", val("script-dialect"));
+  add("TARGET AUDIENCE", val("script-audience"));
+  add("PLATFORM", val("script-platform"));
+  add("CHARACTERS/SETTING", val("script-chars"));
+  add("CTA", val("script-cta"));
+
+  let req = lines.join("\n") + "\n\nIDEA:\n" + idea;
+  if (planReady && lastPlanText) {
+    req += "\n\nPLAN CONTEXT (the approved social media plan — the script must serve it):\n" + lastPlanText.slice(0, 12000);
+  }
+  startRun("script", req);
 }
 
 /* ---------- step 3: storyboard ---------- */
 function runBoard() {
   let script = document.getElementById("board-script").value.trim();
   if (!script && lastScript) script = lastScript;
-  if (!script) { toast("الصق السيناريو أو ولّده الأول من تبويب السيناريو"); return; }
+  if (!script) { toast(t("t_script_first")); return; }
   const styleSel = document.getElementById("board-style-sel").value;
   const styleCustom = document.getElementById("board-style").value.trim();
   const style = [styleSel, styleCustom].filter(Boolean).join(", ");
   const ratio = document.getElementById("board-ratio").value;
+  const withVO = document.getElementById("board-vo").checked;
   startRun("board",
-    `MODE: STORYBOARD\nASPECT RATIO: ${ratio}${style ? "\nVISUAL STYLE: " + style : ""}\n\nSCRIPT:\n${script}`);
+    `MODE: STORYBOARD\nASPECT RATIO: ${ratio}\nINCLUDE VOICE-OVER: ${withVO ? "yes" : "no"}${style ? "\nVISUAL STYLE: " + style : ""}\n\nSCRIPT:\n${script}`);
 }
 
 function useLastScript() {
-  if (!lastScript) { toast("مفيش سيناريو متولد لسه"); return; }
+  if (!lastScript) { toast(t("t_no_script")); return; }
   document.getElementById("board-script").value = lastScript;
-  toast("آخر سيناريو اتحط ✓");
+  toast(t("t_script_set"));
 }
 
 /* ---------- storyboard: split into standalone scene cards ---------- */
@@ -1684,16 +2026,31 @@ function splitScenes(raw) {
   return parts.map(p => {
     const header = (p.match(/━{2,}\s*(SCENE[^━\n]*)/i) || [, "SCENE"])[1].trim();
     // lookahead stops at the next section: audio note, next scene, another
-    // prompt, a code fence, a table row (shot list), or a heading
-    const stop = "(?=\\n\\s*(?:🔊|━{2,}|IMAGE PROMPT|MOTION PROMPT|```|\\||#)|$)";
-    const img = (p.match(new RegExp("IMAGE PROMPT[^:\\n]*:?\\s*\\n?([\\s\\S]*?)" + stop, "i")) || [, ""])[1].trim();
-    const mot = (p.match(new RegExp("MOTION PROMPT[^:\\n]*:?\\s*\\n?([\\s\\S]*?)" + stop, "i")) || [, ""])[1].trim();
-    return { header, full: p.trim(), img, mot };
+    // field (possibly **bold**), a code fence, a table row, or a heading
+    const stop = "(?=\\n\\s*(?:🔊|━{2,}|\\*{0,2}IMAGE PROMPT|\\*{0,2}MOTION PROMPT|\\*{0,2}VOICE-?OVER|```|\\||#)|$)";
+    const grab = label =>
+      (p.match(new RegExp(label + "[^:\\n]*:?\\*{0,2}\\s*\\n?([\\s\\S]*?)" + stop, "i")) || [, ""])[1].trim();
+    const img = grab("IMAGE PROMPT");
+    const mot = grab("MOTION PROMPT");
+    const vo = grab("VOICE-?OVER");
+    return { header, full: p.trim(), img, mot, vo };
   });
 }
 
 function copyText(txt, label) {
-  navigator.clipboard.writeText(txt).then(() => toast(label + " اتنسخ ✓"));
+  navigator.clipboard.writeText(txt).then(() => toast(label + " — " + t("t_copied")));
+}
+
+function scenePromptBlock(i, field, labelKey, copyKey, dir) {
+  const s = window._scenes[i];
+  if (!s[field]) return "";
+  return `
+    <div class="scene-prompt">
+      <div class="sp-head"><span>${t(labelKey)}</span>
+        <button class="btn btn-ghost btn-xs" onclick="copyText(window._scenes[${i}].${field}, t('${copyKey}'))">${t("copy")}</button>
+      </div>
+      <pre dir="${dir}">${s[field].replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>
+    </div>`;
 }
 
 function toggleBoardView() {
@@ -1703,35 +2060,24 @@ function toggleBoardView() {
 
   if (boardView === "full") {
     const scenes = splitScenes(raw);
-    if (!scenes.length) { toast("مش لاقي مشاهد بصيغة ━━━ SCENE — ولّد الاستوري بورد الأول"); return; }
+    if (!scenes.length) { toast(t("t_no_scenes")); return; }
     window._scenes = scenes;
     out.innerHTML = scenes.map((s, i) => `
       <div class="scene-card">
         <div class="scene-head">
           <b>🎬 ${s.header.replace(/━/g, "").trim()}</b>
-          <button class="btn btn-ghost btn-xs" onclick="copyText(window._scenes[${i}].full, 'المشهد كامل')">📋 المشهد كامل</button>
+          <button class="btn btn-ghost btn-xs" onclick="copyText(window._scenes[${i}].full, t('copied_scene'))">${t("scene_full")}</button>
         </div>
-        ${s.img ? `
-        <div class="scene-prompt">
-          <div class="sp-head"><span>🖼 IMAGE PROMPT</span>
-            <button class="btn btn-ghost btn-xs" onclick="copyText(window._scenes[${i}].img, 'برومبت الصورة')">📋 نسخ</button>
-          </div>
-          <pre dir="ltr">${s.img.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>
-        </div>` : ""}
-        ${s.mot ? `
-        <div class="scene-prompt">
-          <div class="sp-head"><span>🎥 MOTION PROMPT</span>
-            <button class="btn btn-ghost btn-xs" onclick="copyText(window._scenes[${i}].mot, 'برومبت الحركة')">📋 نسخ</button>
-          </div>
-          <pre dir="ltr">${s.mot.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>
-        </div>` : ""}
+        ${scenePromptBlock(i, "img", "scene_img", "copied_img", "ltr")}
+        ${scenePromptBlock(i, "mot", "scene_mot", "copied_mot", "ltr")}
+        ${scenePromptBlock(i, "vo", "scene_vo", "copied_vo", "auto")}
       </div>`).join("");
-    btn.textContent = "📄 رجّع العرض الكامل";
+    btn.textContent = t("split_back");
     boardView = "scenes";
-    toast(`اتقسم ${scenes.length} مشهد ✓`);
+    toast(scenes.length + t("t_scenes_done"));
   } else {
     out.innerHTML = mdToHtml(raw);
-    btn.textContent = "🗂️ قسّم المشاهد";
+    btn.textContent = t("split");
     boardView = "full";
   }
 }
@@ -1744,12 +2090,12 @@ Remove completely: scene headers, action/description lines, camera notes, durati
 Merge the result into clean flowing voice-over text, one paragraph per beat. Return ONLY the spoken text — no titles, no commentary.`;
 
 function useScriptForVoice() {
-  if (!lastScript) { toast("مفيش سيناريو متولد لسه"); return; }
+  if (!lastScript) { toast(t("t_no_script")); return; }
   if (!checkReady()) return;
   const ta = document.getElementById("voice-text");
   const btn = document.getElementById("voice-pull");
   ta.value = "";
-  ta.placeholder = "⏳ بستخرج نص الفويس أوفر من السيناريو ومجهزه…";
+  ta.placeholder = t("vo_extracting");
   btn.disabled = true;
 
   runLLM([{ role: "user", text: "SCRIPT:\n" + lastScript.slice(0, 30000) }], {
@@ -1757,12 +2103,12 @@ function useScriptForVoice() {
     onDone(full) {
       btn.disabled = false;
       ta.value = full.trim();
-      ta.placeholder = "اكتب أو الصق النص اللي عايز تسمعه — عربي أو إنجليزي...";
-      if (full.trim()) toast("نص الفويس أوفر اتجهز ✓ — راجعه واضغط ولّد الصوت");
+      ta.placeholder = t("v_text_ph");
+      if (full.trim()) toast(t("t_vo_ready"));
     },
     onError(msg) {
       btn.disabled = false;
-      ta.placeholder = "اكتب أو الصق النص اللي عايز تسمعه — عربي أو إنجليزي...";
+      ta.placeholder = t("v_text_ph");
       toast(msg);
     },
   }, { system: VO_EXTRACT_SYSTEM });
@@ -1770,7 +2116,7 @@ function useScriptForVoice() {
 
 async function runVoice() {
   const text = document.getElementById("voice-text").value.trim();
-  if (!text) { toast("اكتب النص الأول"); return; }
+  if (!text) { toast(t("v_write_first")); return; }
 
   const status = document.getElementById("voice-status");
   const result = document.getElementById("voice-result");
@@ -1779,7 +2125,7 @@ async function runVoice() {
   const style = TTS_STYLES[document.getElementById("voice-style").value] || "";
 
   status.className = "voice-status";
-  status.textContent = "⏳ جاري توليد الصوت… (بياخد ثواني)";
+  status.textContent = t("v_generating");
   result.style.display = "none";
   btn.disabled = true;
 
@@ -1789,7 +2135,7 @@ async function runVoice() {
     lastWavUrl = URL.createObjectURL(wav);
     document.getElementById("voice-audio").src = lastWavUrl;
     result.style.display = "block";
-    status.textContent = "✅ الصوت جاهز — اسمعه أو نزّله";
+    status.textContent = t("v_ready");
     markStepDone("voice");
     document.getElementById("voice-dl").onclick = () => {
       const a = document.createElement("a");
@@ -1800,15 +2146,15 @@ async function runVoice() {
   } catch (e) {
     status.className = "voice-status err";
     if (e.message === "NO_KEY") {
-      status.textContent = "⚠️ الفويس أوفر محتاج مفتاح Google Gemini — ضيفه من الإعدادات (مجاني من aistudio.google.com)";
+      status.textContent = t("v_no_key");
       switchTab("settings");
-      toast("ضيف مفتاح Google Gemini الأول ⚙️");
+      toast(t("v_add_key_toast"));
     } else if (e.message.startsWith("BAD_KEY")) {
-      status.textContent = "⚠️ مفتاح Google Gemini غير صحيح — راجع الإعدادات";
+      status.textContent = t("v_bad_key");
     } else if (e.message.startsWith("RATE")) {
-      status.textContent = "⚠️ تجاوزت حد الطلبات المجاني — استنى دقيقة وحاول تاني";
+      status.textContent = t("v_rate");
     } else {
-      status.textContent = "⚠️ حصلت مشكلة: " + e.message;
+      status.textContent = t("v_err") + e.message;
     }
   } finally {
     btn.disabled = false;
@@ -1826,7 +2172,7 @@ function fillProviderUI(provider) {
 
   document.getElementById("set-key").value = localStorage.getItem("fta_key_" + provider) || "";
   document.getElementById("set-custom").value = localStorage.getItem("fta_custom_model_" + provider) || "";
-  document.getElementById("key-url").textContent = P.keyUrl;
+  document.getElementById("key-url") && (document.getElementById("key-url").textContent = P.keyUrl);
   document.getElementById("pdf-note").style.display = P.pdf ? "none" : "block";
 }
 
@@ -1835,10 +2181,10 @@ function persistSettings() {
   const key = document.getElementById("set-key").value;
   const model = document.getElementById("set-model").value;
   const custom = document.getElementById("set-custom").value;
-  if (!key.trim()) { toast("اكتب مفتاح الـ API الخاص بالمزود ده"); return; }
+  if (!key.trim()) { toast(t("t_key_first")); return; }
   saveSettings(provider, key, model, custom);
   localStorage.setItem("fta_mode", "byok");
-  toast(`الإعدادات اتحفظت ✓ — شغال دلوقتي على ${PROVIDERS[provider].label}`);
+  toast(t("t_saved_pre") + PROVIDERS[provider].label);
 }
 
 /* ---------- cloud account mode ---------- */
@@ -1854,23 +2200,27 @@ function renderUsage(u) {
   const box = document.getElementById("cloud-usage");
   if (!u) { box.style.display = "none"; return; }
   box.style.display = "block";
-  box.innerHTML = u.paid
-    ? `✅ <b>اشتراكك فعّال</b> حتى ${u.paid_until} — استخدام غير محدود (بحد يومي عادل)`
-    : u.active
+  if (u.paid) {
+    box.innerHTML = t("usage_paid") + (u.paid_until ? ` (${u.paid_until})` : "");
+  } else if (u.active) {
+    box.innerHTML = LANG === "ar"
       ? `🎁 <b>التجربة المجانية شغالة</b> — استخدمت <b>${u.used}</b> من <b>${u.limit}</b> توليدة · تنتهي ${u.trial_ends}`
-      : `⛔ التجربة المجانية خلصت — الاشتراك <b>10$/شهر</b> يفتح الاستخدام تاني`;
+      : `🎁 <b>Free trial active</b> — used <b>${u.used}</b> of <b>${u.limit}</b> generations · ends ${u.trial_ends}`;
+  } else {
+    box.innerHTML = t("usage_over");
+  }
 }
 
 async function doCloudSignup() {
   const email = document.getElementById("cloud-email").value.trim();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast("اكتب إيميل صحيح"); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast(t("t_need_email")); return; }
   try {
     const usage = await cloudSignup(email);
     localStorage.setItem("fta_mode", "cloud");
     renderUsage(usage);
-    toast("حسابك جاهز ✓ — ابدأ استخدم الأدوات");
+    toast(t("t_signup_ok"));
   } catch (e) {
-    toast("حصلت مشكلة في التسجيل — حاول تاني");
+    toast(t("t_signup_fail"));
   }
 }
 
@@ -1888,8 +2238,20 @@ function toast(msg) {
   toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2600);
 }
 
+/* ---------- language: refresh JS-generated strings on toggle ---------- */
+function refreshDynamicLang() {
+  const noneOpt = document.querySelector('#board-style-sel option[value=""]');
+  if (noneOpt) noneOpt.textContent = t("b_style_none");
+  const sb = document.getElementById("split-board");
+  if (sb) sb.textContent = boardView === "full" ? t("split") : t("split_back");
+}
+const _baseToggleLang = toggleLang;
+toggleLang = function () { _baseToggleLang(); refreshDynamicLang(); };
+
 /* ---------- boot ---------- */
 document.addEventListener("DOMContentLoaded", () => {
+  applyLang();
+
   document.querySelectorAll(".step-btn").forEach(b =>
     b.addEventListener("click", () => switchTab(b.dataset.tab)));
 
@@ -1904,7 +2266,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // populate the visual-styles catalogue (grouped)
   const styleSel = document.getElementById("board-style-sel");
-  styleSel.innerHTML = '<option value="">— من غير ستايل محدد (الموديل يختار) —</option>' +
+  styleSel.innerHTML = `<option value="">${t("b_style_none")}</option>` +
     STYLE_GROUPS.map(g =>
       `<optgroup label="${g.group}">` +
       g.styles.map(([val, label]) => `<option value="${val}">${label}</option>`).join("") +

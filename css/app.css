@@ -240,6 +240,19 @@ textarea, input[type="text"], input[type="password"], select {
 textarea:focus, input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(242, 178, 62, .13); }
 textarea { resize: vertical; min-height: 130px; }
 
+/* two form fields side by side (script specs) */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+@media (max-width: 560px) { .two-col { grid-template-columns: 1fr; } }
+
+/* checkbox row */
+label.check {
+  display: flex; align-items: center; gap: 10px; cursor: pointer;
+  margin: 16px 0 4px; font-size: 14px; font-weight: 700; color: var(--text);
+}
+label.check input[type="checkbox"] {
+  width: 19px; height: 19px; flex: none; accent-color: var(--accent); cursor: pointer;
+}
+
 .upload {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   border: 1.5px dashed var(--line); border-radius: var(--r-sm);
@@ -258,6 +271,7 @@ textarea { resize: vertical; min-height: 130px; }
   font-size: 15px; box-shadow: var(--shadow);
 }
 .out:empty::before { content: "الناتج هيظهر هنا…"; color: var(--faint); font-weight: 600; }
+html[lang="en"] .out:empty::before { content: "Output will appear here…"; }
 .md h2, .md h3, .md h4, .md h5 { margin: 22px 0 8px; color: var(--accent); font-weight: 800; }
 .md h2 { font-size: 21px; } .md h3 { font-size: 17.5px; } .md h4 { font-size: 15.5px; }
 .md p { margin: 7px 0; }

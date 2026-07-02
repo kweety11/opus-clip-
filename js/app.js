@@ -2,6 +2,7 @@
    FILM-TREND AI — UI logic
    Tabs: social plan / script / storyboard / settings.
    Streams LLM output (any configured provider) and renders markdown.
+   All user-visible strings go through t() (js/i18n.js).
    ============================================================ */
 
 let activeController = null;
@@ -93,9 +94,7 @@ function markStepDone(tool) {
 function checkReady() {
   const { mode, cloudToken, apiKey } = getSettings();
   if (mode === "cloud" ? !cloudToken : !apiKey) {
-    toast(mode === "cloud"
-      ? "سجّل بإيميلك الأول من تبويب الإعدادات ⚙️"
-      : "ضيف مفتاح المزود الأول من تبويب الإعدادات ⚙️");
+    toast(mode === "cloud" ? t("t_need_login") : t("t_need_key"));
     switchTab("settings");
     return false;
   }
@@ -109,7 +108,7 @@ function startRun(tool, text) {
   const out = document.getElementById(`out-${tool}`);
   const btn = document.getElementById(`run-${tool}`);
   const stop = document.getElementById(`stop-${tool}`);
-  out.innerHTML = '<p class="thinking">⏳ الموديل بيفكر ويجهّز الناتج…</p>';
+  out.innerHTML = `<p class="thinking">${t("thinking")}</p>`;
   out.dataset.raw = "";
   btn.disabled = true;
   stop.style.display = "inline-flex";
@@ -125,7 +124,7 @@ function startRun(tool, text) {
       stop.style.display = "none";
       activeController = null;
       if (!full.trim()) {
-        out.innerHTML = '<p class="thinking">ماوصلش ناتج — حاول تاني</p>';
+        out.innerHTML = `<p class="thinking">${t("no_result")}</p>`;
         return;
       }
       out.innerHTML = mdToHtml(full);
@@ -134,7 +133,7 @@ function startRun(tool, text) {
       if (tool === "board") {
         boardView = "full";
         const sb = document.getElementById("split-board");
-        if (sb) sb.textContent = "🗂️ قسّم المشاهد";
+        if (sb) sb.textContent = t("split");
       }
       if (tool === "script") {
         lastScript = full;
@@ -159,7 +158,7 @@ function stopRun(tool) {
 
 function copyOut(tool) {
   navigator.clipboard.writeText(document.getElementById(`out-${tool}`).dataset.raw || "")
-    .then(() => toast("اتنسخ ✓"));
+    .then(() => toast(t("t_copied")));
 }
 
 function downloadOut(tool, name) {
@@ -175,6 +174,8 @@ function downloadOut(tool, name) {
    STEP 1 — planning CHAT
    The user talks to the model, uploads documents (PDF/Word/PPTX/
    images), asks anything; then asks for the final plan.
+   Typing "سيناريو" / "script" navigates to the Script step — the
+   model never writes the script inside the chat.
    ============================================================ */
 const CHAT_ADDON = `
 
@@ -183,11 +184,13 @@ You are chatting live with the user inside the planning step. Behave like a shar
 - Answer questions, brainstorm, refine — short, useful replies (this is a chat, not a report).
 - If the user uploads a document, read it, give a 3-5 bullet digest, and ask at most ONE sharp follow-up question.
 - Only produce the FULL SOCIAL_PLAN deliverable when the user explicitly asks for the final plan. Until then, keep replies conversational.
+- NEVER write a script/screenplay here. If the user asks for the script, reply with one line telling them to press the "Go to Script" button (or type «سيناريو») — the app takes them to the dedicated Script step where they pick format, duration, dialect and more.
 - Keep every reply in the user's language.`;
 
 let chatHistory = [];      // neutral messages for the API
 let chatBusy = false;
-let lastPlanText = "";     // last full assistant reply (for copy/download)
+var lastPlanText = "";     // last full assistant reply (for copy/download)
+var planReady = false;     // a full plan was delivered
 let pendingFile = null;
 
 function chatBubble(role, html) {
@@ -205,14 +208,40 @@ function chatFilePicked(input) {
   document.getElementById("chat-file-chip").textContent = pendingFile ? `📎 ${pendingFile.name}` : "";
 }
 
+/* the message is purely "take me to the script step" */
+function isScriptIntent(text) {
+  return /^["'«»\s]*(سيناريو|اسكريبت|سكريبت|script)[\s!.،؟?«»"']*$/i.test(text);
+}
+
+function goToScriptStep() {
+  if (planReady && lastPlanText) {
+    document.getElementById("plan-link").style.display = "inline-block";
+  }
+  switchTab("script");
+  toast(t("t_to_script"));
+}
+
 async function chatSend(preset) {
   if (chatBusy) return;
-  if (!checkReady()) return;
 
   const ta = document.getElementById("chat-text");
   let text = (preset || ta.value).trim();
   const file = pendingFile;
-  if (!text && !file) { toast("اكتب رسالة أو ارفق ملف"); return; }
+
+  // "سيناريو" / "script" alone → jump straight to the Script step
+  if (text && !file && isScriptIntent(text)) {
+    ta.value = "";
+    goToScriptStep();
+    return;
+  }
+
+  if (!checkReady()) return;
+  if (!text && !file) { toast(t("t_msg_or_file")); return; }
+
+  // the word appears inside a longer message → offer the shortcut button
+  if (/سيناريو|سكريبت|script/i.test(text)) {
+    document.getElementById("go-script").style.display = "inline-flex";
+  }
 
   chatBusy = true;
   document.getElementById("chat-send").disabled = true;
@@ -228,11 +257,11 @@ async function chatSend(preset) {
   // extract the attached document locally (works with every provider)
   let images = [];
   if (file) {
-    const extracting = chatBubble("ai", '<p class="thinking">📄 بقرا المستند وبفرّغه…</p>');
+    const extracting = chatBubble("ai", `<p class="thinking">${t("t_reading_doc")}</p>`);
     try {
       const doc = await extractDocument(file);
       if (doc.image) images.push(doc.image);
-      else text += `\n\n===== محتوى المستند المرفق «${file.name}» =====\n${doc.text.slice(0, 60000)}\n===== نهاية المستند =====`;
+      else text += `\n\n===== ATTACHED DOCUMENT «${file.name}» =====\n${doc.text.slice(0, 60000)}\n===== END OF DOCUMENT =====`;
       extracting.remove();
     } catch (e) {
       extracting.remove();
@@ -241,10 +270,10 @@ async function chatSend(preset) {
       document.getElementById("chat-send").disabled = false;
       return;
     }
-    if (!(preset || "").trim() && !ta.value && text === "" ) text = "اقرا المستند ده ولخصلي أهم النقط.";
+    if (!(preset || "").trim() && !ta.value && text === "") text = "Read this document and summarize the key points.";
   }
 
-  chatHistory.push({ role: "user", text: text || "اقرا المرفق وحلله.", images });
+  chatHistory.push({ role: "user", text: text || "Read the attachment and analyze it.", images });
   if (chatHistory.length > 16) chatHistory = chatHistory.slice(-16);
 
   const aiDiv = chatBubble("ai", '<p class="thinking">⏳ …</p>');
@@ -260,13 +289,17 @@ async function chatSend(preset) {
       chatBusy = false;
       document.getElementById("chat-send").disabled = false;
       activeController = null;
-      if (!full.trim()) { aiDiv.innerHTML = '<p class="thinking">ماوصلش رد — حاول تاني</p>'; return; }
+      if (!full.trim()) { aiDiv.innerHTML = `<p class="thinking">${t("no_result")}</p>`; return; }
       aiDiv.innerHTML = mdToHtml(full);
       chatHistory.push({ role: "assistant", text: full });
       lastPlanText = full;
       document.getElementById("actions-plan").style.display = "flex";
-      // a full plan was delivered → mark the step
-      if (/30|calendar|جدول/i.test(full) && full.length > 2500) markStepDone("plan");
+      // a full plan was delivered → mark the step and unlock the script shortcut
+      if (/30|calendar|جدول/i.test(full) && full.length > 2500) {
+        planReady = true;
+        markStepDone("plan");
+        document.getElementById("go-script").style.display = "inline-flex";
+      }
     },
     onError(msg) {
       chatBusy = false;
@@ -282,7 +315,7 @@ function chatFinalize() {
 }
 
 function copyPlan() {
-  navigator.clipboard.writeText(lastPlanText).then(() => toast("اتنسخ ✓"));
+  navigator.clipboard.writeText(lastPlanText).then(() => toast(t("t_copied")));
 }
 function downloadPlan() {
   const blob = new Blob([lastPlanText], { type: "text/markdown" });
@@ -295,31 +328,46 @@ function downloadPlan() {
 
 /* ---------- step 2: script ---------- */
 function runScript() {
-  const idea = document.getElementById("script-idea").value.trim();
-  if (!idea) { toast("اكتب الفكرة الأول"); return; }
-  const format = document.getElementById("script-format").value;
-  const duration = document.getElementById("script-duration").value.trim();
-  startRun("script",
-    `MODE: SCRIPT\nFORMAT: ${format}${duration ? "\nTARGET DURATION: " + duration : ""}\n\n${idea}`);
+  const val = id => document.getElementById(id).value.trim();
+  const idea = val("script-idea");
+  if (!idea) { toast(t("t_idea")); return; }
+
+  const lines = ["MODE: SCRIPT", "FORMAT: " + val("script-format")];
+  const add = (label, v) => { if (v) lines.push(label + ": " + v); };
+  add("TARGET DURATION", val("script-duration"));
+  add("GENRE", val("script-genre"));
+  add("TONE", val("script-tone"));
+  add("DIALECT", val("script-dialect"));
+  add("TARGET AUDIENCE", val("script-audience"));
+  add("PLATFORM", val("script-platform"));
+  add("CHARACTERS/SETTING", val("script-chars"));
+  add("CTA", val("script-cta"));
+
+  let req = lines.join("\n") + "\n\nIDEA:\n" + idea;
+  if (planReady && lastPlanText) {
+    req += "\n\nPLAN CONTEXT (the approved social media plan — the script must serve it):\n" + lastPlanText.slice(0, 12000);
+  }
+  startRun("script", req);
 }
 
 /* ---------- step 3: storyboard ---------- */
 function runBoard() {
   let script = document.getElementById("board-script").value.trim();
   if (!script && lastScript) script = lastScript;
-  if (!script) { toast("الصق السيناريو أو ولّده الأول من تبويب السيناريو"); return; }
+  if (!script) { toast(t("t_script_first")); return; }
   const styleSel = document.getElementById("board-style-sel").value;
   const styleCustom = document.getElementById("board-style").value.trim();
   const style = [styleSel, styleCustom].filter(Boolean).join(", ");
   const ratio = document.getElementById("board-ratio").value;
+  const withVO = document.getElementById("board-vo").checked;
   startRun("board",
-    `MODE: STORYBOARD\nASPECT RATIO: ${ratio}${style ? "\nVISUAL STYLE: " + style : ""}\n\nSCRIPT:\n${script}`);
+    `MODE: STORYBOARD\nASPECT RATIO: ${ratio}\nINCLUDE VOICE-OVER: ${withVO ? "yes" : "no"}${style ? "\nVISUAL STYLE: " + style : ""}\n\nSCRIPT:\n${script}`);
 }
 
 function useLastScript() {
-  if (!lastScript) { toast("مفيش سيناريو متولد لسه"); return; }
+  if (!lastScript) { toast(t("t_no_script")); return; }
   document.getElementById("board-script").value = lastScript;
-  toast("آخر سيناريو اتحط ✓");
+  toast(t("t_script_set"));
 }
 
 /* ---------- storyboard: split into standalone scene cards ---------- */
@@ -331,16 +379,31 @@ function splitScenes(raw) {
   return parts.map(p => {
     const header = (p.match(/━{2,}\s*(SCENE[^━\n]*)/i) || [, "SCENE"])[1].trim();
     // lookahead stops at the next section: audio note, next scene, another
-    // prompt, a code fence, a table row (shot list), or a heading
-    const stop = "(?=\\n\\s*(?:🔊|━{2,}|IMAGE PROMPT|MOTION PROMPT|```|\\||#)|$)";
-    const img = (p.match(new RegExp("IMAGE PROMPT[^:\\n]*:?\\s*\\n?([\\s\\S]*?)" + stop, "i")) || [, ""])[1].trim();
-    const mot = (p.match(new RegExp("MOTION PROMPT[^:\\n]*:?\\s*\\n?([\\s\\S]*?)" + stop, "i")) || [, ""])[1].trim();
-    return { header, full: p.trim(), img, mot };
+    // field (possibly **bold**), a code fence, a table row, or a heading
+    const stop = "(?=\\n\\s*(?:🔊|━{2,}|\\*{0,2}IMAGE PROMPT|\\*{0,2}MOTION PROMPT|\\*{0,2}VOICE-?OVER|```|\\||#)|$)";
+    const grab = label =>
+      (p.match(new RegExp(label + "[^:\\n]*:?\\*{0,2}\\s*\\n?([\\s\\S]*?)" + stop, "i")) || [, ""])[1].trim();
+    const img = grab("IMAGE PROMPT");
+    const mot = grab("MOTION PROMPT");
+    const vo = grab("VOICE-?OVER");
+    return { header, full: p.trim(), img, mot, vo };
   });
 }
 
 function copyText(txt, label) {
-  navigator.clipboard.writeText(txt).then(() => toast(label + " اتنسخ ✓"));
+  navigator.clipboard.writeText(txt).then(() => toast(label + " — " + t("t_copied")));
+}
+
+function scenePromptBlock(i, field, labelKey, copyKey, dir) {
+  const s = window._scenes[i];
+  if (!s[field]) return "";
+  return `
+    <div class="scene-prompt">
+      <div class="sp-head"><span>${t(labelKey)}</span>
+        <button class="btn btn-ghost btn-xs" onclick="copyText(window._scenes[${i}].${field}, t('${copyKey}'))">${t("copy")}</button>
+      </div>
+      <pre dir="${dir}">${s[field].replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>
+    </div>`;
 }
 
 function toggleBoardView() {
@@ -350,35 +413,24 @@ function toggleBoardView() {
 
   if (boardView === "full") {
     const scenes = splitScenes(raw);
-    if (!scenes.length) { toast("مش لاقي مشاهد بصيغة ━━━ SCENE — ولّد الاستوري بورد الأول"); return; }
+    if (!scenes.length) { toast(t("t_no_scenes")); return; }
     window._scenes = scenes;
     out.innerHTML = scenes.map((s, i) => `
       <div class="scene-card">
         <div class="scene-head">
           <b>🎬 ${s.header.replace(/━/g, "").trim()}</b>
-          <button class="btn btn-ghost btn-xs" onclick="copyText(window._scenes[${i}].full, 'المشهد كامل')">📋 المشهد كامل</button>
+          <button class="btn btn-ghost btn-xs" onclick="copyText(window._scenes[${i}].full, t('copied_scene'))">${t("scene_full")}</button>
         </div>
-        ${s.img ? `
-        <div class="scene-prompt">
-          <div class="sp-head"><span>🖼 IMAGE PROMPT</span>
-            <button class="btn btn-ghost btn-xs" onclick="copyText(window._scenes[${i}].img, 'برومبت الصورة')">📋 نسخ</button>
-          </div>
-          <pre dir="ltr">${s.img.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>
-        </div>` : ""}
-        ${s.mot ? `
-        <div class="scene-prompt">
-          <div class="sp-head"><span>🎥 MOTION PROMPT</span>
-            <button class="btn btn-ghost btn-xs" onclick="copyText(window._scenes[${i}].mot, 'برومبت الحركة')">📋 نسخ</button>
-          </div>
-          <pre dir="ltr">${s.mot.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>
-        </div>` : ""}
+        ${scenePromptBlock(i, "img", "scene_img", "copied_img", "ltr")}
+        ${scenePromptBlock(i, "mot", "scene_mot", "copied_mot", "ltr")}
+        ${scenePromptBlock(i, "vo", "scene_vo", "copied_vo", "auto")}
       </div>`).join("");
-    btn.textContent = "📄 رجّع العرض الكامل";
+    btn.textContent = t("split_back");
     boardView = "scenes";
-    toast(`اتقسم ${scenes.length} مشهد ✓`);
+    toast(scenes.length + t("t_scenes_done"));
   } else {
     out.innerHTML = mdToHtml(raw);
-    btn.textContent = "🗂️ قسّم المشاهد";
+    btn.textContent = t("split");
     boardView = "full";
   }
 }
@@ -391,12 +443,12 @@ Remove completely: scene headers, action/description lines, camera notes, durati
 Merge the result into clean flowing voice-over text, one paragraph per beat. Return ONLY the spoken text — no titles, no commentary.`;
 
 function useScriptForVoice() {
-  if (!lastScript) { toast("مفيش سيناريو متولد لسه"); return; }
+  if (!lastScript) { toast(t("t_no_script")); return; }
   if (!checkReady()) return;
   const ta = document.getElementById("voice-text");
   const btn = document.getElementById("voice-pull");
   ta.value = "";
-  ta.placeholder = "⏳ بستخرج نص الفويس أوفر من السيناريو ومجهزه…";
+  ta.placeholder = t("vo_extracting");
   btn.disabled = true;
 
   runLLM([{ role: "user", text: "SCRIPT:\n" + lastScript.slice(0, 30000) }], {
@@ -404,12 +456,12 @@ function useScriptForVoice() {
     onDone(full) {
       btn.disabled = false;
       ta.value = full.trim();
-      ta.placeholder = "اكتب أو الصق النص اللي عايز تسمعه — عربي أو إنجليزي...";
-      if (full.trim()) toast("نص الفويس أوفر اتجهز ✓ — راجعه واضغط ولّد الصوت");
+      ta.placeholder = t("v_text_ph");
+      if (full.trim()) toast(t("t_vo_ready"));
     },
     onError(msg) {
       btn.disabled = false;
-      ta.placeholder = "اكتب أو الصق النص اللي عايز تسمعه — عربي أو إنجليزي...";
+      ta.placeholder = t("v_text_ph");
       toast(msg);
     },
   }, { system: VO_EXTRACT_SYSTEM });
@@ -417,7 +469,7 @@ function useScriptForVoice() {
 
 async function runVoice() {
   const text = document.getElementById("voice-text").value.trim();
-  if (!text) { toast("اكتب النص الأول"); return; }
+  if (!text) { toast(t("v_write_first")); return; }
 
   const status = document.getElementById("voice-status");
   const result = document.getElementById("voice-result");
@@ -426,7 +478,7 @@ async function runVoice() {
   const style = TTS_STYLES[document.getElementById("voice-style").value] || "";
 
   status.className = "voice-status";
-  status.textContent = "⏳ جاري توليد الصوت… (بياخد ثواني)";
+  status.textContent = t("v_generating");
   result.style.display = "none";
   btn.disabled = true;
 
@@ -436,7 +488,7 @@ async function runVoice() {
     lastWavUrl = URL.createObjectURL(wav);
     document.getElementById("voice-audio").src = lastWavUrl;
     result.style.display = "block";
-    status.textContent = "✅ الصوت جاهز — اسمعه أو نزّله";
+    status.textContent = t("v_ready");
     markStepDone("voice");
     document.getElementById("voice-dl").onclick = () => {
       const a = document.createElement("a");
@@ -447,15 +499,15 @@ async function runVoice() {
   } catch (e) {
     status.className = "voice-status err";
     if (e.message === "NO_KEY") {
-      status.textContent = "⚠️ الفويس أوفر محتاج مفتاح Google Gemini — ضيفه من الإعدادات (مجاني من aistudio.google.com)";
+      status.textContent = t("v_no_key");
       switchTab("settings");
-      toast("ضيف مفتاح Google Gemini الأول ⚙️");
+      toast(t("v_add_key_toast"));
     } else if (e.message.startsWith("BAD_KEY")) {
-      status.textContent = "⚠️ مفتاح Google Gemini غير صحيح — راجع الإعدادات";
+      status.textContent = t("v_bad_key");
     } else if (e.message.startsWith("RATE")) {
-      status.textContent = "⚠️ تجاوزت حد الطلبات المجاني — استنى دقيقة وحاول تاني";
+      status.textContent = t("v_rate");
     } else {
-      status.textContent = "⚠️ حصلت مشكلة: " + e.message;
+      status.textContent = t("v_err") + e.message;
     }
   } finally {
     btn.disabled = false;
@@ -473,7 +525,7 @@ function fillProviderUI(provider) {
 
   document.getElementById("set-key").value = localStorage.getItem("fta_key_" + provider) || "";
   document.getElementById("set-custom").value = localStorage.getItem("fta_custom_model_" + provider) || "";
-  document.getElementById("key-url").textContent = P.keyUrl;
+  document.getElementById("key-url") && (document.getElementById("key-url").textContent = P.keyUrl);
   document.getElementById("pdf-note").style.display = P.pdf ? "none" : "block";
 }
 
@@ -482,10 +534,10 @@ function persistSettings() {
   const key = document.getElementById("set-key").value;
   const model = document.getElementById("set-model").value;
   const custom = document.getElementById("set-custom").value;
-  if (!key.trim()) { toast("اكتب مفتاح الـ API الخاص بالمزود ده"); return; }
+  if (!key.trim()) { toast(t("t_key_first")); return; }
   saveSettings(provider, key, model, custom);
   localStorage.setItem("fta_mode", "byok");
-  toast(`الإعدادات اتحفظت ✓ — شغال دلوقتي على ${PROVIDERS[provider].label}`);
+  toast(t("t_saved_pre") + PROVIDERS[provider].label);
 }
 
 /* ---------- cloud account mode ---------- */
@@ -501,23 +553,27 @@ function renderUsage(u) {
   const box = document.getElementById("cloud-usage");
   if (!u) { box.style.display = "none"; return; }
   box.style.display = "block";
-  box.innerHTML = u.paid
-    ? `✅ <b>اشتراكك فعّال</b> حتى ${u.paid_until} — استخدام غير محدود (بحد يومي عادل)`
-    : u.active
+  if (u.paid) {
+    box.innerHTML = t("usage_paid") + (u.paid_until ? ` (${u.paid_until})` : "");
+  } else if (u.active) {
+    box.innerHTML = LANG === "ar"
       ? `🎁 <b>التجربة المجانية شغالة</b> — استخدمت <b>${u.used}</b> من <b>${u.limit}</b> توليدة · تنتهي ${u.trial_ends}`
-      : `⛔ التجربة المجانية خلصت — الاشتراك <b>10$/شهر</b> يفتح الاستخدام تاني`;
+      : `🎁 <b>Free trial active</b> — used <b>${u.used}</b> of <b>${u.limit}</b> generations · ends ${u.trial_ends}`;
+  } else {
+    box.innerHTML = t("usage_over");
+  }
 }
 
 async function doCloudSignup() {
   const email = document.getElementById("cloud-email").value.trim();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast("اكتب إيميل صحيح"); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast(t("t_need_email")); return; }
   try {
     const usage = await cloudSignup(email);
     localStorage.setItem("fta_mode", "cloud");
     renderUsage(usage);
-    toast("حسابك جاهز ✓ — ابدأ استخدم الأدوات");
+    toast(t("t_signup_ok"));
   } catch (e) {
-    toast("حصلت مشكلة في التسجيل — حاول تاني");
+    toast(t("t_signup_fail"));
   }
 }
 
@@ -535,8 +591,20 @@ function toast(msg) {
   toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2600);
 }
 
+/* ---------- language: refresh JS-generated strings on toggle ---------- */
+function refreshDynamicLang() {
+  const noneOpt = document.querySelector('#board-style-sel option[value=""]');
+  if (noneOpt) noneOpt.textContent = t("b_style_none");
+  const sb = document.getElementById("split-board");
+  if (sb) sb.textContent = boardView === "full" ? t("split") : t("split_back");
+}
+const _baseToggleLang = toggleLang;
+toggleLang = function () { _baseToggleLang(); refreshDynamicLang(); };
+
 /* ---------- boot ---------- */
 document.addEventListener("DOMContentLoaded", () => {
+  applyLang();
+
   document.querySelectorAll(".step-btn").forEach(b =>
     b.addEventListener("click", () => switchTab(b.dataset.tab)));
 
@@ -551,7 +619,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // populate the visual-styles catalogue (grouped)
   const styleSel = document.getElementById("board-style-sel");
-  styleSel.innerHTML = '<option value="">— من غير ستايل محدد (الموديل يختار) —</option>' +
+  styleSel.innerHTML = `<option value="">${t("b_style_none")}</option>` +
     STYLE_GROUPS.map(g =>
       `<optgroup label="${g.group}">` +
       g.styles.map(([val, label]) => `<option value="${val}">${label}</option>`).join("") +
