@@ -26,8 +26,10 @@ const JSZIP = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
 
 /**
  * extractDocument(file) →
- *   { text }                          for pdf/docx/pptx/txt
- *   { image: { mime, b64 } }          for images (vision)
+ *   { text, images }   text = extracted document text (may be "")
+ *                      images = [{mime,b64}] vision blocks (photo files,
+ *                      or rendered PDF pages when the PDF is scanned /
+ *                      image-heavy so the model can READ them itself)
  */
 async function extractDocument(file) {
   const name = file.name.toLowerCase();
@@ -35,14 +37,14 @@ async function extractDocument(file) {
   if (file.size > MAX) throw new Error("الملف أكبر من 25MB");
 
   if (file.type.startsWith("image/")) {
-    return { image: { mime: file.type, b64: await fileToBase64(file) } };
+    return { text: "", images: [{ mime: file.type, b64: await fileToBase64(file) }] };
   }
   if (name.endsWith(".txt") || name.endsWith(".md")) {
-    return { text: await file.text() };
+    return { text: await file.text(), images: [] };
   }
-  if (name.endsWith(".pdf")) return { text: await extractPdf(file) };
-  if (name.endsWith(".docx")) return { text: await extractDocx(file) };
-  if (name.endsWith(".pptx")) return { text: await extractPptx(file) };
+  if (name.endsWith(".pdf")) return await extractPdf(file);
+  if (name.endsWith(".docx")) return { text: await extractDocx(file), images: [] };
+  if (name.endsWith(".pptx")) return { text: await extractPptx(file), images: [] };
   throw new Error("صيغة غير مدعومة — المدعوم: PDF, Word, PowerPoint, صور, نص");
 }
 
@@ -58,8 +60,24 @@ async function extractPdf(file) {
     out.push(tc.items.map(it => it.str).join(" "));
   }
   const text = out.join("\n\n").trim();
-  if (!text) throw new Error("الـ PDF ده صور مش نصوص — جرّب ترفعه كصورة أو انسخ النص");
-  return text;
+
+  // Scanned or design-heavy PDF (little selectable text) → render the
+  // pages themselves as images so vision models read + analyze them.
+  const images = [];
+  if (text.length < 1200) {
+    const n = Math.min(pdf.numPages, 12);
+    for (let i = 1; i <= n; i++) {
+      const page = await pdf.getPage(i);
+      const vp = page.getViewport({ scale: 1.5 });
+      const canvas = document.createElement("canvas");
+      canvas.width = vp.width;
+      canvas.height = vp.height;
+      await page.render({ canvasContext: canvas.getContext("2d"), viewport: vp }).promise;
+      images.push({ mime: "image/jpeg", b64: canvas.toDataURL("image/jpeg", 0.82).split(",")[1] });
+    }
+  }
+  if (!text && !images.length) throw new Error("معرفتش أقرا حاجة من الـ PDF ده");
+  return { text, images };
 }
 
 async function extractDocx(file) {

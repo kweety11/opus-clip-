@@ -94,6 +94,7 @@ const I18N = {
     usage_over: "⛔ التجربة المجانية خلصت — الاشتراك <b>10$/شهر</b> يفتح الاستخدام تاني",
     scene_vo: "🎤 VOICE-OVER", scene_img: "🖼 IMAGE PROMPT", scene_mot: "🎥 MOTION PROMPT",
     copied_scene: "المشهد كامل", copied_img: "برومبت الصورة", copied_mot: "برومبت الحركة", copied_vo: "الفويس أوفر",
+    hint_script_html: "<p>✍️ <b>الخطة جاهزة!</b> عاوز تحوّلها لسيناريو؟ اكتب كلمة <b>«سيناريو»</b> هنا تحت — وهتتنقل فورًا لصفحة السيناريو تختار النوع والمدة واللهجة وكل حاجة.</p>",
   },
   en: {
     nav_features: "Features", nav_pricing: "Pricing", open_studio: "Open Studio →",
@@ -176,6 +177,7 @@ const I18N = {
     usage_over: "⛔ Free trial ended — a <b>$10/mo</b> subscription unlocks usage",
     scene_vo: "🎤 VOICE-OVER", scene_img: "🖼 IMAGE PROMPT", scene_mot: "🎥 MOTION PROMPT",
     copied_scene: "Full scene", copied_img: "Image prompt", copied_mot: "Motion prompt", copied_vo: "Voice-over",
+    hint_script_html: "<p>✍️ <b>The plan is ready!</b> Want to turn it into a script? Type <b>\"script\"</b> below — you'll jump straight to the Script page to pick format, duration, dialect and more.</p>",
   },
 };
 

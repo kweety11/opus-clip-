@@ -101,7 +101,7 @@ function checkReady() {
   return true;
 }
 
-function startRun(tool, text) {
+function startRun(tool, text, sysAddon) {
   if (!checkReady()) return;
   if (activeController) activeController.abort();
 
@@ -147,7 +147,7 @@ function startRun(tool, text) {
       activeController = null;
       out.innerHTML = `<p class="err">⚠️ ${msg}</p>`;
     },
-  });
+  }, sysAddon ? { system: SYSTEM_PROMPT + sysAddon } : {});
 }
 
 function stopRun(tool) {
@@ -179,18 +179,32 @@ function downloadOut(tool, name) {
    ============================================================ */
 const CHAT_ADDON = `
 
-## INTERACTIVE PLANNING CHAT (currently active)
-You are chatting live with the user inside the planning step. Behave like a sharp strategist in a working session:
+## ACTIVE AGENT — #1 MARKETING CONSULTANT (planning chat)
+You are now operating as agent #1 of the studio's specialist team: a senior social-media marketing consultant and strategist in a live working session. (Agent #2 is the screenwriter, agent #3 is the director/storyboard artist — they work in their own steps, never here.)
 - Answer questions, brainstorm, refine — short, useful replies (this is a chat, not a report).
-- If the user uploads a document, read it, give a 3-5 bullet digest, and ask at most ONE sharp follow-up question.
+- STRICT DOCUMENT GROUNDING: when a brief/document is attached, EVERY fact you state or plan on — brand name, product, audience, budget, objectives, numbers — must come from the document's actual content. Quote its real data. NEVER invent or substitute generic information that is not in the document. If a critical detail is missing from the document, explicitly say it is missing and ask for it (max 2 questions).
+- Document pages may arrive as IMAGES (scanned PDF / photos): read every word in them — Arabic or English — and analyze any visuals, logos, charts or products shown, then give a 3-5 bullet digest proving you read the real content.
 - Only produce the FULL SOCIAL_PLAN deliverable when the user explicitly asks for the final plan. Until then, keep replies conversational.
-- NEVER write a script/screenplay here. If the user asks for the script, reply with one line telling them to press the "Go to Script" button (or type «سيناريو») — the app takes them to the dedicated Script step where they pick format, duration, dialect and more.
+- NEVER write a script/screenplay here — that is agent #2's job in the Script step. If the user asks for one, reply with exactly one line telling them to type the exact word «سيناريو» (the app instantly moves them to the Script page). Always use the word «سيناريو» — never say «سكريبت».
 - Keep every reply in the user's language.`;
+
+/* agent #2 — screenwriter (Script step) */
+const SCRIPT_AGENT_ADDON = `
+
+## ACTIVE AGENT — #2 SCREENWRITER (Script step)
+You are now operating as agent #2 of the studio's specialist team: an award-winning screenwriter and script doctor (drama, ads, UGC). Operate ONLY in SCRIPT mode. Honor every spec field strictly. If PLAN CONTEXT is provided, the script must serve that plan's objectives, audience and brand voice — reference its real content, never generic substitutes.`;
+
+/* agent #3 — director / storyboard artist (Storyboard step) */
+const BOARD_AGENT_ADDON = `
+
+## ACTIVE AGENT — #3 DIRECTOR & STORYBOARD ARTIST (Storyboard step)
+You are now operating as agent #3 of the studio's specialist team: a film director + storyboard artist + AI prompt engineer for image/video generation. Operate ONLY in STORYBOARD mode. Follow the per-scene code-block format exactly and honor INCLUDE VOICE-OVER strictly.`;
 
 let chatHistory = [];      // neutral messages for the API
 let chatBusy = false;
 var lastPlanText = "";     // last full assistant reply (for copy/download)
 var planReady = false;     // a full plan was delivered
+let scriptHintShown = false;
 let pendingFile = null;
 
 function chatBubble(role, html) {
@@ -260,8 +274,13 @@ async function chatSend(preset) {
     const extracting = chatBubble("ai", `<p class="thinking">${t("t_reading_doc")}</p>`);
     try {
       const doc = await extractDocument(file);
-      if (doc.image) images.push(doc.image);
-      else text += `\n\n===== ATTACHED DOCUMENT «${file.name}» =====\n${doc.text.slice(0, 60000)}\n===== END OF DOCUMENT =====`;
+      if (doc.images && doc.images.length) images.push(...doc.images);
+      if (doc.text) {
+        text += `\n\n===== ATTACHED DOCUMENT «${file.name}» =====\n${doc.text.slice(0, 60000)}\n===== END OF DOCUMENT =====`;
+      }
+      if (images.length) {
+        text += `\n\n[The attached document «${file.name}» ${doc.text ? "also includes" : "is scanned/visual — its pages are attached as"} images. Read ALL text inside them (Arabic or English) and analyze every visual, logo, chart and product shown. Base your reply strictly on this real content.]`;
+      }
       extracting.remove();
     } catch (e) {
       extracting.remove();
@@ -299,6 +318,10 @@ async function chatSend(preset) {
         planReady = true;
         markStepDone("plan");
         document.getElementById("go-script").style.display = "inline-flex";
+        if (!scriptHintShown) {
+          scriptHintShown = true;
+          chatBubble("ai", t("hint_script_html"));
+        }
       }
     },
     onError(msg) {
@@ -347,7 +370,7 @@ function runScript() {
   if (planReady && lastPlanText) {
     req += "\n\nPLAN CONTEXT (the approved social media plan — the script must serve it):\n" + lastPlanText.slice(0, 12000);
   }
-  startRun("script", req);
+  startRun("script", req, SCRIPT_AGENT_ADDON);
 }
 
 /* ---------- step 3: storyboard ---------- */
@@ -361,7 +384,8 @@ function runBoard() {
   const ratio = document.getElementById("board-ratio").value;
   const withVO = document.getElementById("board-vo").checked;
   startRun("board",
-    `MODE: STORYBOARD\nASPECT RATIO: ${ratio}\nINCLUDE VOICE-OVER: ${withVO ? "yes" : "no"}${style ? "\nVISUAL STYLE: " + style : ""}\n\nSCRIPT:\n${script}`);
+    `MODE: STORYBOARD\nASPECT RATIO: ${ratio}\nINCLUDE VOICE-OVER: ${withVO ? "yes" : "no"}${style ? "\nVISUAL STYLE: " + style : ""}\n\nSCRIPT:\n${script}`,
+    BOARD_AGENT_ADDON);
 }
 
 function useLastScript() {
