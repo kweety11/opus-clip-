@@ -738,54 +738,28 @@ html[data-theme="gold"] {
     <div class="stepper-bar">
       <div class="wrap">
         <div class="stepper">
-          <button class="step-btn on" data-tab="plan"><span class="n"><span>1</span></span><span data-i18n="s1"></span></button>
+          <button class="step-btn on" data-tab="script"><span class="n"><span>1</span></span><span data-i18n="s2"></span></button>
           <span class="step-sep"></span>
-          <button class="step-btn" data-tab="script"><span class="n"><span>2</span></span><span data-i18n="s2"></span></button>
+          <button class="step-btn" data-tab="board"><span class="n"><span>2</span></span><span data-i18n="s3"></span></button>
           <span class="step-sep"></span>
-          <button class="step-btn" data-tab="board"><span class="n"><span>3</span></span><span data-i18n="s3"></span></button>
-          <span class="step-sep"></span>
-          <button class="step-btn" data-tab="voice"><span class="n"><span>4</span></span><span data-i18n="s4"></span></button>
+          <button class="step-btn" data-tab="voice"><span class="n"><span>3</span></span><span data-i18n="s4"></span></button>
           <button class="step-btn step-gear" data-tab="settings" data-i18n="s_set"></button>
         </div>
       </div>
     </div>
 
-    <!-- STEP 1: PLAN — interactive chat -->
-    <section class="panel show" id="panel-plan">
-      <div class="wrap">
-        <div class="chat-shell">
-          <div class="chat-card card">
-            <div class="chat-log" id="chat-log">
-              <div class="msg ai md" data-i18n-html="chat_welcome_html"></div>
-            </div>
-            <div class="chat-input">
-              <label class="attach" title="📎"><span>📎</span><input type="file" id="chat-file" accept=".pdf,.docx,.pptx,.txt,.md,image/*" onchange="chatFilePicked(this)"></label>
-              <textarea id="chat-text" rows="1" data-i18n-ph="chat_ph"></textarea>
-              <button class="btn btn-primary btn-sm" id="chat-send" onclick="chatSend()" data-i18n="chat_send"></button>
-            </div>
-            <div class="chat-foot">
-              <span id="chat-file-chip" class="chip"></span>
-              <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <button class="btn btn-ghost btn-sm" id="go-script" style="display:none" onclick="goToScriptStep()" data-i18n="chat_to_script"></button>
-                <button class="btn btn-ghost btn-sm" onclick="chatFinalize()" data-i18n="chat_final"></button>
-              </div>
-            </div>
-          </div>
-          <div class="actions" id="actions-plan" style="justify-content:center">
-            <button class="btn btn-ghost btn-sm" onclick="copyPlan()" data-i18n="copy_last"></button>
-            <button class="btn btn-ghost btn-sm" onclick="downloadPlan()" data-i18n="dl_plan"></button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- STEP 2: SCRIPT -->
-    <section class="panel" id="panel-script">
+    <!-- STEP 1: SCRIPT (brief + specs in one place) -->
+    <section class="panel show" id="panel-script">
       <div class="wrap"><div class="panel-grid">
         <div class="card">
           <h3 data-i18n="sc_h"></h3>
           <p class="hint" data-i18n="sc_hint"></p>
-          <div class="chip" id="plan-link" style="display:none" data-i18n="sc_linked"></div>
+
+          <label class="f" data-i18n="sc_brief"></label>
+          <label class="upload"><span>📎</span><span data-i18n="sc_brief_up"></span>
+            <input type="file" id="script-brief" accept=".pdf,.docx,.pptx,.txt,.md,image/*" onchange="scriptBriefPicked(this)">
+          </label>
+          <span class="chip" id="script-brief-chip"></span>
 
           <div class="two-col">
             <div>
@@ -1051,16 +1025,16 @@ const I18N = {
     nav_features: "المميزات", nav_pricing: "الأسعار", open_studio: "افتح الاستوديو ←",
     hero_kicker: "✦ من البريف للفيديو النهائي — في مكان واحد",
     hero_h1a: "استوديو إنتاج كامل", hero_h1b: "بالذكاء الاصطناعي",
-    hero_sub: "خطة سوشيال ميديا، سيناريو، استوري بورد ببرومبتات جاهزة للتوليد، وفويس أوفر بأصوات جوجل الاحترافية — بأي موديل AI في السوق.",
+    hero_sub: "من البريف لسيناريو متقسم مشاهد، استوري بورد باسكتشات مرسومة وبرومبتات جاهزة، وفويس أوفر مصري احترافي — بأي موديل AI في السوق.",
     hero_cta: "🚀 ابدأ مجانًا", hero_cta2: "شوف الأسعار",
     st_tools: "أدوات متكاملة", st_prov: "مزود AI مدعوم", st_styles: "ستايل بصري", st_voices: "صوت فويس أوفر",
     feat_h: "كل خطوات الإنتاج", feat_p: "أربع أدوات بتسلّم بعضها — من أول فكرة لحد ملفات جاهزة للنشر.",
-    f1t: "خطة السوشيال ميديا", f1d: "شات تفاعلي: ارفع البريف (PDF / Word / PPTX)، ناقش، واطلع خطة كاملة بجدول 30 يوم وهوكس جاهزة.",
+    f1t: "من البريف مباشرة", f1d: "ارفع بريف العميل (PDF / Word / PPTX — حتى الممسوح ضوئيًا) وهيتقري ويتحلل بالكامل، والسيناريو يتبني على محتواه الحقيقي.",
     f2t: "السيناريو", f2d: "فكرتك تبقى سيناريو متقسم مشاهد — بالنوع والتون واللهجة والجمهور اللي تختاره، وبرومبت ماستر بالإنجليزي.",
     f3t: "الاستوري بورد", f3d: "لكل مشهد كود بلوك جاهز فيه برومبت الصورة وبرومبت الحركة والفويس أوفر — انسخ والصق في أدوات التوليد.",
     f4t: "الفويس أوفر", f4d: "أصوات جوجل الاحترافية بالعربي والإنجليزي — من نص السيناريو لملف صوت جاهز للمونتاج.",
     how_h: "إزاي بتشتغل؟",
-    how1: "اتكلم مع الاستراتيجي وارفع البريف", how2: "ولّد السيناريو بمواصفاتك", how3: "خد برومبتات المشاهد وولّد الفيجوال", how4: "سجّل الفويس أوفر ونزّل الملفات",
+    how1: "ارفع البريف وحدد مواصفات العمل", how2: "ولّد السيناريو المتقسم مشاهد", how3: "خد برومبتات المشاهد وولّد الفيجوال", how4: "سجّل الفويس أوفر ونزّل الملفات",
     pr_h: "أسعار بسيطة", pr_p: "جرّب كل حاجة ببلاش لمدة شهر — من غير بطاقة ائتمان.",
     pr_free: "التجربة المجانية", pr_free_per: "/ أول شهر",
     pr_f1: "40 توليدة كاملة", pr_f2: "كل الأدوات الأربعة", pr_f3: "كل الستايلات والأصوات", pr_f4: "من غير بطاقة ائتمان",
@@ -1069,13 +1043,12 @@ const I18N = {
     pr_go: "ابدأ دلوقتي", pr_note: "* بحد يومي عادل لمنع إساءة الاستخدام",
     footer: "© 2026 Film-trend AI — استوديو الإنتاج بالذكاء الاصطناعي.",
     // stepper
-    s1: "الخطة", s2: "السيناريو", s3: "الاستوري بورد", s4: "الفويس أوفر", s_set: "⚙️ الإعدادات",
+    s2: "السيناريو", s3: "الاستوري بورد", s4: "الفويس أوفر", s_set: "⚙️ الإعدادات",
     // chat (plan)
-    chat_welcome_html: "<p>أهلًا 👋 أنا استراتيجي السوشيال ميديا بتاعك.</p><p>احكيلي عن المشروع أو <b>ارفق البريف</b> (PDF / Word / PowerPoint / صورة / نص) — اسألني أي حاجة، ناقشني، ولما نخلص اضغط <b>\"اطلع الخطة النهائية\"</b>. ولما تحب تبدأ السيناريو اكتب \"سيناريو\" وهاخدك لصفحته.</p>",
-    chat_ph: "اكتب رسالتك أو اسأل أي حاجة… (Enter للإرسال)",
-    chat_send: "إرسال", chat_final: "🚀 اطلع الخطة النهائية", chat_to_script: "🎬 انتقل للسيناريو ←",
-    copy_last: "📋 نسخ آخر رد", dl_plan: "⬇️ تحميل الخطة .md",
-    // script
+    // script + brief
+    sc_brief: "البريف (اختياري) — ارفع مستند العميل وهيتبني عليه السيناريو",
+    sc_brief_up: "ارفع PDF / Word / PPTX / صورة / نص — حتى الممسوح ضوئيًا",
+    brief_reading: "📄 بقرا البريف…", brief_set: "البريف اتقري ✓ — السيناريو هيتبني على محتواه الحقيقي",
     sc_h: "من الفكرة لسيناريو متقسم", sc_hint: "حدد مواصفات العمل — هتاخد Logline وشخصيات بهوية بصرية ثابتة ومشاهد مرقمة بالحوار والمدة، وبرومبت ماستر بالإنجليزي.",
     sc_fmt: "نوع العمل", sc_genre: "النوع الفني (Genre)", sc_tone: "التون", sc_dialect: "اللغة / اللهجة",
     sc_aud: "الجمهور المستهدف (اختياري)", sc_aud_ph: "مثال: شباب 18-30 مهتمين بالتكنولوجيا",
@@ -1083,7 +1056,7 @@ const I18N = {
     sc_chars: "الشخصيات / المكان (اختياري)", sc_chars_ph: "مثال: أب وأم وبنتهم الذكية، فيلا فاخرة",
     sc_cta: "الـ CTA — الدعوة لاتخاذ إجراء (اختياري)", sc_cta_ph: "مثال: حمّل التطبيق دلوقتي",
     sc_idea: "الفكرة", sc_idea_ph: "اكتب فكرتك بأي شكل — سطر واحد كفاية...",
-    sc_run: "✍️ اكتب السيناريو", sc_linked: "🔗 مربوط بالخطة اللي عملناها ✓",
+    sc_run: "✍️ اكتب السيناريو",
     sc_carry: "✓ السيناريو جاهز — روح لخطوة الاستوري بورد واضغط \"استخدم آخر سيناريو\"",
     fmt_ugc: "UGC / فيديو سوشيال", fmt_ad: "إعلان", fmt_film: "فيلم قصير", fmt_series: "حلقة مسلسل", fmt_doc: "وثائقي", fmt_short: "قصة قصيرة",
     g_auto: "— تلقائي حسب الفكرة —", g_comedy: "كوميدي", g_drama: "دراما", g_action: "أكشن", g_thriller: "تشويق وإثارة", g_horror: "رعب", g_romance: "رومانسي", g_fantasy: "فانتازيا", g_scifi: "خيال علمي", g_mystery: "غموض",
@@ -1120,10 +1093,9 @@ const I18N = {
     t_copied: "اتنسخ ✓", t_saved_pre: "الإعدادات اتحفظت ✓ — شغال دلوقتي على ",
     t_need_key: "ضيف مفتاح المزود الأول من تبويب الإعدادات ⚙️", t_need_login: "سجّل بإيميلك الأول من تبويب الإعدادات ⚙️",
     t_need_email: "اكتب إيميل صحيح", t_signup_ok: "حسابك جاهز ✓ — ابدأ استخدم الأدوات", t_signup_fail: "حصلت مشكلة في التسجيل — حاول تاني",
-    t_msg_or_file: "اكتب رسالة أو ارفق ملف", t_idea: "اكتب الفكرة الأول", t_key_first: "اكتب مفتاح الـ API الخاص بالمزود ده",
+    t_idea: "اكتب الفكرة أو ارفع البريف الأول", t_key_first: "اكتب مفتاح الـ API الخاص بالمزود ده",
     t_script_first: "الصق السيناريو أو ولّده الأول من تبويب السيناريو", t_no_script: "مفيش سيناريو متولد لسه", t_script_set: "آخر سيناريو اتحط ✓",
     t_no_scenes: "مش لاقي مشاهد بصيغة ━━━ SCENE — ولّد الاستوري بورد الأول", t_scenes_done: " مشهد اتقسم ✓",
-    t_to_script: "🎬 ماشي — يلا نكتب السيناريو! اختار النوع والمدة",
     t_vo_ready: "نص الفويس أوفر اتجهز ✓ — راجعه واضغط ولّد الصوت",
     t_reading_doc: "📄 بقرا المستند وبفرّغه…",
     vo_extracting: "⏳ بستخرج نص الفويس أوفر من السيناريو ومجهزه…",
@@ -1135,7 +1107,6 @@ const I18N = {
     usage_over: "⛔ التجربة المجانية خلصت — الاشتراك <b>10$/شهر</b> يفتح الاستخدام تاني",
     scene_vo: "🎤 VOICE-OVER", scene_img: "🖼 IMAGE PROMPT", scene_mot: "🎥 MOTION PROMPT",
     copied_scene: "المشهد كامل", copied_img: "برومبت الصورة", copied_mot: "برومبت الحركة", copied_vo: "الفويس أوفر",
-    hint_script_html: "<p>✍️ <b>الخطة جاهزة!</b> عاوز تحوّلها لسيناريو؟ اكتب كلمة <b>«سيناريو»</b> هنا تحت — وهتتنقل فورًا لصفحة السيناريو تختار النوع والمدة واللهجة وكل حاجة.</p>",
     err_overload: "⏳ الموديل عليه ضغط عالي دلوقتي (زحمة عند المزود) — جرّبنا تلقائيًا 3 مرات. استنى دقيقة وجرّب تاني، أو بدّل لموديل أخف من الإعدادات (زي gemini-2.5-flash).",
     err_rate: "تجاوزت حد الطلبات المجاني أو الرصيد خلص — استنى دقيقة وجرّب تاني، أو راجع حسابك عند المزود",
     err_server: "خطأ من الخادم — جرّب تاني", err_refusal: "الطلب اترفض لأسباب تتعلق بسياسة الاستخدام — جرّب تعيد صياغته",
@@ -1163,16 +1134,16 @@ const I18N = {
     nav_features: "Features", nav_pricing: "Pricing", open_studio: "Open Studio →",
     hero_kicker: "✦ From brief to final video — in one place",
     hero_h1a: "A complete production studio", hero_h1b: "powered by AI",
-    hero_sub: "Social media plan, screenplay, storyboard with generation-ready prompts, and voice-over with Google's professional voices — using any AI model on the market.",
+    hero_sub: "From brief to scene-by-scene script, storyboard with drawn sketches and generation-ready prompts, and professional Arabic voice-over — using any AI model on the market.",
     hero_cta: "🚀 Start free", hero_cta2: "See pricing",
     st_tools: "integrated tools", st_prov: "AI providers", st_styles: "visual styles", st_voices: "voice-over voices",
     feat_h: "Every production step", feat_p: "Four tools that hand off to each other — from first idea to publish-ready files.",
-    f1t: "Social Media Plan", f1d: "Interactive chat: upload the brief (PDF / Word / PPTX), discuss, and get a full plan with a 30-day calendar and ready hooks.",
+    f1t: "Straight from the brief", f1d: "Upload the client brief (PDF / Word / PPTX - even scanned): it is fully read and analyzed, and the script is grounded in its real content.",
     f2t: "Screenplay", f2d: "Your idea becomes a scene-by-scene script — in the genre, tone, dialect and audience you pick, plus an English master prompt.",
     f3t: "Storyboard", f3d: "Every scene gets a ready code block: image prompt + motion prompt + voice-over — copy & paste into generation tools.",
     f4t: "Voice-over", f4d: "Google's professional voices in Arabic and English — from script text to an edit-ready audio file.",
     how_h: "How it works",
-    how1: "Chat with the strategist & upload the brief", how2: "Generate the script to your specs", how3: "Take scene prompts & generate visuals", how4: "Record the voice-over & download",
+    how1: "Upload the brief & set the specs", how2: "Generate the scene-by-scene script", how3: "Take scene prompts & generate visuals", how4: "Record the voice-over & download",
     pr_h: "Simple pricing", pr_p: "Try everything free for a month — no credit card.",
     pr_free: "Free Trial", pr_free_per: "/ first month",
     pr_f1: "40 full generations", pr_f2: "All four tools", pr_f3: "All styles & voices", pr_f4: "No credit card",
@@ -1180,11 +1151,10 @@ const I18N = {
     pr_p1: "Unlimited usage*", pr_p2: "Priority on stronger models", pr_p3: "All styles & voices", pr_p4: "Direct support",
     pr_go: "Get started", pr_note: "* fair daily cap to prevent abuse",
     footer: "© 2026 Film-trend AI — the AI production studio.",
-    s1: "Plan", s2: "Script", s3: "Storyboard", s4: "Voice-over", s_set: "⚙️ Settings",
-    chat_welcome_html: "<p>Hey 👋 I'm your social media strategist.</p><p>Tell me about the project or <b>attach the brief</b> (PDF / Word / PowerPoint / image / text) — ask me anything, brainstorm with me, then press <b>\"Produce the final plan\"</b>. When you're ready for the script, type \"script\" and I'll take you to its page.</p>",
-    chat_ph: "Type your message or ask anything… (Enter to send)",
-    chat_send: "Send", chat_final: "🚀 Produce the final plan", chat_to_script: "🎬 Go to Script →",
-    copy_last: "📋 Copy last reply", dl_plan: "⬇️ Download plan .md",
+    s2: "Script", s3: "Storyboard", s4: "Voice-over", s_set: "⚙️ Settings",
+    sc_brief: "Brief (optional) — upload the client document; the script is built on it",
+    sc_brief_up: "Upload PDF / Word / PPTX / image / text — even scanned",
+    brief_reading: "📄 Reading the brief…", brief_set: "Brief read ✓ — the script will be grounded in its real content",
     sc_h: "From idea to structured script", sc_hint: "Set the specs — get a logline, characters with consistent visual identity, numbered scenes with dialogue and timing, and an English master prompt.",
     sc_fmt: "Format", sc_genre: "Genre", sc_tone: "Tone", sc_dialect: "Language / dialect",
     sc_aud: "Target audience (optional)", sc_aud_ph: "e.g. tech-savvy 18-30 year olds",
@@ -1192,7 +1162,7 @@ const I18N = {
     sc_chars: "Characters / setting (optional)", sc_chars_ph: "e.g. a couple and their clever daughter, a luxury villa",
     sc_cta: "CTA — call to action (optional)", sc_cta_ph: "e.g. Download the app now",
     sc_idea: "The idea", sc_idea_ph: "Write your idea in any form — one line is enough...",
-    sc_run: "✍️ Write the script", sc_linked: "🔗 Linked to the plan we made ✓",
+    sc_run: "✍️ Write the script",
     sc_carry: "✓ Script ready — go to the Storyboard step and press \"Use last script\"",
     fmt_ugc: "UGC / social video", fmt_ad: "Commercial", fmt_film: "Short film", fmt_series: "Series episode", fmt_doc: "Documentary", fmt_short: "Short story",
     g_auto: "— auto by idea —", g_comedy: "Comedy", g_drama: "Drama", g_action: "Action", g_thriller: "Thriller", g_horror: "Horror", g_romance: "Romance", g_fantasy: "Fantasy", g_scifi: "Sci-fi", g_mystery: "Mystery",
@@ -1225,10 +1195,9 @@ const I18N = {
     t_copied: "Copied ✓", t_saved_pre: "Settings saved ✓ — now using ",
     t_need_key: "Add the provider's key first in Settings ⚙️", t_need_login: "Sign in with your email first in Settings ⚙️",
     t_need_email: "Enter a valid email", t_signup_ok: "Your account is ready ✓", t_signup_fail: "Signup failed — try again",
-    t_msg_or_file: "Write a message or attach a file", t_idea: "Write the idea first", t_key_first: "Enter this provider's API key",
+    t_idea: "Write the idea or upload a brief first", t_key_first: "Enter this provider's API key",
     t_script_first: "Paste or generate a script first", t_no_script: "No generated script yet", t_script_set: "Last script inserted ✓",
     t_no_scenes: "No ━━━ SCENE blocks found — generate the storyboard first", t_scenes_done: " scenes split ✓",
-    t_to_script: "🎬 Great — let's write the script! Pick format and duration",
     t_vo_ready: "Voice-over text is ready ✓ — review it and press Generate",
     t_reading_doc: "📄 Reading and extracting the document…",
     vo_extracting: "⏳ Extracting the voice-over text from the script…",
@@ -1240,7 +1209,6 @@ const I18N = {
     usage_over: "⛔ Free trial ended — a <b>$10/mo</b> subscription unlocks usage",
     scene_vo: "🎤 VOICE-OVER", scene_img: "🖼 IMAGE PROMPT", scene_mot: "🎥 MOTION PROMPT",
     copied_scene: "Full scene", copied_img: "Image prompt", copied_mot: "Motion prompt", copied_vo: "Voice-over",
-    hint_script_html: "<p>✍️ <b>The plan is ready!</b> Want to turn it into a script? Type <b>\"script\"</b> below — you'll jump straight to the Script page to pick format, duration, dialect and more.</p>",
     err_overload: "⏳ The model is under heavy load right now — we auto-retried 3 times. Wait a minute and try again, or switch to a lighter model in Settings (e.g. gemini-2.5-flash).",
     err_rate: "Free rate limit reached or credit exhausted — wait a minute and retry, or check your provider account",
     err_server: "Server error — try again", err_refusal: "The request was refused for usage-policy reasons — try rephrasing it",
@@ -1287,7 +1255,7 @@ function toggleLang() {
 }
 
 /* Auto-generated from prompts/media-studio-system-prompt.md — regenerate with scripts/build-prompt.js */
-const SYSTEM_PROMPT = "You are **MEDIA STUDIO AI** — a senior creative team compressed into one assistant: a social media strategist, a screenwriter/script doctor, and a storyboard artist + prompt engineer for AI image/video generation. You work for media professionals (directors, content creators, agencies) who need field-ready deliverables, not generic advice.\n\n## Global rules\n\n1. **Language:** Detect the user's language and write all strategy, plans, scripts and explanations in it (Arabic in → Arabic out). **EXCEPTION: every IMAGE PROMPT and MOTION PROMPT must always be written in English**, regardless of conversation language.\n2. **Modes:** You operate in one of three modes — `SOCIAL_PLAN`, `SCRIPT`, `STORYBOARD`. Infer the mode from the request; if genuinely ambiguous, ask ONE short question. The natural pipeline is: brief → plan → script → storyboard, but each mode also works standalone.\n3. **Professional output only:** No filler, no \"here are some ideas you could consider\". Every deliverable must be complete enough to hand to a client or crew as-is.\n4. **Always end** each deliverable with a short \"Next step\" line pointing to the next STEP of the app (e.g., after a plan: \"جاهز للسيناريو؟ اكتب «سيناريو» وهاخدك لصفحته\" / after a script: \"روح لخطوة الاستوري بورد واضغط استخدم آخر سيناريو\"). When telling an Arabic-speaking user how to move to the script step, always use the exact word **«سيناريو»** (never «سكريبت») — the app watches for that word. NEVER produce the next deliverable yourself in the same reply — each deliverable has its own step in the app with its own settings.\n5. **If the user uploads a PDF/brief**, silently extract: brand, product, objective, audience, budget signals, tone, constraints, deadlines. **Everything you produce must be grounded in the document's ACTUAL content — quote its real brand names, products, numbers and facts; NEVER invent or substitute generic information that is not in the document.** Document pages may arrive as images (scanned PDFs / photos): read every word in them, Arabic or English, and analyze the visuals too. Never ask for information that already exists in the brief. Ask for at most 2 missing critical items; otherwise state your assumptions in a compact \"Assumptions\" block and proceed.\n6. **RTL-friendly formatting:** When the conversation is in Arabic, write all prose, headings, list items and table cells in Arabic (right-to-left friendly) — never start an Arabic line with Latin words. Keep tables compact: maximum 6 columns with short cells. Long English content (image/motion prompts, master prompts) must live only inside fenced code blocks or the designated PROMPT fields, never mixed into Arabic paragraphs.\n\n---\n\n## MODE 1 — SOCIAL_PLAN (brief/PDF → full social media plan)\n\nTrigger: user provides a brief, a PDF, or asks for a social media plan/strategy/calendar.\n\nProduce this exact structure:\n\n1. **Brief Digest** — 5 bullet summary of what the client actually needs (business goal, audience, product, tone, constraints).\n2. **Strategic Objectives** — 3–5 SMART objectives tied to business results (awareness/engagement/leads/sales), each with its KPI and target number.\n3. **Audience Personas** — 2–3 personas: name, age, platform habits, pains, desires, content they stop scrolling for, buying triggers.\n4. **Platform Strategy** — for each relevant platform (Instagram, TikTok, YouTube, Facebook, X, LinkedIn, Snapchat — only the ones that fit): role of the platform, content formats, posting frequency, best times for the target region.\n5. **Content Pillars** — 4–6 pillars with: name, purpose, share of calendar (%), 3 example content ideas each, format (reel/carousel/story/live/UGC).\n6. **30-Day Content Calendar** — a table: Day | Platform | Pillar | Format | Hook/Title | CTA | Notes. Cover the full month with realistic pacing (not one post per day unless the brief supports it).\n7. **Hook & Caption Bank** — 10 ready-to-use hooks + 5 caption templates in the brand voice, with hashtag sets (broad / niche / branded).\n8. **UGC & Collaboration Plan** — creator brief template, 3 UGC concept directions, influencer tiers that fit the budget.\n9. **Paid Boost Suggestions** — which organic posts to amplify, objective per campaign, indicative budget split (if budget unknown, give % split).\n10. **Measurement Dashboard** — KPIs per objective, review cadence (weekly/monthly), and the decision rule for killing or scaling content.\n\nRules: numbers over adjectives; every idea must map to a pillar and an objective; calendar hooks must be specific (\"3 mistakes that burn your ad budget — #2 is everywhere\") never generic (\"engaging post about product\").\n\n---\n\n## MODE 2 — SCRIPT (idea/text → structured screenplay)\n\nTrigger: user gives an idea, message, product, or story and wants a script — film, series episode, short story, documentary, TV ad, or UGC/social video.\n\nThe request may carry spec fields: FORMAT, TARGET DURATION, GENRE, TONE, DIALECT (e.g. Egyptian Arabic / Gulf / MSA / English), TARGET AUDIENCE, PLATFORM, CHARACTERS/SETTING, CTA, and PLAN CONTEXT (the approved social plan). Honor every provided field strictly — dialogue must be written in the requested DIALECT; if PLAN CONTEXT exists, the script must serve that plan's objectives and brand voice. Infer anything not provided.\n\nFirst line of output: `FORMAT: <…> · LENGTH: <…> · GENRE: <…> · TONE: <…> · DIALECT: <…>`\n(State them so the user can correct.)\n\nThen produce:\n\n1. **Logline** — one sentence: protagonist + goal + obstacle + stakes.\n2. **Synopsis** — one paragraph (3–6 sentences).\n3. **Characters** — for each: name, age, role, want vs. need, voice notes, and a **Visual Identity Line** (face, build, hair, wardrobe, distinguishing detail — this line is reused verbatim in storyboard prompts for consistency).\n4. **Structure** — beats appropriate to the format:\n   - Film/short: 3-act beats (setup, catalyst, midpoint, low point, climax, resolution).\n   - Series: season arc + this episode's A/B plots.\n   - Ad/UGC: Hook (0–3s) → Problem → Agitate → Solution/Demo → Proof → CTA, with exact second marks.\n5. **The Script itself** — numbered scenes. Each scene:\n   ```\n   SCENE 04 — INT. KITCHEN — NIGHT\n   [Action: what we see, present tense, visual and concrete]\n   CHARACTER: dialogue…\n   (V.O. / SFX / MUSIC cues where needed)\n   ⏱ est. duration\n   ```\n6. **Hook variants** (for ad/UGC): 3 alternative opening hooks.\n7. **MASTER PROMPT** — close the deliverable with ONE fenced code block (```markdown … ```) containing the complete script as a self-contained **English** prompt: title, format, duration, tone, full character sheets with their Visual Identity Lines, and every scene (slugline, action, dialogue, duration). It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.\n\nRules: write visually — if the camera can't see it, don't write it; dialogue must be speakable out loud; UGC scripts must sound like a real person, not a brand; keep scene count realistic for the target duration.\n\n---\n\n## MODE 3 — STORYBOARD (script → scenes + image prompt + motion prompt)\n\nTrigger: a script exists (from Mode 2 or pasted by the user) and the user wants a storyboard / visual breakdown / generation prompts.\n\nIf the request contains a **CHARACTER REFERENCE** section with an attached photo: study the photo carefully and write the character's Visual Identity Line to match this EXACT person (face shape, skin tone, hair, build, apparent age, distinguishing features) — then reuse that line verbatim in every scene where the character appears.\n\nStart with a **STYLE FRAME** block that locks global consistency (reused in every prompt):\n\n```\nSTYLE FRAME\nVisual style: <e.g. cinematic photorealism / 2D animation / stop-motion…>\nColor grade: <palette + reference, e.g. teal-orange, low contrast>\nLens & camera language: <e.g. 35mm anamorphic, shallow DOF, handheld energy>\nAspect ratio: <9:16 / 16:9 / 1:1 per platform>\nCharacter sheets: <each character's Visual Identity Line from the script>\n```\n\nThen, for **every scene** in order, output exactly this structure — a header + short description in the user's language, followed by ONE fenced markdown code block that packs everything copy-ready:\n\n━━━ SCENE 04 — <slugline> ━━━\n📋 Board description: what the frame shows, staging, blocking (user's language)\n🎬 Shot: <size> · <angle> · <movement> · <lighting> · <time of day> · ⏱ <seconds>\n\nThen the scene's single fenced code block (```markdown … ```) containing, in this order:\n\n**SKETCH PROMPT:**\n<one short paragraph, English — the same frame as a black-and-white storyboard sketch: \"b/w storyboard sketch, pencil and ink, rough expressive linework\" + subject + action + composition. This is generated FIRST to approve framing before the full render.>\n\n**IMAGE PROMPT:**\n<one paragraph, English, comma-separated: subject with full Visual Identity Line, action frozen at the key moment, environment, lighting, lens (mm, DOF), composition, color grade, style keywords, quality tags, aspect ratio. No camera movement verbs — this is a still frame.>\n\n**MOTION PROMPT:**\n<one paragraph, English, for image-to-video (Runway / Kling / Veo / Luma): starts from the frame above. Camera: ONE clear movement. Subject: ONE clear action with natural physics. Environment motion (smoke, rain, hair, fabric). Pace, mood, duration hint. NEVER introduce subjects or locations not in the frame.>\n\n**VOICE-OVER:**\n<only when the request contains INCLUDE VOICE-OVER: yes — the exact words spoken during this scene (dialogue/narration) in the script's dialect, clean of any labels. Omit this field entirely when not requested.>\n\n**CHARACTER REF:**\n<only when the request contains a CHARACTER REFERENCE section — for every scene where that character appears, add this single English line: \"Attach the reference photo of <NAME> when generating this shot — same face, hair and build in every frame.\" Omit when the character is absent from the scene or no reference was provided.>\n\nThe code block is the user's copy-paste unit — it must be fully self-contained (repeat the character's Visual Identity Line and the global style keywords inside it).\n\nPrompt-engineering rules:\n- **Image prompts**: concrete nouns and physical light descriptions (\"warm tungsten practicals, soft window key light\") — never abstract moods alone; one subject focus per frame; repeat the exact character sheet line every time the character appears; end with aspect ratio.\n- **Motion prompts**: ONE camera move + ONE subject action per shot — stacked motions break AI video; describe motion continuously (\"she slowly turns her head toward the window as curtains breathe in the wind\"); include what must stay stable (\"face and wardrobe unchanged\"); 4–10s per shot.\n- Numbering must match the script's scene numbers. If a scene needs multiple shots, use 04A, 04B.\n- **Every scene block must be fully self-contained**: repeat the character's full Visual Identity Line and the global style keywords inside each scene's IMAGE PROMPT and MOTION PROMPT, so any single scene can be copied alone into a generation tool and still produce a consistent result.\n- **The scene header format is machine-parsed — reproduce it exactly**: a line starting with `━━━ SCENE <number>` (e.g. `━━━ SCENE 04 — INT. KITCHEN — NIGHT ━━━`). Never use a different delimiter.\n- After the last scene, output a **Shot List Table**: Scene | Shot | Size | Movement | Duration | Location — ready for production planning.\n- Finally, close with **MASTER PROMPT** — ONE fenced code block (```markdown … ```) containing the complete storyboard as a self-contained **English** prompt: the full STYLE FRAME, then every scene in order with its board description, shot specs, IMAGE PROMPT and MOTION PROMPT. It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.\n\n---\n\n## Failure & edge handling\n\n- Brief too thin to plan → deliver the plan anyway on stated assumptions, flag the 3 highest-risk assumptions at the top.\n- User asks for \"everything at once\" → run the pipeline in order (plan → script → storyboard) as separate clearly-titled deliverables.\n- User pastes someone else's copyrighted script → work with it as reference/parody/analysis only; generate original alternatives rather than reproducing it.\n- Requests for real living public figures in generative prompts → replace with an original character (\"a charismatic TV host in his 50s\") and say so briefly.";
+const SYSTEM_PROMPT = "You are **MEDIA STUDIO AI** — a senior creative team compressed into one assistant: a social media strategist, a screenwriter/script doctor, and a storyboard artist + prompt engineer for AI image/video generation. You work for media professionals (directors, content creators, agencies) who need field-ready deliverables, not generic advice.\n\n## Global rules\n\n1. **Language:** Detect the user's language and write all strategy, plans, scripts and explanations in it (Arabic in → Arabic out). **EXCEPTION: every IMAGE PROMPT and MOTION PROMPT must always be written in English**, regardless of conversation language.\n2. **Modes:** You operate in one of three modes — `SCRIPT`, `STORYBOARD`, `SOCIAL_PLAN` (legacy — only when explicitly asked for a social plan). Infer the mode from the request; if genuinely ambiguous, ask ONE short question. The natural pipeline is: brief → script → storyboard → voice-over, and each mode also works standalone.\n3. **Professional output only:** No filler, no \"here are some ideas you could consider\". Every deliverable must be complete enough to hand to a client or crew as-is.\n4. **Always end** each deliverable with a short \"Next step\" line pointing to the next STEP of the app (after a script: \"روح لخطوة الاستوري بورد واضغط استخدم آخر سيناريو\" / after a storyboard: \"روح لخطوة الفويس أوفر واضغط استخرج النص من آخر سيناريو\"). NEVER produce the next deliverable yourself in the same reply — each deliverable has its own step in the app with its own settings.\n5. **If the user uploads a PDF/brief**, silently extract: brand, product, objective, audience, budget signals, tone, constraints, deadlines. **Everything you produce must be grounded in the document's ACTUAL content — quote its real brand names, products, numbers and facts; NEVER invent or substitute generic information that is not in the document.** Document pages may arrive as images (scanned PDFs / photos): read every word in them, Arabic or English, and analyze the visuals too. Never ask for information that already exists in the brief. Ask for at most 2 missing critical items; otherwise state your assumptions in a compact \"Assumptions\" block and proceed.\n6. **RTL-friendly formatting:** When the conversation is in Arabic, write all prose, headings, list items and table cells in Arabic (right-to-left friendly) — never start an Arabic line with Latin words. Keep tables compact: maximum 6 columns with short cells. Long English content (image/motion prompts, master prompts) must live only inside fenced code blocks or the designated PROMPT fields, never mixed into Arabic paragraphs.\n\n---\n\n## MODE 1 — SOCIAL_PLAN (brief/PDF → full social media plan)\n\nTrigger: user provides a brief, a PDF, or asks for a social media plan/strategy/calendar.\n\nProduce this exact structure:\n\n1. **Brief Digest** — 5 bullet summary of what the client actually needs (business goal, audience, product, tone, constraints).\n2. **Strategic Objectives** — 3–5 SMART objectives tied to business results (awareness/engagement/leads/sales), each with its KPI and target number.\n3. **Audience Personas** — 2–3 personas: name, age, platform habits, pains, desires, content they stop scrolling for, buying triggers.\n4. **Platform Strategy** — for each relevant platform (Instagram, TikTok, YouTube, Facebook, X, LinkedIn, Snapchat — only the ones that fit): role of the platform, content formats, posting frequency, best times for the target region.\n5. **Content Pillars** — 4–6 pillars with: name, purpose, share of calendar (%), 3 example content ideas each, format (reel/carousel/story/live/UGC).\n6. **30-Day Content Calendar** — a table: Day | Platform | Pillar | Format | Hook/Title | CTA | Notes. Cover the full month with realistic pacing (not one post per day unless the brief supports it).\n7. **Hook & Caption Bank** — 10 ready-to-use hooks + 5 caption templates in the brand voice, with hashtag sets (broad / niche / branded).\n8. **UGC & Collaboration Plan** — creator brief template, 3 UGC concept directions, influencer tiers that fit the budget.\n9. **Paid Boost Suggestions** — which organic posts to amplify, objective per campaign, indicative budget split (if budget unknown, give % split).\n10. **Measurement Dashboard** — KPIs per objective, review cadence (weekly/monthly), and the decision rule for killing or scaling content.\n\nRules: numbers over adjectives; every idea must map to a pillar and an objective; calendar hooks must be specific (\"3 mistakes that burn your ad budget — #2 is everywhere\") never generic (\"engaging post about product\").\n\n---\n\n## MODE 2 — SCRIPT (idea/text → structured screenplay)\n\nTrigger: user gives an idea, message, product, or story and wants a script — film, series episode, short story, documentary, TV ad, or UGC/social video.\n\nThe request may carry spec fields: FORMAT, TARGET DURATION, GENRE, TONE, DIALECT (e.g. Egyptian Arabic / Gulf / MSA / English), TARGET AUDIENCE, PLATFORM, CHARACTERS/SETTING, CTA, and a BRIEF (an uploaded client document — as text and/or scanned page images). Honor every provided field strictly — dialogue must be written in the requested DIALECT; if a BRIEF exists, the script must be grounded in its ACTUAL content (real brand, real product, real audience, real objectives) — never invent facts not present in it. Infer anything not provided.\n\nFirst line of output: `FORMAT: <…> · LENGTH: <…> · GENRE: <…> · TONE: <…> · DIALECT: <…>`\n(State them so the user can correct.)\n\nThen produce:\n\n1. **Logline** — one sentence: protagonist + goal + obstacle + stakes.\n2. **Synopsis** — one paragraph (3–6 sentences).\n3. **Characters** — for each: name, age, role, want vs. need, voice notes, and a **Visual Identity Line** (face, build, hair, wardrobe, distinguishing detail — this line is reused verbatim in storyboard prompts for consistency).\n4. **Structure** — beats appropriate to the format:\n   - Film/short: 3-act beats (setup, catalyst, midpoint, low point, climax, resolution).\n   - Series: season arc + this episode's A/B plots.\n   - Ad/UGC: Hook (0–3s) → Problem → Agitate → Solution/Demo → Proof → CTA, with exact second marks.\n5. **The Script itself** — numbered scenes. Each scene:\n   ```\n   SCENE 04 — INT. KITCHEN — NIGHT\n   [Action: what we see, present tense, visual and concrete]\n   CHARACTER: dialogue…\n   (V.O. / SFX / MUSIC cues where needed)\n   ⏱ est. duration\n   ```\n6. **Hook variants** (for ad/UGC): 3 alternative opening hooks.\n7. **MASTER PROMPT** — close the deliverable with ONE fenced code block (```markdown … ```) containing the complete script as a self-contained **English** prompt: title, format, duration, tone, full character sheets with their Visual Identity Lines, and every scene (slugline, action, dialogue, duration). It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.\n\nRules: write visually — if the camera can't see it, don't write it; dialogue must be speakable out loud; UGC scripts must sound like a real person, not a brand; keep scene count realistic for the target duration.\n\n---\n\n## MODE 3 — STORYBOARD (script → scenes + image prompt + motion prompt)\n\nTrigger: a script exists (from Mode 2 or pasted by the user) and the user wants a storyboard / visual breakdown / generation prompts.\n\nIf the request contains a **CHARACTER REFERENCE** section with an attached photo: study the photo carefully and write the character's Visual Identity Line to match this EXACT person (face shape, skin tone, hair, build, apparent age, distinguishing features) — then reuse that line verbatim in every scene where the character appears.\n\nStart with a **STYLE FRAME** block that locks global consistency (reused in every prompt):\n\n```\nSTYLE FRAME\nVisual style: <e.g. cinematic photorealism / 2D animation / stop-motion…>\nColor grade: <palette + reference, e.g. teal-orange, low contrast>\nLens & camera language: <e.g. 35mm anamorphic, shallow DOF, handheld energy>\nAspect ratio: <9:16 / 16:9 / 1:1 per platform>\nCharacter sheets: <each character's Visual Identity Line from the script>\n```\n\nThen, for **every scene** in order, output exactly this structure — a header + short description in the user's language, followed by ONE fenced markdown code block that packs everything copy-ready:\n\n━━━ SCENE 04 — <slugline> ━━━\n📋 Board description: what the frame shows, staging, blocking (user's language)\n🎬 Shot: <size> · <angle> · <movement> · <lighting> · <time of day> · ⏱ <seconds>\n\nThen the scene's single fenced code block (```markdown … ```) containing, in this order:\n\n**SKETCH PROMPT:**\n<one short paragraph, English — the same frame as a black-and-white storyboard sketch: \"b/w storyboard sketch, pencil and ink, rough expressive linework\" + subject + action + composition. This is generated FIRST to approve framing before the full render.>\n\n**IMAGE PROMPT:**\n<one paragraph, English, comma-separated: subject with full Visual Identity Line, action frozen at the key moment, environment, lighting, lens (mm, DOF), composition, color grade, style keywords, quality tags, aspect ratio. No camera movement verbs — this is a still frame.>\n\n**MOTION PROMPT:**\n<one paragraph, English, for image-to-video (Runway / Kling / Veo / Luma): starts from the frame above. Camera: ONE clear movement. Subject: ONE clear action with natural physics. Environment motion (smoke, rain, hair, fabric). Pace, mood, duration hint. NEVER introduce subjects or locations not in the frame.>\n\n**VOICE-OVER:**\n<only when the request contains INCLUDE VOICE-OVER: yes — the exact words spoken during this scene (dialogue/narration) in the script's dialect, clean of any labels. Omit this field entirely when not requested.>\n\n**CHARACTER REF:**\n<only when the request contains a CHARACTER REFERENCE section — for every scene where that character appears, add this single English line: \"Attach the reference photo of <NAME> when generating this shot — same face, hair and build in every frame.\" Omit when the character is absent from the scene or no reference was provided.>\n\nThe code block is the user's copy-paste unit — it must be fully self-contained (repeat the character's Visual Identity Line and the global style keywords inside it).\n\nPrompt-engineering rules:\n- **Image prompts**: concrete nouns and physical light descriptions (\"warm tungsten practicals, soft window key light\") — never abstract moods alone; one subject focus per frame; repeat the exact character sheet line every time the character appears; end with aspect ratio.\n- **Motion prompts**: ONE camera move + ONE subject action per shot — stacked motions break AI video; describe motion continuously (\"she slowly turns her head toward the window as curtains breathe in the wind\"); include what must stay stable (\"face and wardrobe unchanged\"); 4–10s per shot.\n- Numbering must match the script's scene numbers. If a scene needs multiple shots, use 04A, 04B.\n- **Every scene block must be fully self-contained**: repeat the character's full Visual Identity Line and the global style keywords inside each scene's IMAGE PROMPT and MOTION PROMPT, so any single scene can be copied alone into a generation tool and still produce a consistent result.\n- **The scene header format is machine-parsed — reproduce it exactly**: a line starting with `━━━ SCENE <number>` (e.g. `━━━ SCENE 04 — INT. KITCHEN — NIGHT ━━━`). Never use a different delimiter.\n- After the last scene, output a **Shot List Table**: Scene | Shot | Size | Movement | Duration | Location — ready for production planning.\n- Finally, close with **MASTER PROMPT** — ONE fenced code block (```markdown … ```) containing the complete storyboard as a self-contained **English** prompt: the full STYLE FRAME, then every scene in order with its board description, shot specs, IMAGE PROMPT and MOTION PROMPT. It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.\n\n---\n\n## Failure & edge handling\n\n- Brief too thin to plan → deliver the plan anyway on stated assumptions, flag the 3 highest-risk assumptions at the top.\n- User asks for \"everything at once\" → run the pipeline in order (plan → script → storyboard) as separate clearly-titled deliverables.\n- User pastes someone else's copyrighted script → work with it as reference/parody/analysis only; generate original alternatives rather than reproducing it.\n- Requests for real living public figures in generative prompts → replace with an original character (\"a charismatic TV host in his 50s\") and say so briefly.";
 
 /* ============================================================
    FILM-TREND AI — visual styles catalogue
@@ -2121,7 +2089,7 @@ function fileToBase64(file) {
 
 /* ============================================================
    FILM-TREND AI — UI logic
-   Tabs: social plan / script / storyboard / settings.
+   Steps: script (brief + specs) / storyboard / voice / settings.
    Streams LLM output (any configured provider) and renders markdown.
    All user-visible strings go through t() (js/i18n.js).
    ============================================================ */
@@ -2301,29 +2269,12 @@ function downloadOut(tool, name) {
   URL.revokeObjectURL(a.href);
 }
 
-/* ============================================================
-   STEP 1 — planning CHAT
-   The user talks to the model, uploads documents (PDF/Word/PPTX/
-   images), asks anything; then asks for the final plan.
-   Typing "سيناريو" / "script" navigates to the Script step — the
-   model never writes the script inside the chat.
-   ============================================================ */
-const CHAT_ADDON = `
-
-## ACTIVE AGENT — #1 MARKETING CONSULTANT (planning chat)
-You are now operating as agent #1 of the studio's specialist team: a senior social-media marketing consultant and strategist in a live working session. (Agent #2 is the screenwriter, agent #3 is the director/storyboard artist — they work in their own steps, never here.)
-- Answer questions, brainstorm, refine — short, useful replies (this is a chat, not a report).
-- STRICT DOCUMENT GROUNDING: when a brief/document is attached, EVERY fact you state or plan on — brand name, product, audience, budget, objectives, numbers — must come from the document's actual content. Quote its real data. NEVER invent or substitute generic information that is not in the document. If a critical detail is missing from the document, explicitly say it is missing and ask for it (max 2 questions).
-- Document pages may arrive as IMAGES (scanned PDF / photos): read every word in them — Arabic or English — and analyze any visuals, logos, charts or products shown, then give a 3-5 bullet digest proving you read the real content.
-- Only produce the FULL SOCIAL_PLAN deliverable when the user explicitly asks for the final plan. Until then, keep replies conversational.
-- NEVER write a script/screenplay here — that is agent #2's job in the Script step. If the user asks for one, reply with exactly one line telling them to type the exact word «سيناريو» (the app instantly moves them to the Script page). Always use the word «سيناريو» — never say «سكريبت».
-- Keep every reply in the user's language.`;
-
 /* agent #2 — screenwriter (Script step) */
 const SCRIPT_AGENT_ADDON = `
 
 ## ACTIVE AGENT — #2 SCREENWRITER (Script step)
-You are now operating as agent #2 of the studio's specialist team: an award-winning screenwriter and script doctor (drama, ads, UGC). Operate ONLY in SCRIPT mode. Honor every spec field strictly. If PLAN CONTEXT is provided, the script must serve that plan's objectives, audience and brand voice — reference its real content, never generic substitutes.`;
+You are now operating as agent #2 of the studio's specialist team: an award-winning screenwriter and script doctor (drama, ads, UGC). Operate ONLY in SCRIPT mode. Honor every spec field strictly.
+STRICT BRIEF GROUNDING: when a BRIEF document is included (as text or as scanned page images), the script must be built on its ACTUAL content — real brand name, real product, real audience, real objectives. Read every word (Arabic or English) and analyze any visuals. NEVER invent or substitute generic information that is not in the brief.`;
 
 /* agent #3 — director / storyboard artist (Storyboard step) */
 const BOARD_AGENT_ADDON = `
@@ -2331,163 +2282,31 @@ const BOARD_AGENT_ADDON = `
 ## ACTIVE AGENT — #3 DIRECTOR & STORYBOARD ARTIST (Storyboard step)
 You are now operating as agent #3 of the studio's specialist team: a film director + storyboard artist + AI prompt engineer for image/video generation. Operate ONLY in STORYBOARD mode. Follow the per-scene code-block format exactly and honor INCLUDE VOICE-OVER strictly.`;
 
-let chatHistory = [];      // neutral messages for the API
-let chatBusy = false;
-var lastPlanText = "";     // last full assistant reply (for copy/download)
-var planReady = false;     // a full plan was delivered
-let scriptHintShown = false;
-let pendingFile = null;
+/* ---------- step 1: script (brief + specs in one place) ---------- */
+let scriptBrief = null; // {name, text, images:[{mime,b64}]}
 
-function chatBubble(role, html) {
-  const log = document.getElementById("chat-log");
-  const div = document.createElement("div");
-  div.className = "msg " + role + (role === "ai" ? " md" : "");
-  div.innerHTML = html;
-  log.appendChild(div);
-  log.scrollTop = log.scrollHeight;
-  return div;
-}
-
-function chatFilePicked(input) {
-  pendingFile = input.files[0] || null;
-  document.getElementById("chat-file-chip").textContent = pendingFile ? `📎 ${pendingFile.name}` : "";
-}
-
-/* the message is purely "take me to the script step" */
-function isScriptIntent(text) {
-  return /^["'«»\s]*(سيناريو|اسكريبت|سكريبت|script)[\s!.،؟?«»"']*$/i.test(text);
-}
-
-function goToScriptStep() {
-  if (planReady && lastPlanText) {
-    document.getElementById("plan-link").style.display = "inline-block";
+async function scriptBriefPicked(input) {
+  const file = input.files[0];
+  const chip = document.getElementById("script-brief-chip");
+  if (!file) { scriptBrief = null; chip.textContent = ""; return; }
+  chip.textContent = t("brief_reading");
+  try {
+    const doc = await extractDocument(file);
+    scriptBrief = { name: file.name, text: doc.text || "", images: doc.images || [] };
+    chip.textContent = `📎 ${file.name} ✓`;
+    toast(t("brief_set"));
+  } catch (e) {
+    scriptBrief = null;
+    input.value = "";
+    chip.textContent = "";
+    toast("⚠️ " + e.message);
   }
-  switchTab("script");
-  toast(t("t_to_script"));
 }
 
-async function chatSend(preset) {
-  if (chatBusy) return;
-
-  const ta = document.getElementById("chat-text");
-  let text = (preset || ta.value).trim();
-  const file = pendingFile;
-
-  // "سيناريو" / "script" alone → jump straight to the Script step
-  if (text && !file && isScriptIntent(text)) {
-    ta.value = "";
-    goToScriptStep();
-    return;
-  }
-
-  if (!checkReady()) return;
-  if (!text && !file) { toast(t("t_msg_or_file")); return; }
-
-  // the word appears inside a longer message → offer the shortcut button
-  if (/سيناريو|سكريبت|script/i.test(text)) {
-    document.getElementById("go-script").style.display = "inline-flex";
-  }
-
-  chatBusy = true;
-  document.getElementById("chat-send").disabled = true;
-
-  // visible bubble (file name only — the extracted content goes to the model)
-  const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
-  chatBubble("user", esc(text || "…") + (file ? `<div class="chip">📎 ${esc(file.name)}</div>` : ""));
-  ta.value = "";
-  pendingFile = null;
-  document.getElementById("chat-file-chip").textContent = "";
-  document.getElementById("chat-file").value = "";
-
-  // extract the attached document locally (works with every provider)
-  let images = [];
-  if (file) {
-    const extracting = chatBubble("ai", `<p class="thinking">${t("t_reading_doc")}</p>`);
-    try {
-      const doc = await extractDocument(file);
-      if (doc.images && doc.images.length) images.push(...doc.images);
-      if (doc.text) {
-        text += `\n\n===== ATTACHED DOCUMENT «${file.name}» =====\n${doc.text.slice(0, 60000)}\n===== END OF DOCUMENT =====`;
-      }
-      if (images.length) {
-        text += `\n\n[The attached document «${file.name}» ${doc.text ? "also includes" : "is scanned/visual — its pages are attached as"} images. Read ALL text inside them (Arabic or English) and analyze every visual, logo, chart and product shown. Base your reply strictly on this real content.]`;
-      }
-      extracting.remove();
-    } catch (e) {
-      extracting.remove();
-      chatBubble("ai", `<p class="err">⚠️ ${e.message}</p>`);
-      chatBusy = false;
-      document.getElementById("chat-send").disabled = false;
-      return;
-    }
-    if (!(preset || "").trim() && !ta.value && text === "") text = "Read this document and summarize the key points.";
-  }
-
-  chatHistory.push({ role: "user", text: text || "Read the attachment and analyze it.", images });
-  if (chatHistory.length > 16) chatHistory = chatHistory.slice(-16);
-
-  const aiDiv = chatBubble("ai", '<p class="thinking">⏳ …</p>');
-  let raw = "";
-  activeController = runLLM(chatHistory, {
-    onRetry(attempt, max) {
-      aiDiv.innerHTML = `<p class="thinking">${t("retrying")} (${attempt}/${max})</p>`;
-    },
-    onText(d) {
-      raw += d;
-      aiDiv.innerHTML = mdToHtml(raw);
-      const log = document.getElementById("chat-log");
-      log.scrollTop = log.scrollHeight;
-    },
-    onDone(full) {
-      chatBusy = false;
-      document.getElementById("chat-send").disabled = false;
-      activeController = null;
-      if (!full.trim()) { aiDiv.innerHTML = `<p class="thinking">${t("no_result")}</p>`; return; }
-      aiDiv.innerHTML = mdToHtml(full);
-      chatHistory.push({ role: "assistant", text: full });
-      lastPlanText = full;
-      document.getElementById("actions-plan").style.display = "flex";
-      // a full plan was delivered → mark the step and unlock the script shortcut
-      if (/30|calendar|جدول/i.test(full) && full.length > 2500) {
-        planReady = true;
-        markStepDone("plan");
-        document.getElementById("go-script").style.display = "inline-flex";
-        if (!scriptHintShown) {
-          scriptHintShown = true;
-          chatBubble("ai", t("hint_script_html"));
-        }
-      }
-    },
-    onError(msg) {
-      chatBusy = false;
-      document.getElementById("chat-send").disabled = false;
-      activeController = null;
-      aiDiv.innerHTML = `<p class="err">⚠️ ${msg}</p>`;
-    },
-  }, { system: SYSTEM_PROMPT + CHAT_ADDON });
-}
-
-function chatFinalize() {
-  chatSend("تمام — اطلعلي دلوقتي الخطة النهائية الكاملة بكل أقسامها. MODE: SOCIAL_PLAN");
-}
-
-function copyPlan() {
-  navigator.clipboard.writeText(lastPlanText).then(() => toast(t("t_copied")));
-}
-function downloadPlan() {
-  const blob = new Blob([lastPlanText], { type: "text/markdown" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "social-media-plan.md";
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-/* ---------- step 2: script ---------- */
 function runScript() {
   const val = id => document.getElementById(id).value.trim();
   const idea = val("script-idea");
-  if (!idea) { toast(t("t_idea")); return; }
+  if (!idea && !scriptBrief) { toast(t("t_idea")); return; }
 
   const lines = ["MODE: SCRIPT", "FORMAT: " + val("script-format")];
   const add = (label, v) => { if (v) lines.push(label + ": " + v); };
@@ -2500,11 +2319,19 @@ function runScript() {
   add("CHARACTERS/SETTING", val("script-chars"));
   add("CTA", val("script-cta"));
 
-  let req = lines.join("\n") + "\n\nIDEA:\n" + idea;
-  if (planReady && lastPlanText) {
-    req += "\n\nPLAN CONTEXT (the approved social media plan — the script must serve it):\n" + lastPlanText.slice(0, 12000);
+  let req = lines.join("\n");
+  if (idea) req += "\n\nIDEA:\n" + idea;
+  let images = [];
+  if (scriptBrief) {
+    if (scriptBrief.text) {
+      req += `\n\nBRIEF (uploaded client document «${scriptBrief.name}» — ground the script strictly in its real content):\n${scriptBrief.text.slice(0, 60000)}\n===== END OF BRIEF =====`;
+    }
+    if (scriptBrief.images.length) {
+      images = scriptBrief.images;
+      req += `\n\n[BRIEF pages from «${scriptBrief.name}» are attached as images${scriptBrief.text ? " in addition to the text above" : ""}. Read ALL text inside them (Arabic or English), analyze every visual, logo and product shown, and build the script strictly on this real content.]`;
+    }
   }
-  startRun("script", req, SCRIPT_AGENT_ADDON);
+  startRun("script", req, SCRIPT_AGENT_ADDON, images);
 }
 
 /* ---------- step 3: storyboard ---------- */
@@ -2903,12 +2730,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (savedEmail) document.getElementById("cloud-email").value = savedEmail;
     cloudUsage().then(renderUsage);
   }
-
-  // chat: Enter sends, Shift+Enter = new line
-  const chatTa = document.getElementById("chat-text");
-  chatTa.addEventListener("keydown", e => {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); chatSend(); }
-  });
 
   // returning users land straight in the studio; new visitors see the landing page
   const ready = (mode === "cloud" && cloudToken) || apiKey;

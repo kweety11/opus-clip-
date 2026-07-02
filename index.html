@@ -130,54 +130,28 @@
     <div class="stepper-bar">
       <div class="wrap">
         <div class="stepper">
-          <button class="step-btn on" data-tab="plan"><span class="n"><span>1</span></span><span data-i18n="s1"></span></button>
+          <button class="step-btn on" data-tab="script"><span class="n"><span>1</span></span><span data-i18n="s2"></span></button>
           <span class="step-sep"></span>
-          <button class="step-btn" data-tab="script"><span class="n"><span>2</span></span><span data-i18n="s2"></span></button>
+          <button class="step-btn" data-tab="board"><span class="n"><span>2</span></span><span data-i18n="s3"></span></button>
           <span class="step-sep"></span>
-          <button class="step-btn" data-tab="board"><span class="n"><span>3</span></span><span data-i18n="s3"></span></button>
-          <span class="step-sep"></span>
-          <button class="step-btn" data-tab="voice"><span class="n"><span>4</span></span><span data-i18n="s4"></span></button>
+          <button class="step-btn" data-tab="voice"><span class="n"><span>3</span></span><span data-i18n="s4"></span></button>
           <button class="step-btn step-gear" data-tab="settings" data-i18n="s_set"></button>
         </div>
       </div>
     </div>
 
-    <!-- STEP 1: PLAN — interactive chat -->
-    <section class="panel show" id="panel-plan">
-      <div class="wrap">
-        <div class="chat-shell">
-          <div class="chat-card card">
-            <div class="chat-log" id="chat-log">
-              <div class="msg ai md" data-i18n-html="chat_welcome_html"></div>
-            </div>
-            <div class="chat-input">
-              <label class="attach" title="📎"><span>📎</span><input type="file" id="chat-file" accept=".pdf,.docx,.pptx,.txt,.md,image/*" onchange="chatFilePicked(this)"></label>
-              <textarea id="chat-text" rows="1" data-i18n-ph="chat_ph"></textarea>
-              <button class="btn btn-primary btn-sm" id="chat-send" onclick="chatSend()" data-i18n="chat_send"></button>
-            </div>
-            <div class="chat-foot">
-              <span id="chat-file-chip" class="chip"></span>
-              <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <button class="btn btn-ghost btn-sm" id="go-script" style="display:none" onclick="goToScriptStep()" data-i18n="chat_to_script"></button>
-                <button class="btn btn-ghost btn-sm" onclick="chatFinalize()" data-i18n="chat_final"></button>
-              </div>
-            </div>
-          </div>
-          <div class="actions" id="actions-plan" style="justify-content:center">
-            <button class="btn btn-ghost btn-sm" onclick="copyPlan()" data-i18n="copy_last"></button>
-            <button class="btn btn-ghost btn-sm" onclick="downloadPlan()" data-i18n="dl_plan"></button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- STEP 2: SCRIPT -->
-    <section class="panel" id="panel-script">
+    <!-- STEP 1: SCRIPT (brief + specs in one place) -->
+    <section class="panel show" id="panel-script">
       <div class="wrap"><div class="panel-grid">
         <div class="card">
           <h3 data-i18n="sc_h"></h3>
           <p class="hint" data-i18n="sc_hint"></p>
-          <div class="chip" id="plan-link" style="display:none" data-i18n="sc_linked"></div>
+
+          <label class="f" data-i18n="sc_brief"></label>
+          <label class="upload"><span>📎</span><span data-i18n="sc_brief_up"></span>
+            <input type="file" id="script-brief" accept=".pdf,.docx,.pptx,.txt,.md,image/*" onchange="scriptBriefPicked(this)">
+          </label>
+          <span class="chip" id="script-brief-chip"></span>
 
           <div class="two-col">
             <div>

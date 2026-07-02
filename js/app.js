@@ -1,6 +1,6 @@
 /* ============================================================
    FILM-TREND AI — UI logic
-   Tabs: social plan / script / storyboard / settings.
+   Steps: script (brief + specs) / storyboard / voice / settings.
    Streams LLM output (any configured provider) and renders markdown.
    All user-visible strings go through t() (js/i18n.js).
    ============================================================ */
@@ -180,29 +180,12 @@ function downloadOut(tool, name) {
   URL.revokeObjectURL(a.href);
 }
 
-/* ============================================================
-   STEP 1 — planning CHAT
-   The user talks to the model, uploads documents (PDF/Word/PPTX/
-   images), asks anything; then asks for the final plan.
-   Typing "سيناريو" / "script" navigates to the Script step — the
-   model never writes the script inside the chat.
-   ============================================================ */
-const CHAT_ADDON = `
-
-## ACTIVE AGENT — #1 MARKETING CONSULTANT (planning chat)
-You are now operating as agent #1 of the studio's specialist team: a senior social-media marketing consultant and strategist in a live working session. (Agent #2 is the screenwriter, agent #3 is the director/storyboard artist — they work in their own steps, never here.)
-- Answer questions, brainstorm, refine — short, useful replies (this is a chat, not a report).
-- STRICT DOCUMENT GROUNDING: when a brief/document is attached, EVERY fact you state or plan on — brand name, product, audience, budget, objectives, numbers — must come from the document's actual content. Quote its real data. NEVER invent or substitute generic information that is not in the document. If a critical detail is missing from the document, explicitly say it is missing and ask for it (max 2 questions).
-- Document pages may arrive as IMAGES (scanned PDF / photos): read every word in them — Arabic or English — and analyze any visuals, logos, charts or products shown, then give a 3-5 bullet digest proving you read the real content.
-- Only produce the FULL SOCIAL_PLAN deliverable when the user explicitly asks for the final plan. Until then, keep replies conversational.
-- NEVER write a script/screenplay here — that is agent #2's job in the Script step. If the user asks for one, reply with exactly one line telling them to type the exact word «سيناريو» (the app instantly moves them to the Script page). Always use the word «سيناريو» — never say «سكريبت».
-- Keep every reply in the user's language.`;
-
 /* agent #2 — screenwriter (Script step) */
 const SCRIPT_AGENT_ADDON = `
 
 ## ACTIVE AGENT — #2 SCREENWRITER (Script step)
-You are now operating as agent #2 of the studio's specialist team: an award-winning screenwriter and script doctor (drama, ads, UGC). Operate ONLY in SCRIPT mode. Honor every spec field strictly. If PLAN CONTEXT is provided, the script must serve that plan's objectives, audience and brand voice — reference its real content, never generic substitutes.`;
+You are now operating as agent #2 of the studio's specialist team: an award-winning screenwriter and script doctor (drama, ads, UGC). Operate ONLY in SCRIPT mode. Honor every spec field strictly.
+STRICT BRIEF GROUNDING: when a BRIEF document is included (as text or as scanned page images), the script must be built on its ACTUAL content — real brand name, real product, real audience, real objectives. Read every word (Arabic or English) and analyze any visuals. NEVER invent or substitute generic information that is not in the brief.`;
 
 /* agent #3 — director / storyboard artist (Storyboard step) */
 const BOARD_AGENT_ADDON = `
@@ -210,163 +193,31 @@ const BOARD_AGENT_ADDON = `
 ## ACTIVE AGENT — #3 DIRECTOR & STORYBOARD ARTIST (Storyboard step)
 You are now operating as agent #3 of the studio's specialist team: a film director + storyboard artist + AI prompt engineer for image/video generation. Operate ONLY in STORYBOARD mode. Follow the per-scene code-block format exactly and honor INCLUDE VOICE-OVER strictly.`;
 
-let chatHistory = [];      // neutral messages for the API
-let chatBusy = false;
-var lastPlanText = "";     // last full assistant reply (for copy/download)
-var planReady = false;     // a full plan was delivered
-let scriptHintShown = false;
-let pendingFile = null;
+/* ---------- step 1: script (brief + specs in one place) ---------- */
+let scriptBrief = null; // {name, text, images:[{mime,b64}]}
 
-function chatBubble(role, html) {
-  const log = document.getElementById("chat-log");
-  const div = document.createElement("div");
-  div.className = "msg " + role + (role === "ai" ? " md" : "");
-  div.innerHTML = html;
-  log.appendChild(div);
-  log.scrollTop = log.scrollHeight;
-  return div;
-}
-
-function chatFilePicked(input) {
-  pendingFile = input.files[0] || null;
-  document.getElementById("chat-file-chip").textContent = pendingFile ? `📎 ${pendingFile.name}` : "";
-}
-
-/* the message is purely "take me to the script step" */
-function isScriptIntent(text) {
-  return /^["'«»\s]*(سيناريو|اسكريبت|سكريبت|script)[\s!.،؟?«»"']*$/i.test(text);
-}
-
-function goToScriptStep() {
-  if (planReady && lastPlanText) {
-    document.getElementById("plan-link").style.display = "inline-block";
+async function scriptBriefPicked(input) {
+  const file = input.files[0];
+  const chip = document.getElementById("script-brief-chip");
+  if (!file) { scriptBrief = null; chip.textContent = ""; return; }
+  chip.textContent = t("brief_reading");
+  try {
+    const doc = await extractDocument(file);
+    scriptBrief = { name: file.name, text: doc.text || "", images: doc.images || [] };
+    chip.textContent = `📎 ${file.name} ✓`;
+    toast(t("brief_set"));
+  } catch (e) {
+    scriptBrief = null;
+    input.value = "";
+    chip.textContent = "";
+    toast("⚠️ " + e.message);
   }
-  switchTab("script");
-  toast(t("t_to_script"));
 }
 
-async function chatSend(preset) {
-  if (chatBusy) return;
-
-  const ta = document.getElementById("chat-text");
-  let text = (preset || ta.value).trim();
-  const file = pendingFile;
-
-  // "سيناريو" / "script" alone → jump straight to the Script step
-  if (text && !file && isScriptIntent(text)) {
-    ta.value = "";
-    goToScriptStep();
-    return;
-  }
-
-  if (!checkReady()) return;
-  if (!text && !file) { toast(t("t_msg_or_file")); return; }
-
-  // the word appears inside a longer message → offer the shortcut button
-  if (/سيناريو|سكريبت|script/i.test(text)) {
-    document.getElementById("go-script").style.display = "inline-flex";
-  }
-
-  chatBusy = true;
-  document.getElementById("chat-send").disabled = true;
-
-  // visible bubble (file name only — the extracted content goes to the model)
-  const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
-  chatBubble("user", esc(text || "…") + (file ? `<div class="chip">📎 ${esc(file.name)}</div>` : ""));
-  ta.value = "";
-  pendingFile = null;
-  document.getElementById("chat-file-chip").textContent = "";
-  document.getElementById("chat-file").value = "";
-
-  // extract the attached document locally (works with every provider)
-  let images = [];
-  if (file) {
-    const extracting = chatBubble("ai", `<p class="thinking">${t("t_reading_doc")}</p>`);
-    try {
-      const doc = await extractDocument(file);
-      if (doc.images && doc.images.length) images.push(...doc.images);
-      if (doc.text) {
-        text += `\n\n===== ATTACHED DOCUMENT «${file.name}» =====\n${doc.text.slice(0, 60000)}\n===== END OF DOCUMENT =====`;
-      }
-      if (images.length) {
-        text += `\n\n[The attached document «${file.name}» ${doc.text ? "also includes" : "is scanned/visual — its pages are attached as"} images. Read ALL text inside them (Arabic or English) and analyze every visual, logo, chart and product shown. Base your reply strictly on this real content.]`;
-      }
-      extracting.remove();
-    } catch (e) {
-      extracting.remove();
-      chatBubble("ai", `<p class="err">⚠️ ${e.message}</p>`);
-      chatBusy = false;
-      document.getElementById("chat-send").disabled = false;
-      return;
-    }
-    if (!(preset || "").trim() && !ta.value && text === "") text = "Read this document and summarize the key points.";
-  }
-
-  chatHistory.push({ role: "user", text: text || "Read the attachment and analyze it.", images });
-  if (chatHistory.length > 16) chatHistory = chatHistory.slice(-16);
-
-  const aiDiv = chatBubble("ai", '<p class="thinking">⏳ …</p>');
-  let raw = "";
-  activeController = runLLM(chatHistory, {
-    onRetry(attempt, max) {
-      aiDiv.innerHTML = `<p class="thinking">${t("retrying")} (${attempt}/${max})</p>`;
-    },
-    onText(d) {
-      raw += d;
-      aiDiv.innerHTML = mdToHtml(raw);
-      const log = document.getElementById("chat-log");
-      log.scrollTop = log.scrollHeight;
-    },
-    onDone(full) {
-      chatBusy = false;
-      document.getElementById("chat-send").disabled = false;
-      activeController = null;
-      if (!full.trim()) { aiDiv.innerHTML = `<p class="thinking">${t("no_result")}</p>`; return; }
-      aiDiv.innerHTML = mdToHtml(full);
-      chatHistory.push({ role: "assistant", text: full });
-      lastPlanText = full;
-      document.getElementById("actions-plan").style.display = "flex";
-      // a full plan was delivered → mark the step and unlock the script shortcut
-      if (/30|calendar|جدول/i.test(full) && full.length > 2500) {
-        planReady = true;
-        markStepDone("plan");
-        document.getElementById("go-script").style.display = "inline-flex";
-        if (!scriptHintShown) {
-          scriptHintShown = true;
-          chatBubble("ai", t("hint_script_html"));
-        }
-      }
-    },
-    onError(msg) {
-      chatBusy = false;
-      document.getElementById("chat-send").disabled = false;
-      activeController = null;
-      aiDiv.innerHTML = `<p class="err">⚠️ ${msg}</p>`;
-    },
-  }, { system: SYSTEM_PROMPT + CHAT_ADDON });
-}
-
-function chatFinalize() {
-  chatSend("تمام — اطلعلي دلوقتي الخطة النهائية الكاملة بكل أقسامها. MODE: SOCIAL_PLAN");
-}
-
-function copyPlan() {
-  navigator.clipboard.writeText(lastPlanText).then(() => toast(t("t_copied")));
-}
-function downloadPlan() {
-  const blob = new Blob([lastPlanText], { type: "text/markdown" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "social-media-plan.md";
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-/* ---------- step 2: script ---------- */
 function runScript() {
   const val = id => document.getElementById(id).value.trim();
   const idea = val("script-idea");
-  if (!idea) { toast(t("t_idea")); return; }
+  if (!idea && !scriptBrief) { toast(t("t_idea")); return; }
 
   const lines = ["MODE: SCRIPT", "FORMAT: " + val("script-format")];
   const add = (label, v) => { if (v) lines.push(label + ": " + v); };
@@ -379,11 +230,19 @@ function runScript() {
   add("CHARACTERS/SETTING", val("script-chars"));
   add("CTA", val("script-cta"));
 
-  let req = lines.join("\n") + "\n\nIDEA:\n" + idea;
-  if (planReady && lastPlanText) {
-    req += "\n\nPLAN CONTEXT (the approved social media plan — the script must serve it):\n" + lastPlanText.slice(0, 12000);
+  let req = lines.join("\n");
+  if (idea) req += "\n\nIDEA:\n" + idea;
+  let images = [];
+  if (scriptBrief) {
+    if (scriptBrief.text) {
+      req += `\n\nBRIEF (uploaded client document «${scriptBrief.name}» — ground the script strictly in its real content):\n${scriptBrief.text.slice(0, 60000)}\n===== END OF BRIEF =====`;
+    }
+    if (scriptBrief.images.length) {
+      images = scriptBrief.images;
+      req += `\n\n[BRIEF pages from «${scriptBrief.name}» are attached as images${scriptBrief.text ? " in addition to the text above" : ""}. Read ALL text inside them (Arabic or English), analyze every visual, logo and product shown, and build the script strictly on this real content.]`;
+    }
   }
-  startRun("script", req, SCRIPT_AGENT_ADDON);
+  startRun("script", req, SCRIPT_AGENT_ADDON, images);
 }
 
 /* ---------- step 3: storyboard ---------- */
@@ -782,12 +641,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (savedEmail) document.getElementById("cloud-email").value = savedEmail;
     cloudUsage().then(renderUsage);
   }
-
-  // chat: Enter sends, Shift+Enter = new line
-  const chatTa = document.getElementById("chat-text");
-  chatTa.addEventListener("keydown", e => {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); chatSend(); }
-  });
 
   // returning users land straight in the studio; new visitors see the landing page
   const ready = (mode === "cloud" && cloudToken) || apiKey;
