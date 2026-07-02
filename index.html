@@ -134,28 +134,33 @@
       </div>
     </div>
 
-    <!-- STEP 1: PLAN -->
+    <!-- STEP 1: PLAN — interactive chat -->
     <section class="panel show" id="panel-plan">
-      <div class="wrap"><div class="panel-grid">
-        <div class="card">
-          <h3>من البريف لخطة كاملة</h3>
-          <p class="hint">اكتب البريف أو ارفع ملف PDF — هتاخد خطة شاملة: أهداف، جمهور، استراتيجية منصات، جدول 30 يوم، هوكس جاهزة وقياس.</p>
-          <label class="f">البريف (اختياري لو رفعت PDF)</label>
-          <textarea id="plan-brief" placeholder="مثال: براند قهوة مختصة جديد في القاهرة، الجمهور 20-35 سنة، الهدف وعي وزيارات، التون شبابي..."></textarea>
-          <label class="f">أو ارفع البريف كـ PDF</label>
-          <label class="upload">📎 اختار ملف PDF<input type="file" id="plan-pdf" accept="application/pdf"></label>
-          <div id="pdf-name"></div>
-          <button class="btn btn-primary btn-block" id="run-plan" onclick="runPlan()">🚀 اعمل الخطة</button>
-          <button class="btn btn-stop" id="stop-plan" onclick="stopRun('plan')">⏹ إيقاف</button>
-        </div>
-        <div>
-          <div class="out" id="out-plan" data-raw=""></div>
-          <div class="actions" id="actions-plan">
-            <button class="btn btn-ghost btn-sm" onclick="copyOut('plan')">📋 نسخ</button>
-            <button class="btn btn-ghost btn-sm" onclick="downloadOut('plan','social-media-plan.md')">⬇️ تحميل .md</button>
+      <div class="wrap">
+        <div class="chat-shell">
+          <div class="chat-card card">
+            <div class="chat-log" id="chat-log">
+              <div class="msg ai md">
+                <p>أهلًا 👋 أنا استراتيجي السوشيال ميديا بتاعك.</p>
+                <p>احكيلي عن المشروع أو <b>ارفق البريف</b> (PDF / Word / PowerPoint / صورة / نص) — اسألني أي حاجة، ناقشني، ولما نخلص اضغط <b>"اطلع الخطة النهائية"</b> وهجهزهالك كاملة.</p>
+              </div>
+            </div>
+            <div class="chat-input">
+              <label class="attach" title="ارفق مستند">📎<input type="file" id="chat-file" accept=".pdf,.docx,.pptx,.txt,.md,image/*" onchange="chatFilePicked(this)"></label>
+              <textarea id="chat-text" rows="1" placeholder="اكتب رسالتك أو اسأل أي حاجة… (Enter للإرسال)"></textarea>
+              <button class="btn btn-primary btn-sm" id="chat-send" onclick="chatSend()">إرسال</button>
+            </div>
+            <div class="chat-foot">
+              <span id="chat-file-chip" class="chip"></span>
+              <button class="btn btn-ghost btn-sm" onclick="chatFinalize()">🚀 اطلع الخطة النهائية</button>
+            </div>
+          </div>
+          <div class="actions" id="actions-plan" style="justify-content:center">
+            <button class="btn btn-ghost btn-sm" onclick="copyPlan()">📋 نسخ آخر رد</button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadPlan()">⬇️ تحميل الخطة .md</button>
           </div>
         </div>
-      </div></div>
+      </div>
     </section>
 
     <!-- STEP 2: SCRIPT -->
@@ -182,7 +187,7 @@
           <div id="carry-note">✓ السيناريو جاهز — روح لخطوة الاستوري بورد واضغط "استخدم آخر سيناريو"</div>
         </div>
         <div>
-          <div class="out" id="out-script" data-raw=""></div>
+          <div class="out md" id="out-script" data-raw=""></div>
           <div class="actions" id="actions-script">
             <button class="btn btn-ghost btn-sm" onclick="copyOut('script')">📋 نسخ</button>
             <button class="btn btn-ghost btn-sm" onclick="downloadOut('script','script.md')">⬇️ تحميل .md</button>
@@ -215,7 +220,7 @@
           <button class="btn btn-stop" id="stop-board" onclick="stopRun('board')">⏹ إيقاف</button>
         </div>
         <div>
-          <div class="out" id="out-board" data-raw=""></div>
+          <div class="out md" id="out-board" data-raw=""></div>
           <div class="actions" id="actions-board">
             <button class="btn btn-ghost btn-sm" id="split-board" onclick="toggleBoardView()">🗂️ قسّم المشاهد</button>
             <button class="btn btn-ghost btn-sm" onclick="copyOut('board')">📋 نسخ الكل</button>
@@ -231,7 +236,7 @@
         <div class="card">
           <h3>الفويس أوفر — أصوات Google</h3>
           <p class="hint">أصوات Gemini الاحترافية بتتكلم <b>عربي وإنجليزي</b>. بيستخدم مفتاح Google Gemini (المجاني) من الإعدادات.</p>
-          <button class="btn btn-ghost btn-block" style="margin-top:0" onclick="useScriptForVoice()">↩️ هات النص من آخر سيناريو</button>
+          <button class="btn btn-ghost btn-block" style="margin-top:0" id="voice-pull" onclick="useScriptForVoice()">🪄 استخرج نص الفويس أوفر من آخر سيناريو</button>
           <label class="f">النص</label>
           <textarea id="voice-text" rows="6" placeholder="اكتب أو الصق النص اللي عايز تسمعه — عربي أو إنجليزي..."></textarea>
           <label class="f">الصوت</label>
@@ -302,6 +307,7 @@
   <script src="js/config.js"></script>
   <script src="js/prompt.js"></script>
   <script src="js/styles.js"></script>
+  <script src="js/docs.js"></script>
   <script src="js/tts.js"></script>
   <script src="js/api.js"></script>
   <script src="js/app.js"></script>

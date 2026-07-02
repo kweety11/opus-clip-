@@ -18,9 +18,11 @@ function mdToHtml(md) {
     .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<i>$2</i>")
     .replace(/`([^`]+)`/g, "<code>$1</code>");
 
+  // dir="auto" makes each block flow by its own language (Arabic → RTL,
+  // English prompts → LTR) so mixed output always reads clean.
   const closeBlocks = () => {
     if (inList) { html += "</ul>"; inList = false; }
-    if (inTable) { html += "</table>"; inTable = false; }
+    if (inTable) { html += "</table></div>"; inTable = false; }
   };
 
   for (const line of lines) {
@@ -33,21 +35,21 @@ function mdToHtml(md) {
     if (inCode) { html += esc(line) + "\n"; continue; }
 
     const h = line.match(/^(#{1,4})\s+(.*)/);
-    if (h) { closeBlocks(); html += `<h${h[1].length + 1}>${inline(h[2])}</h${h[1].length + 1}>`; continue; }
+    if (h) { closeBlocks(); html += `<h${h[1].length + 1} dir="auto">${inline(h[2])}</h${h[1].length + 1}>`; continue; }
 
     if (/^\s*[-*•]\s+/.test(line)) {
-      if (inTable) { html += "</table>"; inTable = false; }
+      if (inTable) { html += "</table></div>"; inTable = false; }
       if (!inList) { html += "<ul>"; inList = true; }
-      html += `<li>${inline(line.replace(/^\s*[-*•]\s+/, ""))}</li>`;
+      html += `<li dir="auto">${inline(line.replace(/^\s*[-*•]\s+/, ""))}</li>`;
       continue;
     }
 
     if (/^\s*\|/.test(line)) {
       if (inList) { html += "</ul>"; inList = false; }
       if (/^\s*\|[\s:|-]+\|\s*$/.test(line)) continue; // separator row
-      if (!inTable) { html += "<table>"; inTable = true; }
+      if (!inTable) { html += '<div class="tblw"><table>'; inTable = true; }
       const cells = line.trim().replace(/^\||\|$/g, "").split("|");
-      html += "<tr>" + cells.map(c => `<td>${inline(c.trim())}</td>`).join("") + "</tr>";
+      html += "<tr>" + cells.map(c => `<td dir="auto">${inline(c.trim())}</td>`).join("") + "</tr>";
       continue;
     }
 
@@ -55,11 +57,11 @@ function mdToHtml(md) {
     if (line.trim() === "") { closeBlocks(); continue; }
 
     closeBlocks();
-    html += `<p>${inline(line)}</p>`;
+    html += `<p dir="auto">${inline(line)}</p>`;
   }
   if (inCode) html += "</pre>";
   if (inList) html += "</ul>";
-  if (inTable) html += "</table>";
+  if (inTable) html += "</table></div>";
   return html;
 }
 
@@ -88,15 +90,20 @@ function markStepDone(tool) {
 }
 
 /* ---------- shared run/render plumbing ---------- */
-function startRun(tool, content) {
-  const { mode, cloudToken, apiKey, provider } = getSettings();
+function checkReady() {
+  const { mode, cloudToken, apiKey } = getSettings();
   if (mode === "cloud" ? !cloudToken : !apiKey) {
     toast(mode === "cloud"
       ? "سجّل بإيميلك الأول من تبويب الإعدادات ⚙️"
-      : `ضيف مفتاح ${PROVIDERS[provider].label} الأول من تبويب الإعدادات ⚙️`);
+      : "ضيف مفتاح المزود الأول من تبويب الإعدادات ⚙️");
     switchTab("settings");
-    return;
+    return false;
   }
+  return true;
+}
+
+function startRun(tool, text) {
+  if (!checkReady()) return;
   if (activeController) activeController.abort();
 
   const out = document.getElementById(`out-${tool}`);
@@ -107,7 +114,7 @@ function startRun(tool, content) {
   btn.disabled = true;
   stop.style.display = "inline-flex";
 
-  activeController = runLLM(content, {
+  activeController = runLLM([{ role: "user", text }], {
     onText(delta) {
       out.dataset.raw += delta;
       out.innerHTML = mdToHtml(out.dataset.raw);
@@ -164,40 +171,139 @@ function downloadOut(tool, name) {
   URL.revokeObjectURL(a.href);
 }
 
-/* ---------- tool 1: social plan ---------- */
-async function runPlan() {
-  const brief = document.getElementById("plan-brief").value.trim();
-  const file = document.getElementById("plan-pdf").files[0];
-  if (!brief && !file) { toast("اكتب البريف أو ارفع ملف PDF"); return; }
+/* ============================================================
+   STEP 1 — planning CHAT
+   The user talks to the model, uploads documents (PDF/Word/PPTX/
+   images), asks anything; then asks for the final plan.
+   ============================================================ */
+const CHAT_ADDON = `
 
-  const content = [];
-  if (file) {
-    if (file.size > 30 * 1024 * 1024) { toast("حجم الـ PDF أكبر من 30MB"); return; }
-    content.push({
-      type: "document",
-      source: { type: "base64", media_type: "application/pdf", data: await fileToBase64(file) },
-    });
-  }
-  content.push({
-    type: "text",
-    text: "MODE: SOCIAL_PLAN\n\n" + (brief || "البريف كامل في ملف الـ PDF المرفق. حوّله لخطة سوشيال ميديا شاملة."),
-  });
-  startRun("plan", content);
+## INTERACTIVE PLANNING CHAT (currently active)
+You are chatting live with the user inside the planning step. Behave like a sharp strategist in a working session:
+- Answer questions, brainstorm, refine — short, useful replies (this is a chat, not a report).
+- If the user uploads a document, read it, give a 3-5 bullet digest, and ask at most ONE sharp follow-up question.
+- Only produce the FULL SOCIAL_PLAN deliverable when the user explicitly asks for the final plan. Until then, keep replies conversational.
+- Keep every reply in the user's language.`;
+
+let chatHistory = [];      // neutral messages for the API
+let chatBusy = false;
+let lastPlanText = "";     // last full assistant reply (for copy/download)
+let pendingFile = null;
+
+function chatBubble(role, html) {
+  const log = document.getElementById("chat-log");
+  const div = document.createElement("div");
+  div.className = "msg " + role + (role === "ai" ? " md" : "");
+  div.innerHTML = html;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+  return div;
 }
 
-/* ---------- tool 2: script ---------- */
+function chatFilePicked(input) {
+  pendingFile = input.files[0] || null;
+  document.getElementById("chat-file-chip").textContent = pendingFile ? `📎 ${pendingFile.name}` : "";
+}
+
+async function chatSend(preset) {
+  if (chatBusy) return;
+  if (!checkReady()) return;
+
+  const ta = document.getElementById("chat-text");
+  let text = (preset || ta.value).trim();
+  const file = pendingFile;
+  if (!text && !file) { toast("اكتب رسالة أو ارفق ملف"); return; }
+
+  chatBusy = true;
+  document.getElementById("chat-send").disabled = true;
+
+  // visible bubble (file name only — the extracted content goes to the model)
+  const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  chatBubble("user", esc(text || "…") + (file ? `<div class="chip">📎 ${esc(file.name)}</div>` : ""));
+  ta.value = "";
+  pendingFile = null;
+  document.getElementById("chat-file-chip").textContent = "";
+  document.getElementById("chat-file").value = "";
+
+  // extract the attached document locally (works with every provider)
+  let images = [];
+  if (file) {
+    const extracting = chatBubble("ai", '<p class="thinking">📄 بقرا المستند وبفرّغه…</p>');
+    try {
+      const doc = await extractDocument(file);
+      if (doc.image) images.push(doc.image);
+      else text += `\n\n===== محتوى المستند المرفق «${file.name}» =====\n${doc.text.slice(0, 60000)}\n===== نهاية المستند =====`;
+      extracting.remove();
+    } catch (e) {
+      extracting.remove();
+      chatBubble("ai", `<p class="err">⚠️ ${e.message}</p>`);
+      chatBusy = false;
+      document.getElementById("chat-send").disabled = false;
+      return;
+    }
+    if (!(preset || "").trim() && !ta.value && text === "" ) text = "اقرا المستند ده ولخصلي أهم النقط.";
+  }
+
+  chatHistory.push({ role: "user", text: text || "اقرا المرفق وحلله.", images });
+  if (chatHistory.length > 16) chatHistory = chatHistory.slice(-16);
+
+  const aiDiv = chatBubble("ai", '<p class="thinking">⏳ …</p>');
+  let raw = "";
+  activeController = runLLM(chatHistory, {
+    onText(d) {
+      raw += d;
+      aiDiv.innerHTML = mdToHtml(raw);
+      const log = document.getElementById("chat-log");
+      log.scrollTop = log.scrollHeight;
+    },
+    onDone(full) {
+      chatBusy = false;
+      document.getElementById("chat-send").disabled = false;
+      activeController = null;
+      if (!full.trim()) { aiDiv.innerHTML = '<p class="thinking">ماوصلش رد — حاول تاني</p>'; return; }
+      aiDiv.innerHTML = mdToHtml(full);
+      chatHistory.push({ role: "assistant", text: full });
+      lastPlanText = full;
+      document.getElementById("actions-plan").style.display = "flex";
+      // a full plan was delivered → mark the step
+      if (/30|calendar|جدول/i.test(full) && full.length > 2500) markStepDone("plan");
+    },
+    onError(msg) {
+      chatBusy = false;
+      document.getElementById("chat-send").disabled = false;
+      activeController = null;
+      aiDiv.innerHTML = `<p class="err">⚠️ ${msg}</p>`;
+    },
+  }, { system: SYSTEM_PROMPT + CHAT_ADDON });
+}
+
+function chatFinalize() {
+  chatSend("تمام — اطلعلي دلوقتي الخطة النهائية الكاملة بكل أقسامها. MODE: SOCIAL_PLAN");
+}
+
+function copyPlan() {
+  navigator.clipboard.writeText(lastPlanText).then(() => toast("اتنسخ ✓"));
+}
+function downloadPlan() {
+  const blob = new Blob([lastPlanText], { type: "text/markdown" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "social-media-plan.md";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ---------- step 2: script ---------- */
 function runScript() {
   const idea = document.getElementById("script-idea").value.trim();
   if (!idea) { toast("اكتب الفكرة الأول"); return; }
   const format = document.getElementById("script-format").value;
   const duration = document.getElementById("script-duration").value.trim();
-  startRun("script", [{
-    type: "text",
-    text: `MODE: SCRIPT\nFORMAT: ${format}${duration ? "\nTARGET DURATION: " + duration : ""}\n\n${idea}`,
-  }]);
+  startRun("script",
+    `MODE: SCRIPT\nFORMAT: ${format}${duration ? "\nTARGET DURATION: " + duration : ""}\n\n${idea}`);
 }
 
-/* ---------- tool 3: storyboard ---------- */
+/* ---------- step 3: storyboard ---------- */
 function runBoard() {
   let script = document.getElementById("board-script").value.trim();
   if (!script && lastScript) script = lastScript;
@@ -206,10 +312,8 @@ function runBoard() {
   const styleCustom = document.getElementById("board-style").value.trim();
   const style = [styleSel, styleCustom].filter(Boolean).join(", ");
   const ratio = document.getElementById("board-ratio").value;
-  startRun("board", [{
-    type: "text",
-    text: `MODE: STORYBOARD\nASPECT RATIO: ${ratio}${style ? "\nVISUAL STYLE: " + style : ""}\n\nSCRIPT:\n${script}`,
-  }]);
+  startRun("board",
+    `MODE: STORYBOARD\nASPECT RATIO: ${ratio}${style ? "\nVISUAL STYLE: " + style : ""}\n\nSCRIPT:\n${script}`);
 }
 
 function useLastScript() {
@@ -282,10 +386,33 @@ function toggleBoardView() {
 /* ---------- step 4: voice-over (Google Gemini TTS) ---------- */
 let lastWavUrl = null;
 
+const VO_EXTRACT_SYSTEM = `You are a voice-over script extractor. From the given screenplay, extract ONLY the words that will be spoken aloud (dialogue lines and narration/V.O.), in their original order and original language.
+Remove completely: scene headers, action/description lines, camera notes, durations, character name labels, parentheticals, markdown, and any prompts.
+Merge the result into clean flowing voice-over text, one paragraph per beat. Return ONLY the spoken text — no titles, no commentary.`;
+
 function useScriptForVoice() {
   if (!lastScript) { toast("مفيش سيناريو متولد لسه"); return; }
-  document.getElementById("voice-text").value = lastScript.slice(0, 4000);
-  toast("النص اتحط من آخر سيناريو ✓");
+  if (!checkReady()) return;
+  const ta = document.getElementById("voice-text");
+  const btn = document.getElementById("voice-pull");
+  ta.value = "";
+  ta.placeholder = "⏳ بستخرج نص الفويس أوفر من السيناريو ومجهزه…";
+  btn.disabled = true;
+
+  runLLM([{ role: "user", text: "SCRIPT:\n" + lastScript.slice(0, 30000) }], {
+    onText(d) { ta.value += d; ta.scrollTop = ta.scrollHeight; },
+    onDone(full) {
+      btn.disabled = false;
+      ta.value = full.trim();
+      ta.placeholder = "اكتب أو الصق النص اللي عايز تسمعه — عربي أو إنجليزي...";
+      if (full.trim()) toast("نص الفويس أوفر اتجهز ✓ — راجعه واضغط ولّد الصوت");
+    },
+    onError(msg) {
+      btn.disabled = false;
+      ta.placeholder = "اكتب أو الصق النص اللي عايز تسمعه — عربي أو إنجليزي...";
+      toast(msg);
+    },
+  }, { system: VO_EXTRACT_SYSTEM });
 }
 
 async function runVoice() {
@@ -444,9 +571,10 @@ document.addEventListener("DOMContentLoaded", () => {
     cloudUsage().then(renderUsage);
   }
 
-  document.getElementById("plan-pdf").addEventListener("change", e => {
-    const f = e.target.files[0];
-    document.getElementById("pdf-name").textContent = f ? `📄 ${f.name}` : "";
+  // chat: Enter sends, Shift+Enter = new line
+  const chatTa = document.getElementById("chat-text");
+  chatTa.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); chatSend(); }
   });
 
   // returning users land straight in the studio; new visitors see the landing page

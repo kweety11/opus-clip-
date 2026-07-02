@@ -129,29 +129,31 @@ function saveSettings(provider, apiKey, model, customModel) {
    content: array of blocks [{type:"text",text}] and optionally
    one {type:"document", source:{...}} (Claude only)
    ============================================================ */
-function runLLM(content, handlers) {
+/**
+ * runLLM(messages, handlers, opts)
+ * messages: neutral history — [{role:"user"|"assistant", text, images?:[{mime,b64}]}]
+ * opts.system: override the system prompt (defaults to SYSTEM_PROMPT)
+ */
+function runLLM(messages, handlers, opts = {}) {
   const { mode, cloudToken, provider, apiKey, model } = getSettings();
-  const P = mode === "cloud" ? { protocol: "cloud", label: "☁️ حساب Film-trend", pdf: false } : PROVIDERS[provider];
+  const P = mode === "cloud" ? { protocol: "cloud", label: "☁️ حساب Film-trend" } : PROVIDERS[provider];
   const controller = new AbortController();
-
-  const hasPdf = content.some(b => b.type === "document");
-  if (hasPdf && !P.pdf) {
-    handlers.onError("رفع الـ PDF متاح حاليًا مع Claude بس (وضع المفتاح الخاص) — أو انسخ نص البريف في الخانة");
-    return controller;
-  }
+  const system = opts.system || SYSTEM_PROMPT;
+  const hasImages = messages.some(m => m.images && m.images.length);
 
   let url, headers, body;
 
   if (P.protocol === "cloud") {
+    if (hasImages) {
+      handlers.onError("رفع الصور متاح في وضع المفتاح الخاص — في حساب Film-trend ارفع مستندات نصية (PDF/Word/PPTX)");
+      return controller;
+    }
     url = backendUrl() + "/generate";
-    headers = {
-      "content-type": "application/json",
-      "authorization": "Bearer " + cloudToken,
-    };
-    body = {
-      system: SYSTEM_PROMPT,
-      user: content.filter(b => b.type === "text").map(b => b.text).join("\n\n"),
-    };
+    headers = { "content-type": "application/json", "authorization": "Bearer " + cloudToken };
+    // the worker takes a single user string — flatten the conversation
+    const flat = messages.map(m =>
+      (m.role === "assistant" ? "ASSISTANT:\n" : "USER:\n") + m.text).join("\n\n");
+    body = { system, user: flat };
   } else if (P.protocol === "anthropic") {
     url = P.url;
     headers = {
@@ -164,27 +166,40 @@ function runLLM(content, handlers) {
       model,
       max_tokens: 64000,
       stream: true,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: "user", content }],
+      system,
+      messages: messages.map(m => ({
+        role: m.role,
+        content: [
+          ...(m.images || []).map(im => ({
+            type: "image",
+            source: { type: "base64", media_type: im.mime, data: im.b64 },
+          })),
+          { type: "text", text: m.text },
+        ],
+      })),
     };
     if (!model.startsWith("claude-haiku")) body.thinking = { type: "adaptive" };
   } else {
     url = P.url;
-    headers = {
-      "content-type": "application/json",
-      "authorization": "Bearer " + apiKey,
-    };
+    headers = { "content-type": "application/json", "authorization": "Bearer " + apiKey };
     if (provider === "openrouter") {
       headers["HTTP-Referer"] = "https://film-trend.ai";
       headers["X-Title"] = "Film-trend AI";
     }
-    const userText = content.filter(b => b.type === "text").map(b => b.text).join("\n\n");
     body = {
       model,
       stream: true,
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: userText },
+        { role: "system", content: system },
+        ...messages.map(m => ({
+          role: m.role,
+          content: (m.images && m.images.length)
+            ? [
+                ...m.images.map(im => ({ type: "image_url", image_url: { url: `data:${im.mime};base64,${im.b64}` } })),
+                { type: "text", text: m.text },
+              ]
+            : m.text,
+        })),
       ],
     };
   }

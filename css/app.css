@@ -258,29 +258,29 @@ textarea { resize: vertical; min-height: 130px; }
   font-size: 15px; box-shadow: var(--shadow);
 }
 .out:empty::before { content: "الناتج هيظهر هنا…"; color: var(--faint); font-weight: 600; }
-.out h2, .out h3, .out h4, .out h5 { margin: 22px 0 8px; color: var(--accent); font-weight: 800; }
-.out h2 { font-size: 21px; } .out h3 { font-size: 17.5px; } .out h4 { font-size: 15.5px; }
-.out p { margin: 7px 0; }
-.out ul { margin: 8px 22px 8px 0; }
-[dir="ltr"] .out ul { margin: 8px 0 8px 22px; }
-.out li { margin: 4px 0; }
-.out hr { border: 0; border-top: 1px solid var(--line); margin: 20px 0; }
-.out code {
+.md h2, .md h3, .md h4, .md h5 { margin: 22px 0 8px; color: var(--accent); font-weight: 800; }
+.md h2 { font-size: 21px; } .md h3 { font-size: 17.5px; } .md h4 { font-size: 15.5px; }
+.md p { margin: 7px 0; }
+.md ul { margin: 8px 22px 8px 0; }
+[dir="ltr"] .md ul { margin: 8px 0 8px 22px; }
+.md li { margin: 4px 0; }
+.md hr { border: 0; border-top: 1px solid var(--line); margin: 20px 0; }
+.md code {
   background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px;
   padding: 1px 8px; font-size: 13px; font-family: var(--mono);
   direction: ltr; unicode-bidi: embed;
 }
-.out pre {
+.md pre {
   background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-sm);
   padding: 15px 17px; margin: 13px 0; overflow-x: auto;
   font-size: 13px; line-height: 1.65; font-family: var(--mono);
   direction: ltr; text-align: left;
 }
-.out table { border-collapse: collapse; margin: 14px 0; width: 100%; font-size: 13.5px; }
-.out td { border: 1px solid var(--line); padding: 8px 12px; vertical-align: top; }
-.out tr:first-child td { background: var(--surface-2); font-weight: 800; }
-.out .thinking { color: var(--muted); font-weight: 600; }
-.out .err { color: var(--err); font-weight: 700; }
+.md table { border-collapse: collapse; margin: 14px 0; width: 100%; font-size: 13.5px; }
+.md td { border: 1px solid var(--line); padding: 8px 12px; vertical-align: top; }
+.md tr:first-child td { background: var(--surface-2); font-weight: 800; }
+.md .thinking, .out .thinking { color: var(--muted); font-weight: 600; }
+.md .err, .out .err { color: var(--err); font-weight: 700; }
 
 .actions { display: none; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
 
@@ -305,6 +305,53 @@ textarea { resize: vertical; min-height: 130px; }
   font-size: 12.5px; line-height: 1.65; white-space: pre-wrap;
   direction: ltr; text-align: left; font-family: var(--mono);
 }
+
+/* markdown tables scroll inside their own wrapper — never break layout */
+.tblw { overflow-x: auto; max-width: 100%; margin: 14px 0; border-radius: var(--r-sm); }
+.md .tblw table { margin: 0; }
+
+/* ============ planning chat ============ */
+.chat-shell { max-width: 880px; margin: 0 auto; }
+.chat-card { display: flex; flex-direction: column; height: min(72vh, 760px); padding: 18px; }
+.chat-log {
+  flex: 1; overflow-y: auto; display: flex; flex-direction: column;
+  gap: 14px; padding: 6px 4px 14px;
+}
+.msg {
+  max-width: 88%; padding: 13px 18px; border-radius: 16px;
+  font-size: 14.5px; line-height: 1.85; overflow-wrap: break-word;
+}
+.msg.user {
+  align-self: flex-start;
+  background: rgba(242, 178, 62, .12); border: 1px solid rgba(242, 178, 62, .3);
+  border-start-start-radius: 4px;
+}
+.msg.ai {
+  align-self: flex-end;
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-start-end-radius: 4px;
+  max-width: 94%;
+}
+.msg .chip { display: inline-block; margin-top: 7px; }
+.chip {
+  background: rgba(67, 202, 187, .1); border: 1px solid rgba(67, 202, 187, .35);
+  color: var(--teal); border-radius: 8px; padding: 2px 10px;
+  font-size: 12px; font-weight: 700;
+}
+.chip:empty { display: none; }
+.chat-input {
+  display: flex; gap: 10px; align-items: flex-end;
+  border-top: 1px solid var(--line-soft); padding-top: 14px;
+}
+.chat-input textarea { flex: 1; min-height: 46px; max-height: 130px; resize: none; }
+.attach {
+  display: grid; place-items: center; width: 46px; height: 46px; flex: none;
+  border: 1.5px dashed var(--line); border-radius: var(--r-sm);
+  font-size: 18px; cursor: pointer; transition: border-color .15s;
+}
+.attach:hover { border-color: var(--accent); }
+.attach input { display: none; }
+.chat-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 10px; flex-wrap: wrap; }
 
 /* voice-over */
 .voice-result { display: none; margin-top: 18px; }
