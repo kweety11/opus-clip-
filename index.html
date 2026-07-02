@@ -25,6 +25,12 @@
         <a href="#features" onclick="goLanding()" data-i18n="nav_features">المميزات</a>
         <a href="#pricing" onclick="goLanding()" data-i18n="nav_pricing">الأسعار</a>
       </nav>
+      <div class="theme-dots" id="theme-dots" title="Theme">
+        <button class="tdot" data-theme="ocean" onclick="setTheme('ocean')"></button>
+        <button class="tdot" data-theme="violet" onclick="setTheme('violet')"></button>
+        <button class="tdot" data-theme="emerald" onclick="setTheme('emerald')"></button>
+        <button class="tdot" data-theme="gold" onclick="setTheme('gold')"></button>
+      </div>
       <button class="btn btn-ghost btn-sm" id="lang-btn" onclick="toggleLang()">EN</button>
       <button class="btn btn-primary btn-sm" onclick="openStudio()" data-i18n="open_studio">افتح الاستوديو ←</button>
     </div>
@@ -292,9 +298,21 @@
           <select id="board-style-sel"></select>
           <label class="f" data-i18n="b_custom"></label>
           <input type="text" id="board-style" dir="ltr" placeholder="e.g. shot on ARRI Alexa, 85mm lens">
+          <label class="f" data-i18n="b_char"></label>
+          <div class="char-ref">
+            <label class="upload"><span>📸</span><span data-i18n="b_char_up"></span>
+              <input type="file" id="board-char" accept="image/*" onchange="boardCharPicked(this)">
+            </label>
+            <img class="char-thumb" id="board-char-thumb" alt="">
+          </div>
+          <input type="text" id="board-char-name" data-i18n-ph="b_char_name_ph" style="margin-top:10px">
           <label class="check">
             <input type="checkbox" id="board-vo" checked>
             <span data-i18n="b_vo"></span>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="board-sketch" checked>
+            <span data-i18n="b_sketch"></span>
           </label>
           <button class="btn btn-primary btn-block" id="run-board" onclick="runBoard()" data-i18n="b_run"></button>
           <button class="btn btn-stop" id="stop-board" onclick="stopRun('board')">⏹</button>
@@ -319,6 +337,25 @@
           <button class="btn btn-ghost btn-block" style="margin-top:0" id="voice-pull" onclick="useScriptForVoice()" data-i18n="v_pull"></button>
           <label class="f" data-i18n="v_text"></label>
           <textarea id="voice-text" rows="6" data-i18n-ph="v_text_ph"></textarea>
+          <label class="f" data-i18n="v_provider"></label>
+          <select id="voice-provider" onchange="voiceProviderChanged()">
+            <option value="gemini" data-i18n="vp_gemini"></option>
+            <option value="elevenlabs" data-i18n="vp_eleven"></option>
+          </select>
+          <div id="eleven-box" style="display:none">
+            <label class="f" data-i18n="v_eleven_key"></label>
+            <input type="password" id="eleven-key" dir="ltr" placeholder="xi-..." autocomplete="off" onchange="elevenKeyChanged()">
+            <div class="note" data-i18n-html="v_eleven_note_html"></div>
+          </div>
+          <div id="accent-box">
+            <label class="f" data-i18n="v_accent"></label>
+            <select id="voice-accent">
+              <option value="egyptian" data-i18n="va_eg"></option>
+              <option value="msa" data-i18n="va_msa"></option>
+              <option value="gulf" data-i18n="va_gulf"></option>
+              <option value="none" data-i18n="va_none"></option>
+            </select>
+          </div>
           <label class="f" data-i18n="v_voice"></label>
           <select id="voice-name"></select>
           <label class="f" data-i18n="v_style"></label>
@@ -389,6 +426,7 @@
   <script src="js/prompt.js"></script>
   <script src="js/styles.js"></script>
   <script src="js/docs.js"></script>
+  <script src="js/imagen.js"></script>
   <script src="js/tts.js"></script>
   <script src="js/api.js"></script>
   <script src="js/app.js"></script>

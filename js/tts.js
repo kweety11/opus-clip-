@@ -34,10 +34,28 @@ const TTS_STYLES = {
   ugc:   "Read the following casually and naturally, like a friend talking on camera: ",
 };
 
+/* dialect steering — Gemini TTS follows spoken-accent directives.
+   The Egyptian one is aggressive on purpose: authentic عامية, not MSA. */
+const TTS_ACCENTS = {
+  none: "",
+  egyptian:
+    "CRITICAL PRONUNCIATION RULE: The text is in Egyptian colloquial Arabic (اللهجة المصرية العامية). " +
+    "Speak it EXACTLY as an Egyptian from Cairo speaks in daily life: pronounce ج as G (like 'gamal'), " +
+    "ق as a glottal stop (hamza), ث as S or T, ذ as Z. Casual street rhythm and intonation, " +
+    "NEVER classical/MSA pronunciation, never formal case endings. ",
+  msa:
+    "Pronounce the following in clear, correct Modern Standard Arabic (الفصحى) with proper tashkeel. ",
+  gulf:
+    "The text is in Gulf Arabic (اللهجة الخليجية). Speak it with an authentic Khaleeji accent, " +
+    "natural Gulf rhythm and pronunciation, not MSA. ",
+};
+
 /**
- * Generate speech. Returns a WAV Blob.
+ * Generate speech. Returns a WAV Blob (Gemini) — accentKey picks TTS_ACCENTS.
  */
-async function ttsGenerate(text, voiceName, stylePrefix) {
+async function ttsGenerate(text, voiceName, stylePrefix, accentKey) {
+  const accent = TTS_ACCENTS[accentKey || "none"] || "";
+  stylePrefix = accent + (stylePrefix || "");
   const key = localStorage.getItem("fta_key_gemini") || "";
   if (!key) throw new Error("NO_KEY");
 
@@ -72,6 +90,47 @@ async function ttsGenerate(text, voiceName, stylePrefix) {
   const rate = parseInt((part.inlineData.mimeType.match(/rate=(\d+)/) || [, "24000"])[1], 10);
   const pcm = Uint8Array.from(atob(part.inlineData.data), c => c.charCodeAt(0));
   return pcmToWav(pcm, rate);
+}
+
+/* ============================================================
+   ElevenLabs TTS — the strongest Arabic voices on the market.
+   Free key from elevenlabs.io (10k chars/month). eleven_v3 follows
+   the text's dialect closely, so Egyptian عامية sounds Egyptian.
+   ============================================================ */
+const ELEVEN_MODEL = "eleven_multilingual_v2";
+
+async function elevenVoices() {
+  const key = localStorage.getItem("fta_key_elevenlabs") || "";
+  if (!key) throw new Error("NO_KEY");
+  const res = await fetch("https://api.elevenlabs.io/v1/voices", {
+    headers: { "xi-api-key": key },
+  });
+  if (!res.ok) throw new Error(res.status === 401 ? "BAD_KEY" : "HTTP " + res.status);
+  const data = await res.json();
+  return (data.voices || []).map(v => [v.voice_id, v.name + (v.labels?.accent ? " — " + v.labels.accent : "")]);
+}
+
+/* accent hints go into the text itself for ElevenLabs (v2 reads the text's dialect) */
+async function elevenGenerate(text, voiceId) {
+  const key = localStorage.getItem("fta_key_elevenlabs") || "";
+  if (!key) throw new Error("NO_KEY");
+  const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+    method: "POST",
+    headers: { "xi-api-key": key, "content-type": "application/json" },
+    body: JSON.stringify({
+      text,
+      model_id: ELEVEN_MODEL,
+      voice_settings: { stability: 0.45, similarity_boost: 0.8, style: 0.35 },
+    }),
+  });
+  if (!res.ok) {
+    if (res.status === 401) throw new Error("BAD_KEY");
+    if (res.status === 429) throw new Error("RATE");
+    let msg = "HTTP " + res.status;
+    try { msg = (await res.json())?.detail?.message || msg; } catch (_) {}
+    throw new Error(msg);
+  }
+  return await res.blob(); // audio/mpeg — plays directly in <audio>
 }
 
 /* wrap raw 16-bit mono PCM in a WAV container so <audio> can play it */

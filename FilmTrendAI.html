@@ -29,10 +29,12 @@
   --faint: #5c6284;
   --accent: #a78bfa;
   --accent-2: #ec4899;
+  --acc-deep: #7c3aed;
   --cyan: #22d3ee;
+  --btn-fg: #fff;
   --accent-grad: linear-gradient(120deg, #7c3aed, #a855f7 40%, #ec4899 85%);
   --accent-grad-anim: linear-gradient(120deg, #7c3aed, #a855f7 25%, #ec4899 50%, #22d3ee 75%, #7c3aed);
-  --glow: 0 0 24px rgba(168, 85, 247, .35), 0 0 60px rgba(236, 72, 153, .12);
+  --glow: 0 0 24px color-mix(in srgb, var(--accent) 35%, transparent), 0 0 60px color-mix(in srgb, var(--accent-2) 12%, transparent);
   --teal: #34d3bd;
   --err: #f0564f;
   --r-lg: 22px;
@@ -60,13 +62,13 @@ body {
 body::before {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background:
-    radial-gradient(900px 520px at 85% -10%, rgba(124, 58, 237, .16), transparent 60%),
-    radial-gradient(700px 460px at 8% 12%, rgba(236, 72, 153, .09), transparent 60%),
-    radial-gradient(800px 600px at 50% 115%, rgba(34, 211, 238, .07), transparent 60%),
+    radial-gradient(900px 520px at 85% -10%, color-mix(in srgb, var(--acc-deep) 16%, transparent), transparent 60%),
+    radial-gradient(700px 460px at 8% 12%, color-mix(in srgb, var(--accent-2) 9%, transparent), transparent 60%),
+    radial-gradient(800px 600px at 50% 115%, color-mix(in srgb, var(--cyan) 7%, transparent), transparent 60%),
     var(--bg);
 }
 
-::selection { background: rgba(168, 85, 247, .35); }
+::selection { background: color-mix(in srgb, var(--accent) 35%, transparent); }
 a { color: inherit; text-decoration: none; }
 img, svg { max-width: 100%; }
 
@@ -81,8 +83,8 @@ img, svg { max-width: 100%; }
   66% { transform: translate(-30px, 24px) scale(.94); }
 }
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 18px rgba(168, 85, 247, .35); }
-  50% { box-shadow: 0 0 34px rgba(236, 72, 153, .5); }
+  0%, 100% { box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 35%, transparent); }
+  50% { box-shadow: 0 0 34px color-mix(in srgb, var(--accent-2) 50%, transparent); }
 }
 @keyframes spinSlow { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) {
@@ -94,7 +96,7 @@ img, svg { max-width: 100%; }
   position: sticky; top: 0; z-index: 100;
   background: rgba(5, 6, 12, .68);
   backdrop-filter: blur(20px) saturate(150%);
-  border-bottom: 1px solid rgba(124, 58, 237, .18);
+  border-bottom: 1px solid color-mix(in srgb, var(--acc-deep) 18%, transparent);
 }
 .site-header .wrap { display: flex; align-items: center; gap: 30px; height: 72px; }
 .brand { display: flex; align-items: center; gap: 12px; font-weight: 900; font-size: 20px; cursor: pointer; }
@@ -112,7 +114,7 @@ img, svg { max-width: 100%; }
   padding: 8px 16px; border-radius: 10px; font-size: 15px; font-weight: 600; color: var(--muted);
   transition: color .15s, background .15s;
 }
-.head-nav a:hover { color: var(--text); background: rgba(124, 58, 237, .12); }
+.head-nav a:hover { color: var(--text); background: color-mix(in srgb, var(--acc-deep) 12%, transparent); }
 
 /* ============ buttons ============ */
 .btn {
@@ -126,8 +128,8 @@ img, svg { max-width: 100%; }
 .btn:active { transform: translateY(1.5px) scale(.99); }
 .btn:disabled { opacity: .5; cursor: wait; }
 .btn-primary {
-  background: var(--accent-grad); background-size: 160% 160%; color: #fff;
-  box-shadow: 0 8px 28px rgba(147, 51, 234, .38);
+  background: var(--accent-grad); background-size: 160% 160%; color: var(--btn-fg);
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--acc-deep) 38%, transparent);
   animation: gradShift 7s ease infinite;
 }
 /* shine sweep across primary buttons on hover */
@@ -138,14 +140,14 @@ img, svg { max-width: 100%; }
   transition: transform .6s ease;
 }
 [dir="rtl"] .btn-primary::after { transform: translateX(120%); }
-.btn-primary:hover:not(:disabled) { box-shadow: 0 14px 44px rgba(168, 85, 247, .55); transform: translateY(-2px); }
+.btn-primary:hover:not(:disabled) { box-shadow: 0 14px 44px color-mix(in srgb, var(--accent) 55%, transparent); transform: translateY(-2px); }
 .btn-primary:hover:not(:disabled)::after { transform: translateX(120%); }
 [dir="rtl"] .btn-primary:hover:not(:disabled)::after { transform: translateX(-120%); }
 .btn-ghost {
   border-color: var(--line); color: var(--text);
   background: rgba(255, 255, 255, .03); backdrop-filter: blur(8px);
 }
-.btn-ghost:hover { border-color: rgba(168, 85, 247, .55); background: rgba(124, 58, 237, .1); box-shadow: 0 0 20px rgba(124, 58, 237, .18); transform: translateY(-1px); }
+.btn-ghost:hover { border-color: color-mix(in srgb, var(--accent) 55%, transparent); background: color-mix(in srgb, var(--acc-deep) 10%, transparent); box-shadow: 0 0 20px color-mix(in srgb, var(--acc-deep) 18%, transparent); transform: translateY(-1px); }
 .btn-lg { padding: 16px 38px; font-size: 17px; border-radius: 15px; }
 .btn-sm { padding: 8px 18px; font-size: 13.5px; font-weight: 700; }
 .btn-xs { padding: 5px 13px; font-size: 12px; font-weight: 700; border-radius: 8px; }
@@ -164,19 +166,19 @@ img, svg { max-width: 100%; }
 }
 .hero::before {
   width: 560px; height: 560px; top: -180px; inset-inline-start: -120px;
-  background: radial-gradient(circle at 35% 35%, #7c3aed, #4c1d95 60%, transparent 75%);
+  background: radial-gradient(circle at 35% 35%, var(--acc-deep), color-mix(in srgb, var(--acc-deep) 55%, #000) 60%, transparent 75%);
   animation: orbFloat 16s ease-in-out infinite;
 }
 .hero::after {
   width: 480px; height: 480px; bottom: -160px; inset-inline-end: -100px;
-  background: radial-gradient(circle at 60% 40%, #ec4899, #22d3ee 80%, transparent 90%);
+  background: radial-gradient(circle at 60% 40%, var(--accent-2), var(--cyan) 80%, transparent 90%);
   animation: orbFloat 20s ease-in-out infinite reverse;
 }
 .hero > .wrap { position: relative; z-index: 1; }
 .kicker {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 8px 18px; border-radius: 999px;
-  border: 1px solid rgba(168, 85, 247, .4); background: rgba(124, 58, 237, .12);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); background: color-mix(in srgb, var(--acc-deep) 12%, transparent);
   backdrop-filter: blur(10px);
   color: var(--accent); font-size: 13.5px; font-weight: 700; margin-bottom: 26px;
   animation: fadeUp .7s ease both;
@@ -217,26 +219,26 @@ img, svg { max-width: 100%; }
 }
 .feat::before {
   content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  background: radial-gradient(420px 200px at 50% -20%, rgba(168, 85, 247, .16), transparent 70%);
+  background: radial-gradient(420px 200px at 50% -20%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%);
   opacity: 0; transition: opacity .3s;
 }
 .feat:hover {
   transform: translateY(-8px) rotateX(4deg) rotateY(-3deg) scale(1.015);
-  border-color: rgba(168, 85, 247, .45);
-  box-shadow: 0 22px 60px rgba(0, 0, 0, .5), 0 0 42px rgba(124, 58, 237, .16);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, .5), 0 0 42px color-mix(in srgb, var(--acc-deep) 16%, transparent);
 }
 [dir="rtl"] .feat:hover { transform: translateY(-8px) rotateX(4deg) rotateY(3deg) scale(1.015); }
 .feat:hover::before { opacity: 1; }
 .feat .num {
   position: absolute; top: 14px; inset-inline-end: 20px;
-  font-size: 44px; font-weight: 900; color: rgba(168, 85, 247, .14); line-height: 1;
+  font-size: 44px; font-weight: 900; color: color-mix(in srgb, var(--accent) 14%, transparent); line-height: 1;
 }
 .feat .ico {
   width: 54px; height: 54px; border-radius: 16px; margin-bottom: 20px;
   display: grid; place-items: center; font-size: 25px;
-  background: linear-gradient(135deg, rgba(124, 58, 237, .28), rgba(236, 72, 153, .14));
-  border: 1px solid rgba(168, 85, 247, .35);
-  box-shadow: inset 0 0 18px rgba(168, 85, 247, .12);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--acc-deep) 28%, transparent), color-mix(in srgb, var(--accent-2) 14%, transparent));
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: inset 0 0 18px color-mix(in srgb, var(--accent) 12%, transparent);
   transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
 }
 .feat:hover .ico { transform: translateZ(26px) scale(1.1); }
@@ -250,13 +252,13 @@ img, svg { max-width: 100%; }
   padding: 26px 22px; text-align: center;
   transition: transform .3s, border-color .25s, box-shadow .3s;
 }
-.how:hover { transform: translateY(-5px); border-color: rgba(34, 211, 238, .4); box-shadow: 0 14px 40px rgba(0, 0, 0, .4); }
+.how:hover { transform: translateY(-5px); border-color: color-mix(in srgb, var(--cyan) 40%, transparent); box-shadow: 0 14px 40px rgba(0, 0, 0, .4); }
 .how::before {
   counter-increment: hstep; content: counter(hstep);
   display: grid; place-items: center; width: 48px; height: 48px; margin: 0 auto 16px;
-  border-radius: 50%; background: var(--accent-grad); color: #fff;
+  border-radius: 50%; background: var(--accent-grad); color: var(--btn-fg);
   font-size: 20px; font-weight: 900;
-  box-shadow: 0 6px 20px rgba(147, 51, 234, .4);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--acc-deep) 40%, transparent);
 }
 .how p { font-size: 15px; font-weight: 700; }
 
@@ -276,13 +278,13 @@ img, svg { max-width: 100%; }
     var(--accent-grad-anim) border-box;
   background-size: auto, 300% 100%;
   animation: gradShift 6s linear infinite;
-  box-shadow: 0 16px 56px rgba(147, 51, 234, .22);
+  box-shadow: 0 16px 56px color-mix(in srgb, var(--acc-deep) 22%, transparent);
 }
 .price .flag {
   position: absolute; top: -14px; inset-inline-start: 50%; transform: translateX(50%);
-  background: var(--accent-grad); color: #fff; font-size: 12px; font-weight: 900;
+  background: var(--accent-grad); color: var(--btn-fg); font-size: 12px; font-weight: 900;
   padding: 5px 18px; border-radius: 999px;
-  box-shadow: 0 6px 18px rgba(236, 72, 153, .4);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent-2) 40%, transparent);
 }
 [dir="ltr"] .price .flag { transform: translateX(-50%); }
 .price h3 { font-size: 19px; font-weight: 800; }
@@ -301,7 +303,7 @@ body.in-studio #landing { display: none; }
 body.in-studio #studio { display: block; }
 
 .stepper-bar {
-  border-bottom: 1px solid rgba(124, 58, 237, .16); background: rgba(8, 9, 18, .72);
+  border-bottom: 1px solid color-mix(in srgb, var(--acc-deep) 16%, transparent); background: rgba(8, 9, 18, .72);
   backdrop-filter: blur(16px);
   position: sticky; top: 72px; z-index: 90;
 }
@@ -313,17 +315,17 @@ body.in-studio #studio { display: block; }
   font: inherit; font-size: 15px; font-weight: 700; white-space: nowrap;
   transition: all .2s;
 }
-.step-btn:hover { color: var(--text); background: rgba(124, 58, 237, .1); }
+.step-btn:hover { color: var(--text); background: color-mix(in srgb, var(--acc-deep) 10%, transparent); }
 .step-btn.on {
-  background: rgba(124, 58, 237, .14); border-color: rgba(168, 85, 247, .45); color: var(--accent);
-  box-shadow: 0 0 22px rgba(124, 58, 237, .16);
+  background: color-mix(in srgb, var(--acc-deep) 14%, transparent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); color: var(--accent);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--acc-deep) 16%, transparent);
 }
 .step-btn .n {
   display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
   background: var(--surface-2); border: 1.5px solid var(--line); color: var(--muted);
   font-size: 13.5px; font-weight: 800; transition: all .2s;
 }
-.step-btn.on .n { background: var(--accent-grad); border-color: transparent; color: #fff; animation: pulseGlow 2.6s ease-in-out infinite; }
+.step-btn.on .n { background: var(--accent-grad); border-color: transparent; color: var(--btn-fg); animation: pulseGlow 2.6s ease-in-out infinite; }
 .step-btn.done .n { background: var(--teal); border-color: transparent; color: #06231f; animation: none; }
 .step-btn.done .n::before { content: "✓"; }
 .step-btn.done .n span { display: none; }
@@ -352,7 +354,7 @@ textarea, input[type="text"], input[type="password"], select {
   padding: 12px 15px; font: inherit; font-size: 14.5px; font-weight: 500;
   outline: none; transition: border-color .2s, box-shadow .2s;
 }
-textarea:focus, input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(168, 85, 247, .16), 0 0 24px rgba(124, 58, 237, .12); }
+textarea:focus, input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent), 0 0 24px color-mix(in srgb, var(--acc-deep) 12%, transparent); }
 textarea { resize: vertical; min-height: 130px; }
 
 /* two form fields side by side (script specs) */
@@ -374,7 +376,7 @@ label.check input[type="checkbox"] {
   padding: 17px; color: var(--muted); font-size: 14px; font-weight: 700; cursor: pointer;
   transition: border-color .15s, color .15s, background .15s;
 }
-.upload:hover { border-color: var(--accent); color: var(--text); background: rgba(124, 58, 237, .06); }
+.upload:hover { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--acc-deep) 6%, transparent); }
 .upload input { display: none; }
 #pdf-name { color: var(--teal); font-size: 13px; font-weight: 700; margin-top: 8px; }
 
@@ -406,7 +408,7 @@ html[lang="en"] .out:empty::before { content: "Output will appear here…"; }
   overflow-wrap: anywhere;
 }
 .md pre {
-  background: rgba(5, 6, 12, .82); border: 1px solid rgba(124, 58, 237, .28);
+  background: rgba(5, 6, 12, .82); border: 1px solid color-mix(in srgb, var(--acc-deep) 28%, transparent);
   border-radius: var(--r-sm);
   padding: 15px 17px; margin: 13px 0;
   font-size: 13px; line-height: 1.7; font-family: var(--mono);
@@ -445,7 +447,7 @@ html[lang="en"] .out:empty::before { content: "Output will appear here…"; }
   content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 3px;
   border-radius: 3px; background: var(--accent-grad);
 }
-.scene-card:hover { transform: translateY(-3px); border-color: rgba(168, 85, 247, .4); box-shadow: 0 14px 40px rgba(0, 0, 0, .4); }
+.scene-card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--accent) 40%, transparent); box-shadow: 0 14px 40px rgba(0, 0, 0, .4); }
 .scene-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
 .scene-head b { color: var(--accent); font-size: 15px; font-weight: 800; }
 .scene-prompt { margin-top: 12px; min-width: 0; }
@@ -476,7 +478,7 @@ html[lang="en"] .out:empty::before { content: "Output will appear here…"; }
 }
 .msg.user {
   align-self: flex-start;
-  background: rgba(124, 58, 237, .16); border: 1px solid rgba(168, 85, 247, .35);
+  background: color-mix(in srgb, var(--acc-deep) 16%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
   border-start-start-radius: 4px;
 }
 .msg.ai {
@@ -487,7 +489,7 @@ html[lang="en"] .out:empty::before { content: "Output will appear here…"; }
 }
 .msg .chip { display: inline-block; margin-top: 7px; }
 .chip {
-  background: rgba(34, 211, 238, .1); border: 1px solid rgba(34, 211, 238, .35);
+  background: color-mix(in srgb, var(--cyan) 10%, transparent); border: 1px solid color-mix(in srgb, var(--cyan) 35%, transparent);
   color: var(--cyan); border-radius: 8px; padding: 2px 10px;
   font-size: 12px; font-weight: 700;
 }
@@ -502,7 +504,7 @@ html[lang="en"] .out:empty::before { content: "Output will appear here…"; }
   border: 1.5px dashed var(--line); border-radius: var(--r-sm);
   font-size: 18px; cursor: pointer; transition: border-color .15s, box-shadow .2s;
 }
-.attach:hover { border-color: var(--accent); box-shadow: 0 0 16px rgba(124, 58, 237, .2); }
+.attach:hover { border-color: var(--accent); box-shadow: 0 0 16px color-mix(in srgb, var(--acc-deep) 20%, transparent); }
 .attach input { display: none; }
 .chat-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 10px; flex-wrap: wrap; }
 
@@ -523,11 +525,11 @@ html[lang="en"] .out:empty::before { content: "Output will appear here…"; }
 }
 .mode-btn small { display: block; font-weight: 500; font-size: 12px; margin-top: 4px; color: var(--faint); }
 .mode-btn:hover { color: var(--text); }
-.mode-btn.on { border-color: var(--accent); color: var(--accent); background: rgba(124, 58, 237, .1); box-shadow: 0 0 22px rgba(124, 58, 237, .14); }
+.mode-btn.on { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--acc-deep) 10%, transparent); box-shadow: 0 0 22px color-mix(in srgb, var(--acc-deep) 14%, transparent); }
 .mode-btn.on small { color: var(--muted); }
 .note {
   margin-top: 16px; padding: 13px 17px; border-radius: var(--r-sm);
-  background: rgba(124, 58, 237, .08); border: 1px solid rgba(168, 85, 247, .3);
+  background: color-mix(in srgb, var(--acc-deep) 8%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
   color: var(--muted); font-size: 13.5px; line-height: 1.8;
 }
 .note b { color: var(--accent); }
@@ -536,11 +538,11 @@ html[lang="en"] .out:empty::before { content: "Output will appear here…"; }
 .toast {
   position: fixed; bottom: 28px; right: 50%; transform: translate(50%, 16px);
   background: rgba(24, 27, 46, .88); backdrop-filter: blur(14px);
-  border: 1px solid rgba(168, 85, 247, .4);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
   color: var(--text); padding: 13px 26px; border-radius: 13px;
   font-size: 14.5px; font-weight: 700;
   opacity: 0; pointer-events: none; transition: opacity .2s, transform .25s cubic-bezier(.34, 1.56, .64, 1);
-  z-index: 300; box-shadow: var(--shadow-lg), 0 0 30px rgba(124, 58, 237, .18);
+  z-index: 300; box-shadow: var(--shadow-lg), 0 0 30px color-mix(in srgb, var(--acc-deep) 18%, transparent);
 }
 .toast.show { opacity: 1; transform: translate(50%, 0); }
 
@@ -557,6 +559,65 @@ html[lang="en"] .out:empty::before { content: "Output will appear here…"; }
   .mode-switch { flex-direction: column; }
 }
 
+
+/* ============ THEMES — picked from the header dots, saved locally ============ */
+html[data-theme="ocean"] {
+  --accent: #4cc4ff; --accent-2: #6366f1; --acc-deep: #0284d8; --cyan: #22d3ee; --btn-fg: #fff;
+  --accent-grad: linear-gradient(120deg, #0891d1, #38bdf8 45%, #6366f1);
+  --accent-grad-anim: linear-gradient(120deg, #0891d1, #38bdf8 25%, #6366f1 50%, #22d3ee 75%, #0891d1);
+  --bg: #04070d; --bg-2: #070b14;
+  --surface: rgba(13, 19, 32, .72); --surface-solid: #0d1320; --surface-2: #131b2c;
+  --line: #1f2b45; --line-soft: #17203355;
+}
+html[data-theme="emerald"] {
+  --accent: #3ee6a8; --accent-2: #22d3ee; --acc-deep: #0a9e6d; --cyan: #67e8f9; --btn-fg: #04231a;
+  --accent-grad: linear-gradient(120deg, #0d9f70, #10c98a 45%, #22d3ee);
+  --accent-grad-anim: linear-gradient(120deg, #0d9f70, #10c98a 25%, #22d3ee 50%, #34d399 75%, #0d9f70);
+  --bg: #040b09; --bg-2: #071310;
+  --surface: rgba(10, 24, 20, .72); --surface-solid: #0a1814; --surface-2: #10231d;
+  --line: #1b3a31; --line-soft: #142b2455;
+}
+html[data-theme="gold"] {
+  --accent: #f2b23e; --accent-2: #e8862d; --acc-deep: #d98a1f; --cyan: #43cabb; --btn-fg: #201302;
+  --accent-grad: linear-gradient(120deg, #f6c15a, #f2b23e 45%, #e8862d);
+  --accent-grad-anim: linear-gradient(120deg, #f6c15a, #f2b23e 25%, #e8862d 50%, #f6c15a 75%, #f6c15a);
+  --bg: #0a0c11; --bg-2: #0d1017;
+  --surface: rgba(19, 23, 34, .78); --surface-solid: #131722; --surface-2: #1a1f2d;
+  --line: #242b3d; --line-soft: #1c2231;
+}
+
+/* theme picker dots (header) */
+.theme-dots { display: flex; gap: 7px; align-items: center; }
+.tdot {
+  width: 20px; height: 20px; border-radius: 50%; cursor: pointer; flex: none;
+  border: 2px solid rgba(255, 255, 255, .18); padding: 0;
+  transition: transform .2s cubic-bezier(.34, 1.56, .64, 1), border-color .2s, box-shadow .2s;
+}
+.tdot:hover { transform: scale(1.22); }
+.tdot.on { border-color: #fff; box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent); transform: scale(1.12); }
+.tdot[data-theme="ocean"] { background: linear-gradient(120deg, #0891d1, #38bdf8, #6366f1); }
+.tdot[data-theme="violet"] { background: linear-gradient(120deg, #7c3aed, #a855f7, #ec4899); }
+.tdot[data-theme="emerald"] { background: linear-gradient(120deg, #0d9f70, #10c98a, #22d3ee); }
+.tdot[data-theme="gold"] { background: linear-gradient(120deg, #f6c15a, #f2b23e, #e8862d); }
+
+/* character reference (storyboard) */
+.char-ref { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.char-ref .upload { flex: 1; padding: 12px; margin: 0; }
+.char-thumb {
+  width: 52px; height: 52px; border-radius: var(--r-sm); object-fit: cover; display: none;
+  border: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--acc-deep) 30%, transparent);
+}
+
+/* generated b/w sketch inside scene cards */
+.sketch-box { margin-top: 12px; }
+.sketch-box img {
+  width: 100%; border-radius: var(--r-sm); display: block;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+.sketch-status { color: var(--muted); font-size: 12.5px; font-weight: 700; }
+
 </style>
 </head>
 <body>
@@ -572,6 +633,12 @@ html[lang="en"] .out:empty::before { content: "Output will appear here…"; }
         <a href="#features" onclick="goLanding()" data-i18n="nav_features">المميزات</a>
         <a href="#pricing" onclick="goLanding()" data-i18n="nav_pricing">الأسعار</a>
       </nav>
+      <div class="theme-dots" id="theme-dots" title="Theme">
+        <button class="tdot" data-theme="ocean" onclick="setTheme('ocean')"></button>
+        <button class="tdot" data-theme="violet" onclick="setTheme('violet')"></button>
+        <button class="tdot" data-theme="emerald" onclick="setTheme('emerald')"></button>
+        <button class="tdot" data-theme="gold" onclick="setTheme('gold')"></button>
+      </div>
       <button class="btn btn-ghost btn-sm" id="lang-btn" onclick="toggleLang()">EN</button>
       <button class="btn btn-primary btn-sm" onclick="openStudio()" data-i18n="open_studio">افتح الاستوديو ←</button>
     </div>
@@ -839,9 +906,21 @@ html[lang="en"] .out:empty::before { content: "Output will appear here…"; }
           <select id="board-style-sel"></select>
           <label class="f" data-i18n="b_custom"></label>
           <input type="text" id="board-style" dir="ltr" placeholder="e.g. shot on ARRI Alexa, 85mm lens">
+          <label class="f" data-i18n="b_char"></label>
+          <div class="char-ref">
+            <label class="upload"><span>📸</span><span data-i18n="b_char_up"></span>
+              <input type="file" id="board-char" accept="image/*" onchange="boardCharPicked(this)">
+            </label>
+            <img class="char-thumb" id="board-char-thumb" alt="">
+          </div>
+          <input type="text" id="board-char-name" data-i18n-ph="b_char_name_ph" style="margin-top:10px">
           <label class="check">
             <input type="checkbox" id="board-vo" checked>
             <span data-i18n="b_vo"></span>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="board-sketch" checked>
+            <span data-i18n="b_sketch"></span>
           </label>
           <button class="btn btn-primary btn-block" id="run-board" onclick="runBoard()" data-i18n="b_run"></button>
           <button class="btn btn-stop" id="stop-board" onclick="stopRun('board')">⏹</button>
@@ -866,6 +945,25 @@ html[lang="en"] .out:empty::before { content: "Output will appear here…"; }
           <button class="btn btn-ghost btn-block" style="margin-top:0" id="voice-pull" onclick="useScriptForVoice()" data-i18n="v_pull"></button>
           <label class="f" data-i18n="v_text"></label>
           <textarea id="voice-text" rows="6" data-i18n-ph="v_text_ph"></textarea>
+          <label class="f" data-i18n="v_provider"></label>
+          <select id="voice-provider" onchange="voiceProviderChanged()">
+            <option value="gemini" data-i18n="vp_gemini"></option>
+            <option value="elevenlabs" data-i18n="vp_eleven"></option>
+          </select>
+          <div id="eleven-box" style="display:none">
+            <label class="f" data-i18n="v_eleven_key"></label>
+            <input type="password" id="eleven-key" dir="ltr" placeholder="xi-..." autocomplete="off" onchange="elevenKeyChanged()">
+            <div class="note" data-i18n-html="v_eleven_note_html"></div>
+          </div>
+          <div id="accent-box">
+            <label class="f" data-i18n="v_accent"></label>
+            <select id="voice-accent">
+              <option value="egyptian" data-i18n="va_eg"></option>
+              <option value="msa" data-i18n="va_msa"></option>
+              <option value="gulf" data-i18n="va_gulf"></option>
+              <option value="none" data-i18n="va_none"></option>
+            </select>
+          </div>
           <label class="f" data-i18n="v_voice"></label>
           <select id="voice-name"></select>
           <label class="f" data-i18n="v_style"></label>
@@ -1043,6 +1141,23 @@ const I18N = {
     err_server: "خطأ من الخادم — جرّب تاني", err_refusal: "الطلب اترفض لأسباب تتعلق بسياسة الاستخدام — جرّب تعيد صياغته",
     err_conn: "تعذّر الاتصال — اتأكد من الإنترنت والمفتاح",
     retrying: "⏳ الموديل زحمة دلوقتي — بنحاول تاني تلقائيًا…",
+    // character reference + sketches
+    b_char: "الشخصية الثابتة (اختياري) — ارفع صورة مرجعية",
+    b_char_up: "ارفع صورتك أو صورة الشخصية", b_char_name_ph: "اسم الشخصية — مثال: أحمد",
+    b_sketch: "✏️ اسكتشات أبيض وأسود لكل مشهد (بترسم بمفتاح Gemini المجاني)",
+    sk_draw: "✏️ ارسم الاسكتش", sk_drawing: "⏳ بيرسم…", sk_all: "✏️ ارسم كل الاسكتشات",
+    sk_prompt: "✏️ SKETCH PROMPT", copied_sk: "برومبت الاسكتش",
+    sk_no_key: "الاسكتشات محتاجة مفتاح Google Gemini (مجاني) — ضيفه من الإعدادات",
+    sk_rate: "وصلت لحد الرسم المجاني — استنى دقيقة وحاول تاني",
+    sk_busy: "موديل الرسم زحمة — حاول تاني بعد شوية", sk_fail: "معرفش يرسم المشهد ده — حاول تاني",
+    char_set: "صورة الشخصية اتحطت ✓ — هتفضل ثابتة في كل المشاهد",
+    scene_ref: "📸 CHARACTER REF",
+    // voice provider + accent
+    v_provider: "مزود الصوت", vp_gemini: "Google Gemini — مجاني", vp_eleven: "ElevenLabs — أقوى صوت عربي (مفتاح مجاني)",
+    v_eleven_key: "مفتاح ElevenLabs",
+    v_eleven_note_html: "🎙️ مفتاح <b>مجاني</b> من <span dir=\"ltr\">elevenlabs.io</span> → Profile → API Keys. أصوات ElevenLabs بتنطق العامية المصرية بشكل طبيعي جدًا.",
+    v_accent: "اللهجة / النطق", va_eg: "🇪🇬 مصري عامي", va_msa: "عربي فصحى", va_gulf: "خليجي", va_none: "تلقائي — من غير توجيه",
+    v_eleven_loading: "⏳ بجيب الأصوات من حسابك…", v_eleven_bad: "مفتاح ElevenLabs غير صحيح",
   },
   en: {
     nav_features: "Features", nav_pricing: "Pricing", open_studio: "Open Studio →",
@@ -1131,6 +1246,23 @@ const I18N = {
     err_server: "Server error — try again", err_refusal: "The request was refused for usage-policy reasons — try rephrasing it",
     err_conn: "Connection failed — check your internet and key",
     retrying: "⏳ The model is busy — retrying automatically…",
+    // character reference + sketches
+    b_char: "Consistent character (optional) — upload a reference photo",
+    b_char_up: "Upload your photo or the character's", b_char_name_ph: "Character name — e.g. Ahmed",
+    b_sketch: "✏️ B/W sketch for every scene (drawn with your free Gemini key)",
+    sk_draw: "✏️ Draw sketch", sk_drawing: "⏳ Drawing…", sk_all: "✏️ Draw all sketches",
+    sk_prompt: "✏️ SKETCH PROMPT", copied_sk: "Sketch prompt",
+    sk_no_key: "Sketches need a (free) Google Gemini key — add it in Settings",
+    sk_rate: "Free drawing limit reached — wait a minute and retry",
+    sk_busy: "The drawing model is busy — try again shortly", sk_fail: "Couldn't draw this scene — try again",
+    char_set: "Character photo set ✓ — it stays consistent across all scenes",
+    scene_ref: "📸 CHARACTER REF",
+    // voice provider + accent
+    v_provider: "Voice provider", vp_gemini: "Google Gemini — free", vp_eleven: "ElevenLabs — best Arabic voices (free key)",
+    v_eleven_key: "ElevenLabs API key",
+    v_eleven_note_html: "🎙️ <b>Free</b> key from <span dir=\"ltr\">elevenlabs.io</span> → Profile → API Keys. ElevenLabs voices pronounce Egyptian Arabic very naturally.",
+    v_accent: "Dialect / pronunciation", va_eg: "🇪🇬 Egyptian colloquial", va_msa: "Modern Standard Arabic", va_gulf: "Gulf", va_none: "Auto — no steering",
+    v_eleven_loading: "⏳ Fetching voices from your account…", v_eleven_bad: "Invalid ElevenLabs key",
   },
 };
 
@@ -1155,7 +1287,7 @@ function toggleLang() {
 }
 
 /* Auto-generated from prompts/media-studio-system-prompt.md — regenerate with scripts/build-prompt.js */
-const SYSTEM_PROMPT = "You are **MEDIA STUDIO AI** — a senior creative team compressed into one assistant: a social media strategist, a screenwriter/script doctor, and a storyboard artist + prompt engineer for AI image/video generation. You work for media professionals (directors, content creators, agencies) who need field-ready deliverables, not generic advice.\n\n## Global rules\n\n1. **Language:** Detect the user's language and write all strategy, plans, scripts and explanations in it (Arabic in → Arabic out). **EXCEPTION: every IMAGE PROMPT and MOTION PROMPT must always be written in English**, regardless of conversation language.\n2. **Modes:** You operate in one of three modes — `SOCIAL_PLAN`, `SCRIPT`, `STORYBOARD`. Infer the mode from the request; if genuinely ambiguous, ask ONE short question. The natural pipeline is: brief → plan → script → storyboard, but each mode also works standalone.\n3. **Professional output only:** No filler, no \"here are some ideas you could consider\". Every deliverable must be complete enough to hand to a client or crew as-is.\n4. **Always end** each deliverable with a short \"Next step\" line pointing to the next STEP of the app (e.g., after a plan: \"جاهز للسيناريو؟ اكتب «سيناريو» وهاخدك لصفحته\" / after a script: \"روح لخطوة الاستوري بورد واضغط استخدم آخر سيناريو\"). When telling an Arabic-speaking user how to move to the script step, always use the exact word **«سيناريو»** (never «سكريبت») — the app watches for that word. NEVER produce the next deliverable yourself in the same reply — each deliverable has its own step in the app with its own settings.\n5. **If the user uploads a PDF/brief**, silently extract: brand, product, objective, audience, budget signals, tone, constraints, deadlines. **Everything you produce must be grounded in the document's ACTUAL content — quote its real brand names, products, numbers and facts; NEVER invent or substitute generic information that is not in the document.** Document pages may arrive as images (scanned PDFs / photos): read every word in them, Arabic or English, and analyze the visuals too. Never ask for information that already exists in the brief. Ask for at most 2 missing critical items; otherwise state your assumptions in a compact \"Assumptions\" block and proceed.\n6. **RTL-friendly formatting:** When the conversation is in Arabic, write all prose, headings, list items and table cells in Arabic (right-to-left friendly) — never start an Arabic line with Latin words. Keep tables compact: maximum 6 columns with short cells. Long English content (image/motion prompts, master prompts) must live only inside fenced code blocks or the designated PROMPT fields, never mixed into Arabic paragraphs.\n\n---\n\n## MODE 1 — SOCIAL_PLAN (brief/PDF → full social media plan)\n\nTrigger: user provides a brief, a PDF, or asks for a social media plan/strategy/calendar.\n\nProduce this exact structure:\n\n1. **Brief Digest** — 5 bullet summary of what the client actually needs (business goal, audience, product, tone, constraints).\n2. **Strategic Objectives** — 3–5 SMART objectives tied to business results (awareness/engagement/leads/sales), each with its KPI and target number.\n3. **Audience Personas** — 2–3 personas: name, age, platform habits, pains, desires, content they stop scrolling for, buying triggers.\n4. **Platform Strategy** — for each relevant platform (Instagram, TikTok, YouTube, Facebook, X, LinkedIn, Snapchat — only the ones that fit): role of the platform, content formats, posting frequency, best times for the target region.\n5. **Content Pillars** — 4–6 pillars with: name, purpose, share of calendar (%), 3 example content ideas each, format (reel/carousel/story/live/UGC).\n6. **30-Day Content Calendar** — a table: Day | Platform | Pillar | Format | Hook/Title | CTA | Notes. Cover the full month with realistic pacing (not one post per day unless the brief supports it).\n7. **Hook & Caption Bank** — 10 ready-to-use hooks + 5 caption templates in the brand voice, with hashtag sets (broad / niche / branded).\n8. **UGC & Collaboration Plan** — creator brief template, 3 UGC concept directions, influencer tiers that fit the budget.\n9. **Paid Boost Suggestions** — which organic posts to amplify, objective per campaign, indicative budget split (if budget unknown, give % split).\n10. **Measurement Dashboard** — KPIs per objective, review cadence (weekly/monthly), and the decision rule for killing or scaling content.\n\nRules: numbers over adjectives; every idea must map to a pillar and an objective; calendar hooks must be specific (\"3 mistakes that burn your ad budget — #2 is everywhere\") never generic (\"engaging post about product\").\n\n---\n\n## MODE 2 — SCRIPT (idea/text → structured screenplay)\n\nTrigger: user gives an idea, message, product, or story and wants a script — film, series episode, short story, documentary, TV ad, or UGC/social video.\n\nThe request may carry spec fields: FORMAT, TARGET DURATION, GENRE, TONE, DIALECT (e.g. Egyptian Arabic / Gulf / MSA / English), TARGET AUDIENCE, PLATFORM, CHARACTERS/SETTING, CTA, and PLAN CONTEXT (the approved social plan). Honor every provided field strictly — dialogue must be written in the requested DIALECT; if PLAN CONTEXT exists, the script must serve that plan's objectives and brand voice. Infer anything not provided.\n\nFirst line of output: `FORMAT: <…> · LENGTH: <…> · GENRE: <…> · TONE: <…> · DIALECT: <…>`\n(State them so the user can correct.)\n\nThen produce:\n\n1. **Logline** — one sentence: protagonist + goal + obstacle + stakes.\n2. **Synopsis** — one paragraph (3–6 sentences).\n3. **Characters** — for each: name, age, role, want vs. need, voice notes, and a **Visual Identity Line** (face, build, hair, wardrobe, distinguishing detail — this line is reused verbatim in storyboard prompts for consistency).\n4. **Structure** — beats appropriate to the format:\n   - Film/short: 3-act beats (setup, catalyst, midpoint, low point, climax, resolution).\n   - Series: season arc + this episode's A/B plots.\n   - Ad/UGC: Hook (0–3s) → Problem → Agitate → Solution/Demo → Proof → CTA, with exact second marks.\n5. **The Script itself** — numbered scenes. Each scene:\n   ```\n   SCENE 04 — INT. KITCHEN — NIGHT\n   [Action: what we see, present tense, visual and concrete]\n   CHARACTER: dialogue…\n   (V.O. / SFX / MUSIC cues where needed)\n   ⏱ est. duration\n   ```\n6. **Hook variants** (for ad/UGC): 3 alternative opening hooks.\n7. **MASTER PROMPT** — close the deliverable with ONE fenced code block (```markdown … ```) containing the complete script as a self-contained **English** prompt: title, format, duration, tone, full character sheets with their Visual Identity Lines, and every scene (slugline, action, dialogue, duration). It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.\n\nRules: write visually — if the camera can't see it, don't write it; dialogue must be speakable out loud; UGC scripts must sound like a real person, not a brand; keep scene count realistic for the target duration.\n\n---\n\n## MODE 3 — STORYBOARD (script → scenes + image prompt + motion prompt)\n\nTrigger: a script exists (from Mode 2 or pasted by the user) and the user wants a storyboard / visual breakdown / generation prompts.\n\nStart with a **STYLE FRAME** block that locks global consistency (reused in every prompt):\n\n```\nSTYLE FRAME\nVisual style: <e.g. cinematic photorealism / 2D animation / stop-motion…>\nColor grade: <palette + reference, e.g. teal-orange, low contrast>\nLens & camera language: <e.g. 35mm anamorphic, shallow DOF, handheld energy>\nAspect ratio: <9:16 / 16:9 / 1:1 per platform>\nCharacter sheets: <each character's Visual Identity Line from the script>\n```\n\nThen, for **every scene** in order, output exactly this structure — a header + short description in the user's language, followed by ONE fenced markdown code block that packs everything copy-ready:\n\n━━━ SCENE 04 — <slugline> ━━━\n📋 Board description: what the frame shows, staging, blocking (user's language)\n🎬 Shot: <size> · <angle> · <movement> · <lighting> · <time of day> · ⏱ <seconds>\n\nThen the scene's single fenced code block (```markdown … ```) containing, in this order:\n\n**IMAGE PROMPT:**\n<one paragraph, English, comma-separated: subject with full Visual Identity Line, action frozen at the key moment, environment, lighting, lens (mm, DOF), composition, color grade, style keywords, quality tags, aspect ratio. No camera movement verbs — this is a still frame.>\n\n**MOTION PROMPT:**\n<one paragraph, English, for image-to-video (Runway / Kling / Veo / Luma): starts from the frame above. Camera: ONE clear movement. Subject: ONE clear action with natural physics. Environment motion (smoke, rain, hair, fabric). Pace, mood, duration hint. NEVER introduce subjects or locations not in the frame.>\n\n**VOICE-OVER:**\n<only when the request contains INCLUDE VOICE-OVER: yes — the exact words spoken during this scene (dialogue/narration) in the script's dialect, clean of any labels. Omit this field entirely when not requested.>\n\nThe code block is the user's copy-paste unit — it must be fully self-contained (repeat the character's Visual Identity Line and the global style keywords inside it).\n\nPrompt-engineering rules:\n- **Image prompts**: concrete nouns and physical light descriptions (\"warm tungsten practicals, soft window key light\") — never abstract moods alone; one subject focus per frame; repeat the exact character sheet line every time the character appears; end with aspect ratio.\n- **Motion prompts**: ONE camera move + ONE subject action per shot — stacked motions break AI video; describe motion continuously (\"she slowly turns her head toward the window as curtains breathe in the wind\"); include what must stay stable (\"face and wardrobe unchanged\"); 4–10s per shot.\n- Numbering must match the script's scene numbers. If a scene needs multiple shots, use 04A, 04B.\n- **Every scene block must be fully self-contained**: repeat the character's full Visual Identity Line and the global style keywords inside each scene's IMAGE PROMPT and MOTION PROMPT, so any single scene can be copied alone into a generation tool and still produce a consistent result.\n- **The scene header format is machine-parsed — reproduce it exactly**: a line starting with `━━━ SCENE <number>` (e.g. `━━━ SCENE 04 — INT. KITCHEN — NIGHT ━━━`). Never use a different delimiter.\n- After the last scene, output a **Shot List Table**: Scene | Shot | Size | Movement | Duration | Location — ready for production planning.\n- Finally, close with **MASTER PROMPT** — ONE fenced code block (```markdown … ```) containing the complete storyboard as a self-contained **English** prompt: the full STYLE FRAME, then every scene in order with its board description, shot specs, IMAGE PROMPT and MOTION PROMPT. It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.\n\n---\n\n## Failure & edge handling\n\n- Brief too thin to plan → deliver the plan anyway on stated assumptions, flag the 3 highest-risk assumptions at the top.\n- User asks for \"everything at once\" → run the pipeline in order (plan → script → storyboard) as separate clearly-titled deliverables.\n- User pastes someone else's copyrighted script → work with it as reference/parody/analysis only; generate original alternatives rather than reproducing it.\n- Requests for real living public figures in generative prompts → replace with an original character (\"a charismatic TV host in his 50s\") and say so briefly.";
+const SYSTEM_PROMPT = "You are **MEDIA STUDIO AI** — a senior creative team compressed into one assistant: a social media strategist, a screenwriter/script doctor, and a storyboard artist + prompt engineer for AI image/video generation. You work for media professionals (directors, content creators, agencies) who need field-ready deliverables, not generic advice.\n\n## Global rules\n\n1. **Language:** Detect the user's language and write all strategy, plans, scripts and explanations in it (Arabic in → Arabic out). **EXCEPTION: every IMAGE PROMPT and MOTION PROMPT must always be written in English**, regardless of conversation language.\n2. **Modes:** You operate in one of three modes — `SOCIAL_PLAN`, `SCRIPT`, `STORYBOARD`. Infer the mode from the request; if genuinely ambiguous, ask ONE short question. The natural pipeline is: brief → plan → script → storyboard, but each mode also works standalone.\n3. **Professional output only:** No filler, no \"here are some ideas you could consider\". Every deliverable must be complete enough to hand to a client or crew as-is.\n4. **Always end** each deliverable with a short \"Next step\" line pointing to the next STEP of the app (e.g., after a plan: \"جاهز للسيناريو؟ اكتب «سيناريو» وهاخدك لصفحته\" / after a script: \"روح لخطوة الاستوري بورد واضغط استخدم آخر سيناريو\"). When telling an Arabic-speaking user how to move to the script step, always use the exact word **«سيناريو»** (never «سكريبت») — the app watches for that word. NEVER produce the next deliverable yourself in the same reply — each deliverable has its own step in the app with its own settings.\n5. **If the user uploads a PDF/brief**, silently extract: brand, product, objective, audience, budget signals, tone, constraints, deadlines. **Everything you produce must be grounded in the document's ACTUAL content — quote its real brand names, products, numbers and facts; NEVER invent or substitute generic information that is not in the document.** Document pages may arrive as images (scanned PDFs / photos): read every word in them, Arabic or English, and analyze the visuals too. Never ask for information that already exists in the brief. Ask for at most 2 missing critical items; otherwise state your assumptions in a compact \"Assumptions\" block and proceed.\n6. **RTL-friendly formatting:** When the conversation is in Arabic, write all prose, headings, list items and table cells in Arabic (right-to-left friendly) — never start an Arabic line with Latin words. Keep tables compact: maximum 6 columns with short cells. Long English content (image/motion prompts, master prompts) must live only inside fenced code blocks or the designated PROMPT fields, never mixed into Arabic paragraphs.\n\n---\n\n## MODE 1 — SOCIAL_PLAN (brief/PDF → full social media plan)\n\nTrigger: user provides a brief, a PDF, or asks for a social media plan/strategy/calendar.\n\nProduce this exact structure:\n\n1. **Brief Digest** — 5 bullet summary of what the client actually needs (business goal, audience, product, tone, constraints).\n2. **Strategic Objectives** — 3–5 SMART objectives tied to business results (awareness/engagement/leads/sales), each with its KPI and target number.\n3. **Audience Personas** — 2–3 personas: name, age, platform habits, pains, desires, content they stop scrolling for, buying triggers.\n4. **Platform Strategy** — for each relevant platform (Instagram, TikTok, YouTube, Facebook, X, LinkedIn, Snapchat — only the ones that fit): role of the platform, content formats, posting frequency, best times for the target region.\n5. **Content Pillars** — 4–6 pillars with: name, purpose, share of calendar (%), 3 example content ideas each, format (reel/carousel/story/live/UGC).\n6. **30-Day Content Calendar** — a table: Day | Platform | Pillar | Format | Hook/Title | CTA | Notes. Cover the full month with realistic pacing (not one post per day unless the brief supports it).\n7. **Hook & Caption Bank** — 10 ready-to-use hooks + 5 caption templates in the brand voice, with hashtag sets (broad / niche / branded).\n8. **UGC & Collaboration Plan** — creator brief template, 3 UGC concept directions, influencer tiers that fit the budget.\n9. **Paid Boost Suggestions** — which organic posts to amplify, objective per campaign, indicative budget split (if budget unknown, give % split).\n10. **Measurement Dashboard** — KPIs per objective, review cadence (weekly/monthly), and the decision rule for killing or scaling content.\n\nRules: numbers over adjectives; every idea must map to a pillar and an objective; calendar hooks must be specific (\"3 mistakes that burn your ad budget — #2 is everywhere\") never generic (\"engaging post about product\").\n\n---\n\n## MODE 2 — SCRIPT (idea/text → structured screenplay)\n\nTrigger: user gives an idea, message, product, or story and wants a script — film, series episode, short story, documentary, TV ad, or UGC/social video.\n\nThe request may carry spec fields: FORMAT, TARGET DURATION, GENRE, TONE, DIALECT (e.g. Egyptian Arabic / Gulf / MSA / English), TARGET AUDIENCE, PLATFORM, CHARACTERS/SETTING, CTA, and PLAN CONTEXT (the approved social plan). Honor every provided field strictly — dialogue must be written in the requested DIALECT; if PLAN CONTEXT exists, the script must serve that plan's objectives and brand voice. Infer anything not provided.\n\nFirst line of output: `FORMAT: <…> · LENGTH: <…> · GENRE: <…> · TONE: <…> · DIALECT: <…>`\n(State them so the user can correct.)\n\nThen produce:\n\n1. **Logline** — one sentence: protagonist + goal + obstacle + stakes.\n2. **Synopsis** — one paragraph (3–6 sentences).\n3. **Characters** — for each: name, age, role, want vs. need, voice notes, and a **Visual Identity Line** (face, build, hair, wardrobe, distinguishing detail — this line is reused verbatim in storyboard prompts for consistency).\n4. **Structure** — beats appropriate to the format:\n   - Film/short: 3-act beats (setup, catalyst, midpoint, low point, climax, resolution).\n   - Series: season arc + this episode's A/B plots.\n   - Ad/UGC: Hook (0–3s) → Problem → Agitate → Solution/Demo → Proof → CTA, with exact second marks.\n5. **The Script itself** — numbered scenes. Each scene:\n   ```\n   SCENE 04 — INT. KITCHEN — NIGHT\n   [Action: what we see, present tense, visual and concrete]\n   CHARACTER: dialogue…\n   (V.O. / SFX / MUSIC cues where needed)\n   ⏱ est. duration\n   ```\n6. **Hook variants** (for ad/UGC): 3 alternative opening hooks.\n7. **MASTER PROMPT** — close the deliverable with ONE fenced code block (```markdown … ```) containing the complete script as a self-contained **English** prompt: title, format, duration, tone, full character sheets with their Visual Identity Lines, and every scene (slugline, action, dialogue, duration). It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.\n\nRules: write visually — if the camera can't see it, don't write it; dialogue must be speakable out loud; UGC scripts must sound like a real person, not a brand; keep scene count realistic for the target duration.\n\n---\n\n## MODE 3 — STORYBOARD (script → scenes + image prompt + motion prompt)\n\nTrigger: a script exists (from Mode 2 or pasted by the user) and the user wants a storyboard / visual breakdown / generation prompts.\n\nIf the request contains a **CHARACTER REFERENCE** section with an attached photo: study the photo carefully and write the character's Visual Identity Line to match this EXACT person (face shape, skin tone, hair, build, apparent age, distinguishing features) — then reuse that line verbatim in every scene where the character appears.\n\nStart with a **STYLE FRAME** block that locks global consistency (reused in every prompt):\n\n```\nSTYLE FRAME\nVisual style: <e.g. cinematic photorealism / 2D animation / stop-motion…>\nColor grade: <palette + reference, e.g. teal-orange, low contrast>\nLens & camera language: <e.g. 35mm anamorphic, shallow DOF, handheld energy>\nAspect ratio: <9:16 / 16:9 / 1:1 per platform>\nCharacter sheets: <each character's Visual Identity Line from the script>\n```\n\nThen, for **every scene** in order, output exactly this structure — a header + short description in the user's language, followed by ONE fenced markdown code block that packs everything copy-ready:\n\n━━━ SCENE 04 — <slugline> ━━━\n📋 Board description: what the frame shows, staging, blocking (user's language)\n🎬 Shot: <size> · <angle> · <movement> · <lighting> · <time of day> · ⏱ <seconds>\n\nThen the scene's single fenced code block (```markdown … ```) containing, in this order:\n\n**SKETCH PROMPT:**\n<one short paragraph, English — the same frame as a black-and-white storyboard sketch: \"b/w storyboard sketch, pencil and ink, rough expressive linework\" + subject + action + composition. This is generated FIRST to approve framing before the full render.>\n\n**IMAGE PROMPT:**\n<one paragraph, English, comma-separated: subject with full Visual Identity Line, action frozen at the key moment, environment, lighting, lens (mm, DOF), composition, color grade, style keywords, quality tags, aspect ratio. No camera movement verbs — this is a still frame.>\n\n**MOTION PROMPT:**\n<one paragraph, English, for image-to-video (Runway / Kling / Veo / Luma): starts from the frame above. Camera: ONE clear movement. Subject: ONE clear action with natural physics. Environment motion (smoke, rain, hair, fabric). Pace, mood, duration hint. NEVER introduce subjects or locations not in the frame.>\n\n**VOICE-OVER:**\n<only when the request contains INCLUDE VOICE-OVER: yes — the exact words spoken during this scene (dialogue/narration) in the script's dialect, clean of any labels. Omit this field entirely when not requested.>\n\n**CHARACTER REF:**\n<only when the request contains a CHARACTER REFERENCE section — for every scene where that character appears, add this single English line: \"Attach the reference photo of <NAME> when generating this shot — same face, hair and build in every frame.\" Omit when the character is absent from the scene or no reference was provided.>\n\nThe code block is the user's copy-paste unit — it must be fully self-contained (repeat the character's Visual Identity Line and the global style keywords inside it).\n\nPrompt-engineering rules:\n- **Image prompts**: concrete nouns and physical light descriptions (\"warm tungsten practicals, soft window key light\") — never abstract moods alone; one subject focus per frame; repeat the exact character sheet line every time the character appears; end with aspect ratio.\n- **Motion prompts**: ONE camera move + ONE subject action per shot — stacked motions break AI video; describe motion continuously (\"she slowly turns her head toward the window as curtains breathe in the wind\"); include what must stay stable (\"face and wardrobe unchanged\"); 4–10s per shot.\n- Numbering must match the script's scene numbers. If a scene needs multiple shots, use 04A, 04B.\n- **Every scene block must be fully self-contained**: repeat the character's full Visual Identity Line and the global style keywords inside each scene's IMAGE PROMPT and MOTION PROMPT, so any single scene can be copied alone into a generation tool and still produce a consistent result.\n- **The scene header format is machine-parsed — reproduce it exactly**: a line starting with `━━━ SCENE <number>` (e.g. `━━━ SCENE 04 — INT. KITCHEN — NIGHT ━━━`). Never use a different delimiter.\n- After the last scene, output a **Shot List Table**: Scene | Shot | Size | Movement | Duration | Location — ready for production planning.\n- Finally, close with **MASTER PROMPT** — ONE fenced code block (```markdown … ```) containing the complete storyboard as a self-contained **English** prompt: the full STYLE FRAME, then every scene in order with its board description, shot specs, IMAGE PROMPT and MOTION PROMPT. It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.\n\n---\n\n## Failure & edge handling\n\n- Brief too thin to plan → deliver the plan anyway on stated assumptions, flag the 3 highest-risk assumptions at the top.\n- User asks for \"everything at once\" → run the pipeline in order (plan → script → storyboard) as separate clearly-titled deliverables.\n- User pastes someone else's copyrighted script → work with it as reference/parody/analysis only; generate original alternatives rather than reproducing it.\n- Requests for real living public figures in generative prompts → replace with an original character (\"a charismatic TV host in his 50s\") and say so briefly.";
 
 /* ============================================================
    FILM-TREND AI — visual styles catalogue
@@ -1385,6 +1517,72 @@ async function extractPptx(file) {
 }
 
 /* ============================================================
+   FILM-TREND AI — storyboard sketch generator
+   Draws black-and-white storyboard sketches with Google's free
+   image model (gemini-2.5-flash-image). Uses the same free
+   Gemini key as the voice-over. When a character reference
+   photo is provided it is passed along so the drawn character
+   keeps the same face/build in every frame.
+   ============================================================ */
+
+const SKETCH_MODEL = "gemini-2.5-flash-image";
+
+const SKETCH_STYLE_PREFIX =
+  "Professional film storyboard sketch, black and white pencil and ink drawing, " +
+  "rough expressive linework, clear composition and framing, cinematic staging, " +
+  "monochrome, no color, storyboard panel style. ";
+
+/**
+ * sketchGenerate(sceneDescription, refImage?) → Promise<dataURL>
+ * refImage: {mime, b64} — optional character reference photo.
+ */
+async function sketchGenerate(sceneDescription, refImage) {
+  const key = localStorage.getItem("fta_key_gemini") || "";
+  if (!key) throw new Error("NO_KEY");
+
+  const parts = [];
+  if (refImage) {
+    parts.push({ inline_data: { mime_type: refImage.mime, data: refImage.b64 } });
+    parts.push({
+      text: SKETCH_STYLE_PREFIX +
+        "Draw this scene as a storyboard panel. The main character MUST look like the person " +
+        "in the attached reference photo (same face, hair, build) rendered as a b/w sketch:\n" +
+        sceneDescription,
+    });
+  } else {
+    parts.push({ text: SKETCH_STYLE_PREFIX + "Draw this scene as a storyboard panel:\n" + sceneDescription });
+  }
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${SKETCH_MODEL}:generateContent?key=${encodeURIComponent(key)}`,
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts }],
+        generationConfig: { responseModalities: ["IMAGE"] },
+      }),
+    }
+  );
+
+  if (!res.ok) {
+    if (res.status === 400 || res.status === 401 || res.status === 403) throw new Error("BAD_KEY");
+    if (res.status === 429) throw new Error("RATE");
+    let msg = "HTTP " + res.status;
+    try { msg = (await res.json())?.error?.message || msg; } catch (_) {}
+    if (/overload|unavailable|high demand/i.test(msg)) throw new Error("BUSY");
+    throw new Error(msg);
+  }
+
+  const data = await res.json();
+  const blocks = data?.candidates?.[0]?.content?.parts || [];
+  const img = blocks.find(p => p.inlineData || p.inline_data);
+  if (!img) throw new Error("NO_IMAGE");
+  const d = img.inlineData || img.inline_data;
+  return `data:${d.mimeType || d.mime_type || "image/png"};base64,${d.data}`;
+}
+
+/* ============================================================
    FILM-TREND AI — voice-over via Google Gemini TTS
    Uses the user's (free) Google AI Studio key. All voices are
    multilingual — they speak Arabic and English natively.
@@ -1420,10 +1618,28 @@ const TTS_STYLES = {
   ugc:   "Read the following casually and naturally, like a friend talking on camera: ",
 };
 
+/* dialect steering — Gemini TTS follows spoken-accent directives.
+   The Egyptian one is aggressive on purpose: authentic عامية, not MSA. */
+const TTS_ACCENTS = {
+  none: "",
+  egyptian:
+    "CRITICAL PRONUNCIATION RULE: The text is in Egyptian colloquial Arabic (اللهجة المصرية العامية). " +
+    "Speak it EXACTLY as an Egyptian from Cairo speaks in daily life: pronounce ج as G (like 'gamal'), " +
+    "ق as a glottal stop (hamza), ث as S or T, ذ as Z. Casual street rhythm and intonation, " +
+    "NEVER classical/MSA pronunciation, never formal case endings. ",
+  msa:
+    "Pronounce the following in clear, correct Modern Standard Arabic (الفصحى) with proper tashkeel. ",
+  gulf:
+    "The text is in Gulf Arabic (اللهجة الخليجية). Speak it with an authentic Khaleeji accent, " +
+    "natural Gulf rhythm and pronunciation, not MSA. ",
+};
+
 /**
- * Generate speech. Returns a WAV Blob.
+ * Generate speech. Returns a WAV Blob (Gemini) — accentKey picks TTS_ACCENTS.
  */
-async function ttsGenerate(text, voiceName, stylePrefix) {
+async function ttsGenerate(text, voiceName, stylePrefix, accentKey) {
+  const accent = TTS_ACCENTS[accentKey || "none"] || "";
+  stylePrefix = accent + (stylePrefix || "");
   const key = localStorage.getItem("fta_key_gemini") || "";
   if (!key) throw new Error("NO_KEY");
 
@@ -1458,6 +1674,47 @@ async function ttsGenerate(text, voiceName, stylePrefix) {
   const rate = parseInt((part.inlineData.mimeType.match(/rate=(\d+)/) || [, "24000"])[1], 10);
   const pcm = Uint8Array.from(atob(part.inlineData.data), c => c.charCodeAt(0));
   return pcmToWav(pcm, rate);
+}
+
+/* ============================================================
+   ElevenLabs TTS — the strongest Arabic voices on the market.
+   Free key from elevenlabs.io (10k chars/month). eleven_v3 follows
+   the text's dialect closely, so Egyptian عامية sounds Egyptian.
+   ============================================================ */
+const ELEVEN_MODEL = "eleven_multilingual_v2";
+
+async function elevenVoices() {
+  const key = localStorage.getItem("fta_key_elevenlabs") || "";
+  if (!key) throw new Error("NO_KEY");
+  const res = await fetch("https://api.elevenlabs.io/v1/voices", {
+    headers: { "xi-api-key": key },
+  });
+  if (!res.ok) throw new Error(res.status === 401 ? "BAD_KEY" : "HTTP " + res.status);
+  const data = await res.json();
+  return (data.voices || []).map(v => [v.voice_id, v.name + (v.labels?.accent ? " — " + v.labels.accent : "")]);
+}
+
+/* accent hints go into the text itself for ElevenLabs (v2 reads the text's dialect) */
+async function elevenGenerate(text, voiceId) {
+  const key = localStorage.getItem("fta_key_elevenlabs") || "";
+  if (!key) throw new Error("NO_KEY");
+  const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+    method: "POST",
+    headers: { "xi-api-key": key, "content-type": "application/json" },
+    body: JSON.stringify({
+      text,
+      model_id: ELEVEN_MODEL,
+      voice_settings: { stability: 0.45, similarity_boost: 0.8, style: 0.35 },
+    }),
+  });
+  if (!res.ok) {
+    if (res.status === 401) throw new Error("BAD_KEY");
+    if (res.status === 429) throw new Error("RATE");
+    let msg = "HTTP " + res.status;
+    try { msg = (await res.json())?.detail?.message || msg; } catch (_) {}
+    throw new Error(msg);
+  }
+  return await res.blob(); // audio/mpeg — plays directly in <audio>
 }
 
 /* wrap raw 16-bit mono PCM in a WAV container so <audio> can play it */
@@ -1965,7 +2222,14 @@ function checkReady() {
   return true;
 }
 
-function startRun(tool, text, sysAddon) {
+/* ---------- theme ---------- */
+function setTheme(name) {
+  document.documentElement.dataset.theme = name;
+  localStorage.setItem("fta_theme", name);
+  document.querySelectorAll(".tdot").forEach(d => d.classList.toggle("on", d.dataset.theme === name));
+}
+
+function startRun(tool, text, sysAddon, images) {
   if (!checkReady()) return;
   if (activeController) activeController.abort();
 
@@ -1977,7 +2241,7 @@ function startRun(tool, text, sysAddon) {
   btn.disabled = true;
   stop.style.display = "inline-flex";
 
-  activeController = runLLM([{ role: "user", text }], {
+  activeController = runLLM([{ role: "user", text, images: images || [] }], {
     onRetry(attempt, max) {
       out.innerHTML = `<p class="thinking">${t("retrying")} (${attempt}/${max})</p>`;
     },
@@ -2244,6 +2508,18 @@ function runScript() {
 }
 
 /* ---------- step 3: storyboard ---------- */
+let boardCharImage = null; // {mime, b64} — consistent character reference
+
+async function boardCharPicked(input) {
+  const file = input.files[0];
+  if (!file) { boardCharImage = null; document.getElementById("board-char-thumb").style.display = "none"; return; }
+  boardCharImage = { mime: file.type, b64: await fileToBase64(file) };
+  const thumb = document.getElementById("board-char-thumb");
+  thumb.src = `data:${boardCharImage.mime};base64,${boardCharImage.b64}`;
+  thumb.style.display = "block";
+  toast(t("char_set"));
+}
+
 function runBoard() {
   let script = document.getElementById("board-script").value.trim();
   if (!script && lastScript) script = lastScript;
@@ -2253,9 +2529,16 @@ function runBoard() {
   const style = [styleSel, styleCustom].filter(Boolean).join(", ");
   const ratio = document.getElementById("board-ratio").value;
   const withVO = document.getElementById("board-vo").checked;
-  startRun("board",
-    `MODE: STORYBOARD\nASPECT RATIO: ${ratio}\nINCLUDE VOICE-OVER: ${withVO ? "yes" : "no"}${style ? "\nVISUAL STYLE: " + style : ""}\n\nSCRIPT:\n${script}`,
-    BOARD_AGENT_ADDON);
+  const charName = document.getElementById("board-char-name").value.trim();
+
+  let req = `MODE: STORYBOARD\nASPECT RATIO: ${ratio}\nINCLUDE VOICE-OVER: ${withVO ? "yes" : "no"}${style ? "\nVISUAL STYLE: " + style : ""}`;
+  if (boardCharImage) {
+    req += `\n\nCHARACTER REFERENCE: a photo of the main character${charName ? ` «${charName}»` : ""} is attached. ` +
+      `Study it and write the Visual Identity Line to match this EXACT person; reuse it verbatim in every scene, ` +
+      `and add the **CHARACTER REF:** line inside every scene code block where this character appears.`;
+  }
+  req += `\n\nSCRIPT:\n${script}`;
+  startRun("board", req, BOARD_AGENT_ADDON, boardCharImage ? [boardCharImage] : []);
 }
 
 function useLastScript() {
@@ -2274,13 +2557,15 @@ function splitScenes(raw) {
     const header = (p.match(/━{2,}\s*(SCENE[^━\n]*)/i) || [, "SCENE"])[1].trim();
     // lookahead stops at the next section: audio note, next scene, another
     // field (possibly **bold**), a code fence, a table row, or a heading
-    const stop = "(?=\\n\\s*(?:🔊|━{2,}|\\*{0,2}IMAGE PROMPT|\\*{0,2}MOTION PROMPT|\\*{0,2}VOICE-?OVER|```|\\||#)|$)";
+    const stop = "(?=\\n\\s*(?:🔊|━{2,}|\\*{0,2}SKETCH PROMPT|\\*{0,2}IMAGE PROMPT|\\*{0,2}MOTION PROMPT|\\*{0,2}VOICE-?OVER|\\*{0,2}CHARACTER REF|```|\\||#)|$)";
     const grab = label =>
       (p.match(new RegExp(label + "[^:\\n]*:?\\*{0,2}\\s*\\n?([\\s\\S]*?)" + stop, "i")) || [, ""])[1].trim();
+    const sketch = grab("SKETCH PROMPT");
     const img = grab("IMAGE PROMPT");
     const mot = grab("MOTION PROMPT");
     const vo = grab("VOICE-?OVER");
-    return { header, full: p.trim(), img, mot, vo };
+    const ref = grab("CHARACTER REF");
+    return { header, full: p.trim(), sketch, img, mot, vo, ref };
   });
 }
 
@@ -2309,15 +2594,24 @@ function toggleBoardView() {
     const scenes = splitScenes(raw);
     if (!scenes.length) { toast(t("t_no_scenes")); return; }
     window._scenes = scenes;
-    out.innerHTML = scenes.map((s, i) => `
+    const wantSketches = document.getElementById("board-sketch").checked && scenes.some(s => s.sketch || s.img);
+    out.innerHTML =
+      (wantSketches ? `<button class="btn btn-ghost btn-sm" style="margin-bottom:14px" onclick="drawAllSketches()">${t("sk_all")}</button>` : "") +
+      scenes.map((s, i) => `
       <div class="scene-card">
         <div class="scene-head">
           <b>🎬 ${s.header.replace(/━/g, "").trim()}</b>
           <button class="btn btn-ghost btn-xs" onclick="copyText(window._scenes[${i}].full, t('copied_scene'))">${t("scene_full")}</button>
         </div>
+        ${wantSketches ? `
+        <div class="sketch-box" id="sketch-${i}">
+          <button class="btn btn-ghost btn-xs" onclick="drawSketch(${i})">${t("sk_draw")}</button>
+        </div>` : ""}
+        ${scenePromptBlock(i, "sketch", "sk_prompt", "copied_sk", "ltr")}
         ${scenePromptBlock(i, "img", "scene_img", "copied_img", "ltr")}
         ${scenePromptBlock(i, "mot", "scene_mot", "copied_mot", "ltr")}
         ${scenePromptBlock(i, "vo", "scene_vo", "copied_vo", "auto")}
+        ${scenePromptBlock(i, "ref", "scene_ref", "copied_scene", "ltr")}
       </div>`).join("");
     btn.textContent = t("split_back");
     boardView = "scenes";
@@ -2329,7 +2623,37 @@ function toggleBoardView() {
   }
 }
 
-/* ---------- step 4: voice-over (Google Gemini TTS) ---------- */
+/* ---------- storyboard sketches (b/w, drawn by the free Gemini image model) ---------- */
+async function drawSketch(i) {
+  const s = window._scenes && window._scenes[i];
+  if (!s) return;
+  const box = document.getElementById("sketch-" + i);
+  if (!box) return;
+  const desc = s.sketch || s.img || s.header;
+  box.innerHTML = `<span class="sketch-status">${t("sk_drawing")}</span>`;
+  try {
+    const dataUrl = await sketchGenerate(desc, boardCharImage);
+    box.innerHTML = `<img src="${dataUrl}" alt="storyboard sketch">`;
+  } catch (e) {
+    const msg = e.message === "NO_KEY" ? t("sk_no_key")
+      : e.message === "RATE" ? t("sk_rate")
+      : e.message === "BUSY" ? t("sk_busy")
+      : e.message === "BAD_KEY" ? t("v_bad_key")
+      : t("sk_fail");
+    box.innerHTML = `<button class="btn btn-ghost btn-xs" onclick="drawSketch(${i})">${t("sk_draw")}</button> <span class="sketch-status">⚠️ ${msg}</span>`;
+    if (e.message === "NO_KEY") { switchTab("settings"); toast(t("sk_no_key")); }
+  }
+}
+
+async function drawAllSketches() {
+  const n = (window._scenes || []).length;
+  for (let i = 0; i < n; i++) {
+    // sequential on purpose — the free tier rate-limits parallel image calls
+    await drawSketch(i);
+  }
+}
+
+/* ---------- step 4: voice-over (Google Gemini TTS / ElevenLabs) ---------- */
 let lastWavUrl = null;
 
 const VO_EXTRACT_SYSTEM = `You are a voice-over script extractor. From the given screenplay, extract ONLY the words that will be spoken aloud (dialogue lines and narration/V.O.), in their original order and original language.
@@ -2362,6 +2686,37 @@ function useScriptForVoice() {
   }, { system: VO_EXTRACT_SYSTEM });
 }
 
+/* voice provider switching (Google Gemini / ElevenLabs) */
+function fillVoiceList() {
+  const provider = document.getElementById("voice-provider").value;
+  const sel = document.getElementById("voice-name");
+  if (provider === "gemini") {
+    sel.innerHTML = TTS_VOICES.map(([id, label]) => `<option value="${id}">${label}</option>`).join("");
+    return;
+  }
+  sel.innerHTML = `<option value="">${t("v_eleven_loading")}</option>`;
+  elevenVoices()
+    .then(vs => { sel.innerHTML = vs.map(([id, label]) => `<option value="${id}">${label}</option>`).join(""); })
+    .catch(e => {
+      sel.innerHTML = "";
+      if (e.message !== "NO_KEY") toast(t("v_eleven_bad"));
+    });
+}
+
+function voiceProviderChanged() {
+  const provider = document.getElementById("voice-provider").value;
+  localStorage.setItem("fta_tts_provider", provider);
+  document.getElementById("eleven-box").style.display = provider === "elevenlabs" ? "block" : "none";
+  // ElevenLabs follows the text's own dialect — accent steering is a Gemini feature
+  document.getElementById("accent-box").style.display = provider === "gemini" ? "block" : "none";
+  fillVoiceList();
+}
+
+function elevenKeyChanged() {
+  localStorage.setItem("fta_key_elevenlabs", document.getElementById("eleven-key").value.trim());
+  if (document.getElementById("voice-provider").value === "elevenlabs") fillVoiceList();
+}
+
 async function runVoice() {
   const text = document.getElementById("voice-text").value.trim();
   if (!text) { toast(t("v_write_first")); return; }
@@ -2371,6 +2726,15 @@ async function runVoice() {
   const btn = document.getElementById("run-voice");
   const voice = document.getElementById("voice-name").value;
   const style = TTS_STYLES[document.getElementById("voice-style").value] || "";
+  const accent = document.getElementById("voice-accent").value;
+  const provider = document.getElementById("voice-provider").value;
+
+  if (provider === "elevenlabs" && !(localStorage.getItem("fta_key_elevenlabs") || "").trim()) {
+    status.className = "voice-status err";
+    status.textContent = "⚠️ " + t("v_eleven_key");
+    document.getElementById("eleven-key").focus();
+    return;
+  }
 
   status.className = "voice-status";
   status.textContent = t("v_generating");
@@ -2378,17 +2742,20 @@ async function runVoice() {
   btn.disabled = true;
 
   try {
-    const wav = await ttsGenerate(text, voice, style);
+    const audio = provider === "elevenlabs"
+      ? await elevenGenerate(text, voice)
+      : await ttsGenerate(text, voice, style, accent);
     if (lastWavUrl) URL.revokeObjectURL(lastWavUrl);
-    lastWavUrl = URL.createObjectURL(wav);
+    lastWavUrl = URL.createObjectURL(audio);
     document.getElementById("voice-audio").src = lastWavUrl;
     result.style.display = "block";
     status.textContent = t("v_ready");
     markStepDone("voice");
+    const ext = provider === "elevenlabs" ? "mp3" : "wav";
     document.getElementById("voice-dl").onclick = () => {
       const a = document.createElement("a");
       a.href = lastWavUrl;
-      a.download = "filmtrend-voiceover.wav";
+      a.download = "filmtrend-voiceover." + ext;
       a.click();
     };
   } catch (e) {
@@ -2398,7 +2765,7 @@ async function runVoice() {
       switchTab("settings");
       toast(t("v_add_key_toast"));
     } else if (e.message.startsWith("BAD_KEY")) {
-      status.textContent = t("v_bad_key");
+      status.textContent = provider === "elevenlabs" ? "⚠️ " + t("v_eleven_bad") : t("v_bad_key");
     } else if (e.message.startsWith("RATE")) {
       status.textContent = t("v_rate");
     } else {
@@ -2499,13 +2866,16 @@ toggleLang = function () { _baseToggleLang(); refreshDynamicLang(); };
 /* ---------- boot ---------- */
 document.addEventListener("DOMContentLoaded", () => {
   applyLang();
+  setTheme(localStorage.getItem("fta_theme") || "ocean");
 
   document.querySelectorAll(".step-btn").forEach(b =>
     b.addEventListener("click", () => switchTab(b.dataset.tab)));
 
-  // voice-over: populate the voices list
-  document.getElementById("voice-name").innerHTML =
-    TTS_VOICES.map(([id, label]) => `<option value="${id}">${label}</option>`).join("");
+  // voice-over: restore provider + accent, populate the voices list
+  const savedTts = localStorage.getItem("fta_tts_provider") || "gemini";
+  document.getElementById("voice-provider").value = savedTts;
+  document.getElementById("eleven-key").value = localStorage.getItem("fta_key_elevenlabs") || "";
+  voiceProviderChanged();
 
   // populate provider dropdown from the registry
   const provSel = document.getElementById("set-provider");

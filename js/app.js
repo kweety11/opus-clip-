@@ -101,7 +101,14 @@ function checkReady() {
   return true;
 }
 
-function startRun(tool, text, sysAddon) {
+/* ---------- theme ---------- */
+function setTheme(name) {
+  document.documentElement.dataset.theme = name;
+  localStorage.setItem("fta_theme", name);
+  document.querySelectorAll(".tdot").forEach(d => d.classList.toggle("on", d.dataset.theme === name));
+}
+
+function startRun(tool, text, sysAddon, images) {
   if (!checkReady()) return;
   if (activeController) activeController.abort();
 
@@ -113,7 +120,7 @@ function startRun(tool, text, sysAddon) {
   btn.disabled = true;
   stop.style.display = "inline-flex";
 
-  activeController = runLLM([{ role: "user", text }], {
+  activeController = runLLM([{ role: "user", text, images: images || [] }], {
     onRetry(attempt, max) {
       out.innerHTML = `<p class="thinking">${t("retrying")} (${attempt}/${max})</p>`;
     },
@@ -380,6 +387,18 @@ function runScript() {
 }
 
 /* ---------- step 3: storyboard ---------- */
+let boardCharImage = null; // {mime, b64} — consistent character reference
+
+async function boardCharPicked(input) {
+  const file = input.files[0];
+  if (!file) { boardCharImage = null; document.getElementById("board-char-thumb").style.display = "none"; return; }
+  boardCharImage = { mime: file.type, b64: await fileToBase64(file) };
+  const thumb = document.getElementById("board-char-thumb");
+  thumb.src = `data:${boardCharImage.mime};base64,${boardCharImage.b64}`;
+  thumb.style.display = "block";
+  toast(t("char_set"));
+}
+
 function runBoard() {
   let script = document.getElementById("board-script").value.trim();
   if (!script && lastScript) script = lastScript;
@@ -389,9 +408,16 @@ function runBoard() {
   const style = [styleSel, styleCustom].filter(Boolean).join(", ");
   const ratio = document.getElementById("board-ratio").value;
   const withVO = document.getElementById("board-vo").checked;
-  startRun("board",
-    `MODE: STORYBOARD\nASPECT RATIO: ${ratio}\nINCLUDE VOICE-OVER: ${withVO ? "yes" : "no"}${style ? "\nVISUAL STYLE: " + style : ""}\n\nSCRIPT:\n${script}`,
-    BOARD_AGENT_ADDON);
+  const charName = document.getElementById("board-char-name").value.trim();
+
+  let req = `MODE: STORYBOARD\nASPECT RATIO: ${ratio}\nINCLUDE VOICE-OVER: ${withVO ? "yes" : "no"}${style ? "\nVISUAL STYLE: " + style : ""}`;
+  if (boardCharImage) {
+    req += `\n\nCHARACTER REFERENCE: a photo of the main character${charName ? ` «${charName}»` : ""} is attached. ` +
+      `Study it and write the Visual Identity Line to match this EXACT person; reuse it verbatim in every scene, ` +
+      `and add the **CHARACTER REF:** line inside every scene code block where this character appears.`;
+  }
+  req += `\n\nSCRIPT:\n${script}`;
+  startRun("board", req, BOARD_AGENT_ADDON, boardCharImage ? [boardCharImage] : []);
 }
 
 function useLastScript() {
@@ -410,13 +436,15 @@ function splitScenes(raw) {
     const header = (p.match(/━{2,}\s*(SCENE[^━\n]*)/i) || [, "SCENE"])[1].trim();
     // lookahead stops at the next section: audio note, next scene, another
     // field (possibly **bold**), a code fence, a table row, or a heading
-    const stop = "(?=\\n\\s*(?:🔊|━{2,}|\\*{0,2}IMAGE PROMPT|\\*{0,2}MOTION PROMPT|\\*{0,2}VOICE-?OVER|```|\\||#)|$)";
+    const stop = "(?=\\n\\s*(?:🔊|━{2,}|\\*{0,2}SKETCH PROMPT|\\*{0,2}IMAGE PROMPT|\\*{0,2}MOTION PROMPT|\\*{0,2}VOICE-?OVER|\\*{0,2}CHARACTER REF|```|\\||#)|$)";
     const grab = label =>
       (p.match(new RegExp(label + "[^:\\n]*:?\\*{0,2}\\s*\\n?([\\s\\S]*?)" + stop, "i")) || [, ""])[1].trim();
+    const sketch = grab("SKETCH PROMPT");
     const img = grab("IMAGE PROMPT");
     const mot = grab("MOTION PROMPT");
     const vo = grab("VOICE-?OVER");
-    return { header, full: p.trim(), img, mot, vo };
+    const ref = grab("CHARACTER REF");
+    return { header, full: p.trim(), sketch, img, mot, vo, ref };
   });
 }
 
@@ -445,15 +473,24 @@ function toggleBoardView() {
     const scenes = splitScenes(raw);
     if (!scenes.length) { toast(t("t_no_scenes")); return; }
     window._scenes = scenes;
-    out.innerHTML = scenes.map((s, i) => `
+    const wantSketches = document.getElementById("board-sketch").checked && scenes.some(s => s.sketch || s.img);
+    out.innerHTML =
+      (wantSketches ? `<button class="btn btn-ghost btn-sm" style="margin-bottom:14px" onclick="drawAllSketches()">${t("sk_all")}</button>` : "") +
+      scenes.map((s, i) => `
       <div class="scene-card">
         <div class="scene-head">
           <b>🎬 ${s.header.replace(/━/g, "").trim()}</b>
           <button class="btn btn-ghost btn-xs" onclick="copyText(window._scenes[${i}].full, t('copied_scene'))">${t("scene_full")}</button>
         </div>
+        ${wantSketches ? `
+        <div class="sketch-box" id="sketch-${i}">
+          <button class="btn btn-ghost btn-xs" onclick="drawSketch(${i})">${t("sk_draw")}</button>
+        </div>` : ""}
+        ${scenePromptBlock(i, "sketch", "sk_prompt", "copied_sk", "ltr")}
         ${scenePromptBlock(i, "img", "scene_img", "copied_img", "ltr")}
         ${scenePromptBlock(i, "mot", "scene_mot", "copied_mot", "ltr")}
         ${scenePromptBlock(i, "vo", "scene_vo", "copied_vo", "auto")}
+        ${scenePromptBlock(i, "ref", "scene_ref", "copied_scene", "ltr")}
       </div>`).join("");
     btn.textContent = t("split_back");
     boardView = "scenes";
@@ -465,7 +502,37 @@ function toggleBoardView() {
   }
 }
 
-/* ---------- step 4: voice-over (Google Gemini TTS) ---------- */
+/* ---------- storyboard sketches (b/w, drawn by the free Gemini image model) ---------- */
+async function drawSketch(i) {
+  const s = window._scenes && window._scenes[i];
+  if (!s) return;
+  const box = document.getElementById("sketch-" + i);
+  if (!box) return;
+  const desc = s.sketch || s.img || s.header;
+  box.innerHTML = `<span class="sketch-status">${t("sk_drawing")}</span>`;
+  try {
+    const dataUrl = await sketchGenerate(desc, boardCharImage);
+    box.innerHTML = `<img src="${dataUrl}" alt="storyboard sketch">`;
+  } catch (e) {
+    const msg = e.message === "NO_KEY" ? t("sk_no_key")
+      : e.message === "RATE" ? t("sk_rate")
+      : e.message === "BUSY" ? t("sk_busy")
+      : e.message === "BAD_KEY" ? t("v_bad_key")
+      : t("sk_fail");
+    box.innerHTML = `<button class="btn btn-ghost btn-xs" onclick="drawSketch(${i})">${t("sk_draw")}</button> <span class="sketch-status">⚠️ ${msg}</span>`;
+    if (e.message === "NO_KEY") { switchTab("settings"); toast(t("sk_no_key")); }
+  }
+}
+
+async function drawAllSketches() {
+  const n = (window._scenes || []).length;
+  for (let i = 0; i < n; i++) {
+    // sequential on purpose — the free tier rate-limits parallel image calls
+    await drawSketch(i);
+  }
+}
+
+/* ---------- step 4: voice-over (Google Gemini TTS / ElevenLabs) ---------- */
 let lastWavUrl = null;
 
 const VO_EXTRACT_SYSTEM = `You are a voice-over script extractor. From the given screenplay, extract ONLY the words that will be spoken aloud (dialogue lines and narration/V.O.), in their original order and original language.
@@ -498,6 +565,37 @@ function useScriptForVoice() {
   }, { system: VO_EXTRACT_SYSTEM });
 }
 
+/* voice provider switching (Google Gemini / ElevenLabs) */
+function fillVoiceList() {
+  const provider = document.getElementById("voice-provider").value;
+  const sel = document.getElementById("voice-name");
+  if (provider === "gemini") {
+    sel.innerHTML = TTS_VOICES.map(([id, label]) => `<option value="${id}">${label}</option>`).join("");
+    return;
+  }
+  sel.innerHTML = `<option value="">${t("v_eleven_loading")}</option>`;
+  elevenVoices()
+    .then(vs => { sel.innerHTML = vs.map(([id, label]) => `<option value="${id}">${label}</option>`).join(""); })
+    .catch(e => {
+      sel.innerHTML = "";
+      if (e.message !== "NO_KEY") toast(t("v_eleven_bad"));
+    });
+}
+
+function voiceProviderChanged() {
+  const provider = document.getElementById("voice-provider").value;
+  localStorage.setItem("fta_tts_provider", provider);
+  document.getElementById("eleven-box").style.display = provider === "elevenlabs" ? "block" : "none";
+  // ElevenLabs follows the text's own dialect — accent steering is a Gemini feature
+  document.getElementById("accent-box").style.display = provider === "gemini" ? "block" : "none";
+  fillVoiceList();
+}
+
+function elevenKeyChanged() {
+  localStorage.setItem("fta_key_elevenlabs", document.getElementById("eleven-key").value.trim());
+  if (document.getElementById("voice-provider").value === "elevenlabs") fillVoiceList();
+}
+
 async function runVoice() {
   const text = document.getElementById("voice-text").value.trim();
   if (!text) { toast(t("v_write_first")); return; }
@@ -507,6 +605,15 @@ async function runVoice() {
   const btn = document.getElementById("run-voice");
   const voice = document.getElementById("voice-name").value;
   const style = TTS_STYLES[document.getElementById("voice-style").value] || "";
+  const accent = document.getElementById("voice-accent").value;
+  const provider = document.getElementById("voice-provider").value;
+
+  if (provider === "elevenlabs" && !(localStorage.getItem("fta_key_elevenlabs") || "").trim()) {
+    status.className = "voice-status err";
+    status.textContent = "⚠️ " + t("v_eleven_key");
+    document.getElementById("eleven-key").focus();
+    return;
+  }
 
   status.className = "voice-status";
   status.textContent = t("v_generating");
@@ -514,17 +621,20 @@ async function runVoice() {
   btn.disabled = true;
 
   try {
-    const wav = await ttsGenerate(text, voice, style);
+    const audio = provider === "elevenlabs"
+      ? await elevenGenerate(text, voice)
+      : await ttsGenerate(text, voice, style, accent);
     if (lastWavUrl) URL.revokeObjectURL(lastWavUrl);
-    lastWavUrl = URL.createObjectURL(wav);
+    lastWavUrl = URL.createObjectURL(audio);
     document.getElementById("voice-audio").src = lastWavUrl;
     result.style.display = "block";
     status.textContent = t("v_ready");
     markStepDone("voice");
+    const ext = provider === "elevenlabs" ? "mp3" : "wav";
     document.getElementById("voice-dl").onclick = () => {
       const a = document.createElement("a");
       a.href = lastWavUrl;
-      a.download = "filmtrend-voiceover.wav";
+      a.download = "filmtrend-voiceover." + ext;
       a.click();
     };
   } catch (e) {
@@ -534,7 +644,7 @@ async function runVoice() {
       switchTab("settings");
       toast(t("v_add_key_toast"));
     } else if (e.message.startsWith("BAD_KEY")) {
-      status.textContent = t("v_bad_key");
+      status.textContent = provider === "elevenlabs" ? "⚠️ " + t("v_eleven_bad") : t("v_bad_key");
     } else if (e.message.startsWith("RATE")) {
       status.textContent = t("v_rate");
     } else {
@@ -635,13 +745,16 @@ toggleLang = function () { _baseToggleLang(); refreshDynamicLang(); };
 /* ---------- boot ---------- */
 document.addEventListener("DOMContentLoaded", () => {
   applyLang();
+  setTheme(localStorage.getItem("fta_theme") || "ocean");
 
   document.querySelectorAll(".step-btn").forEach(b =>
     b.addEventListener("click", () => switchTab(b.dataset.tab)));
 
-  // voice-over: populate the voices list
-  document.getElementById("voice-name").innerHTML =
-    TTS_VOICES.map(([id, label]) => `<option value="${id}">${label}</option>`).join("");
+  // voice-over: restore provider + accent, populate the voices list
+  const savedTts = localStorage.getItem("fta_tts_provider") || "gemini";
+  document.getElementById("voice-provider").value = savedTts;
+  document.getElementById("eleven-key").value = localStorage.getItem("fta_key_elevenlabs") || "";
+  voiceProviderChanged();
 
   // populate provider dropdown from the registry
   const provSel = document.getElementById("set-provider");

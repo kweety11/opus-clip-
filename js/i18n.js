@@ -100,6 +100,23 @@ const I18N = {
     err_server: "خطأ من الخادم — جرّب تاني", err_refusal: "الطلب اترفض لأسباب تتعلق بسياسة الاستخدام — جرّب تعيد صياغته",
     err_conn: "تعذّر الاتصال — اتأكد من الإنترنت والمفتاح",
     retrying: "⏳ الموديل زحمة دلوقتي — بنحاول تاني تلقائيًا…",
+    // character reference + sketches
+    b_char: "الشخصية الثابتة (اختياري) — ارفع صورة مرجعية",
+    b_char_up: "ارفع صورتك أو صورة الشخصية", b_char_name_ph: "اسم الشخصية — مثال: أحمد",
+    b_sketch: "✏️ اسكتشات أبيض وأسود لكل مشهد (بترسم بمفتاح Gemini المجاني)",
+    sk_draw: "✏️ ارسم الاسكتش", sk_drawing: "⏳ بيرسم…", sk_all: "✏️ ارسم كل الاسكتشات",
+    sk_prompt: "✏️ SKETCH PROMPT", copied_sk: "برومبت الاسكتش",
+    sk_no_key: "الاسكتشات محتاجة مفتاح Google Gemini (مجاني) — ضيفه من الإعدادات",
+    sk_rate: "وصلت لحد الرسم المجاني — استنى دقيقة وحاول تاني",
+    sk_busy: "موديل الرسم زحمة — حاول تاني بعد شوية", sk_fail: "معرفش يرسم المشهد ده — حاول تاني",
+    char_set: "صورة الشخصية اتحطت ✓ — هتفضل ثابتة في كل المشاهد",
+    scene_ref: "📸 CHARACTER REF",
+    // voice provider + accent
+    v_provider: "مزود الصوت", vp_gemini: "Google Gemini — مجاني", vp_eleven: "ElevenLabs — أقوى صوت عربي (مفتاح مجاني)",
+    v_eleven_key: "مفتاح ElevenLabs",
+    v_eleven_note_html: "🎙️ مفتاح <b>مجاني</b> من <span dir=\"ltr\">elevenlabs.io</span> → Profile → API Keys. أصوات ElevenLabs بتنطق العامية المصرية بشكل طبيعي جدًا.",
+    v_accent: "اللهجة / النطق", va_eg: "🇪🇬 مصري عامي", va_msa: "عربي فصحى", va_gulf: "خليجي", va_none: "تلقائي — من غير توجيه",
+    v_eleven_loading: "⏳ بجيب الأصوات من حسابك…", v_eleven_bad: "مفتاح ElevenLabs غير صحيح",
   },
   en: {
     nav_features: "Features", nav_pricing: "Pricing", open_studio: "Open Studio →",
@@ -188,6 +205,23 @@ const I18N = {
     err_server: "Server error — try again", err_refusal: "The request was refused for usage-policy reasons — try rephrasing it",
     err_conn: "Connection failed — check your internet and key",
     retrying: "⏳ The model is busy — retrying automatically…",
+    // character reference + sketches
+    b_char: "Consistent character (optional) — upload a reference photo",
+    b_char_up: "Upload your photo or the character's", b_char_name_ph: "Character name — e.g. Ahmed",
+    b_sketch: "✏️ B/W sketch for every scene (drawn with your free Gemini key)",
+    sk_draw: "✏️ Draw sketch", sk_drawing: "⏳ Drawing…", sk_all: "✏️ Draw all sketches",
+    sk_prompt: "✏️ SKETCH PROMPT", copied_sk: "Sketch prompt",
+    sk_no_key: "Sketches need a (free) Google Gemini key — add it in Settings",
+    sk_rate: "Free drawing limit reached — wait a minute and retry",
+    sk_busy: "The drawing model is busy — try again shortly", sk_fail: "Couldn't draw this scene — try again",
+    char_set: "Character photo set ✓ — it stays consistent across all scenes",
+    scene_ref: "📸 CHARACTER REF",
+    // voice provider + accent
+    v_provider: "Voice provider", vp_gemini: "Google Gemini — free", vp_eleven: "ElevenLabs — best Arabic voices (free key)",
+    v_eleven_key: "ElevenLabs API key",
+    v_eleven_note_html: "🎙️ <b>Free</b> key from <span dir=\"ltr\">elevenlabs.io</span> → Profile → API Keys. ElevenLabs voices pronounce Egyptian Arabic very naturally.",
+    v_accent: "Dialect / pronunciation", va_eg: "🇪🇬 Egyptian colloquial", va_msa: "Modern Standard Arabic", va_gulf: "Gulf", va_none: "Auto — no steering",
+    v_eleven_loading: "⏳ Fetching voices from your account…", v_eleven_bad: "Invalid ElevenLabs key",
   },
 };
 

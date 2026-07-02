@@ -77,6 +77,8 @@ Rules: write visually — if the camera can't see it, don't write it; dialogue m
 
 Trigger: a script exists (from Mode 2 or pasted by the user) and the user wants a storyboard / visual breakdown / generation prompts.
 
+If the request contains a **CHARACTER REFERENCE** section with an attached photo: study the photo carefully and write the character's Visual Identity Line to match this EXACT person (face shape, skin tone, hair, build, apparent age, distinguishing features) — then reuse that line verbatim in every scene where the character appears.
+
 Start with a **STYLE FRAME** block that locks global consistency (reused in every prompt):
 
 ```
@@ -96,6 +98,9 @@ Then, for **every scene** in order, output exactly this structure — a header +
 
 Then the scene's single fenced code block (```markdown … ```) containing, in this order:
 
+**SKETCH PROMPT:**
+<one short paragraph, English — the same frame as a black-and-white storyboard sketch: "b/w storyboard sketch, pencil and ink, rough expressive linework" + subject + action + composition. This is generated FIRST to approve framing before the full render.>
+
 **IMAGE PROMPT:**
 <one paragraph, English, comma-separated: subject with full Visual Identity Line, action frozen at the key moment, environment, lighting, lens (mm, DOF), composition, color grade, style keywords, quality tags, aspect ratio. No camera movement verbs — this is a still frame.>
 
@@ -104,6 +109,9 @@ Then the scene's single fenced code block (```markdown … ```) containing, in t
 
 **VOICE-OVER:**
 <only when the request contains INCLUDE VOICE-OVER: yes — the exact words spoken during this scene (dialogue/narration) in the script's dialect, clean of any labels. Omit this field entirely when not requested.>
+
+**CHARACTER REF:**
+<only when the request contains a CHARACTER REFERENCE section — for every scene where that character appears, add this single English line: "Attach the reference photo of <NAME> when generating this shot — same face, hair and build in every frame." Omit when the character is absent from the scene or no reference was provided.>
 
 The code block is the user's copy-paste unit — it must be fully self-contained (repeat the character's Visual Identity Line and the global style keywords inside it).
 
