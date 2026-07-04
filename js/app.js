@@ -799,7 +799,7 @@ toggleLang = function () { _baseToggleLang(); refreshDynamicLang(); };
 /* ---------- boot ---------- */
 document.addEventListener("DOMContentLoaded", () => {
   applyLang();
-  setTheme(localStorage.getItem("fta_theme") || "ocean");
+  setTheme(localStorage.getItem("fta_theme") || "sky");
   renderShootList();
 
   document.querySelectorAll(".step-btn").forEach(b =>
