@@ -585,6 +585,21 @@ html[data-theme="gold"] {
   --surface: rgba(19, 23, 34, .78); --surface-solid: #131722; --surface-2: #1a1f2d;
   --line: #242b3d; --line-soft: #1c2231;
 }
+/* light mode — sky blue on white */
+html[data-theme="sky"] {
+  --accent: #0ea5e9; --accent-2: #2563eb; --acc-deep: #0284c7; --cyan: #06b6d4; --btn-fg: #fff;
+  --accent-grad: linear-gradient(120deg, #0284c7, #38bdf8 45%, #2563eb);
+  --accent-grad-anim: linear-gradient(120deg, #0284c7, #38bdf8 25%, #2563eb 50%, #06b6d4 75%, #0284c7);
+  --bg: #eef6fd; --bg-2: #ffffff;
+  --surface: rgba(255, 255, 255, .85); --surface-solid: #ffffff; --surface-2: #e8f2fb;
+  --line: #c9ddef; --line-soft: #dcebf7;
+  --text: #0c1b2a; --muted: #46617d; --faint: #7e95ad;
+  --shadow-lg: 0 24px 70px rgba(30, 80, 140, .16);
+  --shadow: 0 12px 40px rgba(30, 80, 140, .12);
+}
+html[data-theme="sky"] .deepthink { background: rgba(2, 132, 199, .06); }
+html[data-theme="sky"] .tdot { border-color: rgba(12, 27, 42, .18); }
+html[data-theme="sky"] .tdot.on { border-color: var(--accent); }
 
 /* theme picker dots (header) */
 .theme-dots { display: flex; gap: 7px; align-items: center; }
@@ -599,6 +614,45 @@ html[data-theme="gold"] {
 .tdot[data-theme="violet"] { background: linear-gradient(120deg, #7c3aed, #a855f7, #ec4899); }
 .tdot[data-theme="emerald"] { background: linear-gradient(120deg, #0d9f70, #10c98a, #22d3ee); }
 .tdot[data-theme="gold"] { background: linear-gradient(120deg, #f6c15a, #f2b23e, #e8862d); }
+.tdot[data-theme="sky"] { background: linear-gradient(120deg, #e0f2fe, #7dd3fc, #2563eb); }
+
+/* dark / light toggle (header) */
+.mode-toggle {
+  width: 26px; height: 26px; border-radius: 50%; cursor: pointer; flex: none;
+  border: 1.5px solid var(--line); background: transparent; font-size: 14px; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center; padding: 0;
+  transition: transform .2s cubic-bezier(.34, 1.56, .64, 1), border-color .2s;
+}
+.mode-toggle:hover { transform: scale(1.15); border-color: var(--accent); }
+
+/* shoot list — scenes × seconds control (script tab) */
+.shoot-list {
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 12px 14px; margin: 0 0 10px;
+  background: color-mix(in srgb, var(--surface-2) 60%, transparent);
+}
+.sl-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 10px; flex-wrap: wrap; }
+.sl-title { font-size: 12.5px; font-weight: 800; letter-spacing: .06em; color: var(--accent); }
+.sl-total { font-size: 12px; color: var(--muted); font-weight: 700; }
+.sl-row { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-end; }
+.sl-group label { display: block; font-size: 12px; color: var(--muted); font-weight: 700; margin-bottom: 6px; }
+.stepper-ctl { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--line); border-radius: 10px; padding: 3px; }
+.stepper-ctl button {
+  width: 28px; height: 28px; border: none; border-radius: 8px; cursor: pointer;
+  background: var(--surface-2); color: var(--text); font-size: 16px; font-weight: 800;
+  transition: background .18s;
+}
+.stepper-ctl button:hover { background: color-mix(in srgb, var(--accent) 22%, var(--surface-2)); }
+.stepper-ctl span { min-width: 30px; text-align: center; font-weight: 800; font-size: 15px; }
+.stepper-ctl small { color: var(--faint); margin-inline-end: 5px; font-weight: 700; }
+.sl-chips { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+.sl-chips button {
+  padding: 6px 13px; border-radius: 9px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 800;
+  border: 1px solid var(--line); background: transparent; color: var(--muted);
+  transition: all .18s; direction: ltr;
+}
+.sl-chips button:hover { border-color: var(--accent); color: var(--text); }
+.sl-chips button.on { background: var(--accent); border-color: var(--accent); color: var(--btn-fg); }
 
 /* character reference (storyboard) */
 .char-ref { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
@@ -657,6 +711,8 @@ html[data-theme="gold"] {
         <button class="tdot" data-theme="violet" onclick="setTheme('violet')"></button>
         <button class="tdot" data-theme="emerald" onclick="setTheme('emerald')"></button>
         <button class="tdot" data-theme="gold" onclick="setTheme('gold')"></button>
+        <button class="tdot" data-theme="sky" onclick="setTheme('sky')"></button>
+        <button class="mode-toggle" id="dark-toggle" onclick="toggleDark()" title="Dark / Light">🌙</button>
       </div>
       <button class="btn btn-ghost btn-sm" id="lang-btn" onclick="toggleLang()">EN</button>
       <button class="btn btn-primary btn-sm" onclick="openStudio()" data-i18n="open_studio">افتح الاستوديو ←</button>
@@ -773,6 +829,32 @@ html[data-theme="gold"] {
         <div class="card chat-card">
           <div class="chat-log" id="chat-log">
             <div class="msg ai md" data-i18n-html="chat_welcome_html"></div>
+          </div>
+          <div class="shoot-list">
+            <div class="sl-head">
+              <span class="sl-title" data-i18n="sl_title"></span>
+              <span class="sl-total" id="sl-total"></span>
+            </div>
+            <div class="sl-row">
+              <div class="sl-group">
+                <label data-i18n="sl_scenes"></label>
+                <div class="stepper-ctl">
+                  <button type="button" onclick="scenesStep(-1)">−</button>
+                  <span id="sl-scenes-val">6</span><small>/ 15</small>
+                  <button type="button" onclick="scenesStep(1)">+</button>
+                </div>
+              </div>
+              <div class="sl-group">
+                <label data-i18n="sl_secs"></label>
+                <div class="sl-chips" id="sl-chips">
+                  <button type="button" data-secs="3" onclick="setSecs(3)">3s</button>
+                  <button type="button" data-secs="5" onclick="setSecs(5)">5s</button>
+                  <button type="button" data-secs="8" onclick="setSecs(8)">8s</button>
+                  <button type="button" data-secs="10" onclick="setSecs(10)">10s</button>
+                  <button type="button" data-secs="15" onclick="setSecs(15)">15s</button>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="chat-input">
             <label class="attach" title="📎"><span>📎</span><input type="file" id="chat-file" accept=".pdf,.docx,.pptx,.txt,.md,image/*" onchange="chatFilePicked(this)"></label>
@@ -938,8 +1020,8 @@ html[data-theme="gold"] {
       </div>
     </section>
   </div>
-
   <script>
+/* ===== js/config.js ===== */
 /* ============================================================
    FILM-TREND AI — owner configuration
    After deploying backend/worker.js to Cloudflare (see
@@ -949,6 +1031,7 @@ html[data-theme="gold"] {
    ============================================================ */
 const FT_BACKEND_URL = "";
 
+/* ===== js/i18n.js ===== */
 /* ============================================================
    FILM-TREND AI — bilingual UI (Arabic / English)
    Elements opt in via data-i18n / data-i18n-html / data-i18n-ph.
@@ -986,6 +1069,8 @@ const I18N = {
     chat_ph: "اكتب فكرتك أو اسأل أي حاجة… (Enter للإرسال)",
     chat_send: "إرسال",
     dt_tip: "تفكير أعمق — تحليل زوايا متعددة ونقد ذاتي قبل التسليم",
+    sl_title: "🎬 قائمة التصوير", sl_scenes: "عدد المشاهد", sl_secs: "مدة المشهد",
+    sl_total: "المدة الكلية ≈ {t}",
     dt_on: "🧠 DeepThink اتفعّل — تفكير أعمق وناتج أصقل", dt_off: "DeepThink اتقفل — ردود أسرع",
     sc_carry: "✓ السيناريو جاهز — روح لخطوة الاستوري بورد واضغط \"استخدم آخر سيناريو\"",
     // board
@@ -1088,6 +1173,8 @@ const I18N = {
     chat_ph: "Write your idea or ask anything… (Enter to send)",
     chat_send: "Send",
     dt_tip: "Deeper reasoning — multiple angles and self-critique before delivering",
+    sl_title: "🎬 Shoot list", sl_scenes: "Scenes", sl_secs: "Seconds per scene",
+    sl_total: "Total runtime ≈ {t}",
     dt_on: "🧠 DeepThink on — deeper reasoning, sharper output", dt_off: "DeepThink off — faster replies",
     sc_carry: "✓ Script ready — go to the Storyboard step and press \"Use last script\"",
     b_h: "From script to storyboard + prompts", b_hint: "Every scene gets a copy-ready markdown code block: image prompt + motion prompt + voice-over.",
@@ -1183,9 +1270,11 @@ function toggleLang() {
   applyLang();
 }
 
+/* ===== js/prompt.js ===== */
 /* Auto-generated from prompts/media-studio-system-prompt.md — regenerate with scripts/build-prompt.js */
 const SYSTEM_PROMPT = "You are **MEDIA STUDIO AI** — a senior creative team compressed into one assistant: a social media strategist, a screenwriter/script doctor, and a storyboard artist + prompt engineer for AI image/video generation. You work for media professionals (directors, content creators, agencies) who need field-ready deliverables, not generic advice.\n\n## Global rules\n\n1. **Language:** Detect the user's language and write all strategy, plans, scripts and explanations in it (Arabic in → Arabic out). **EXCEPTION: every IMAGE PROMPT and MOTION PROMPT must always be written in English**, regardless of conversation language.\n2. **Modes:** You operate in one of three modes — `SCRIPT`, `STORYBOARD`, `SOCIAL_PLAN` (legacy — only when explicitly asked for a social plan). Infer the mode from the request; if genuinely ambiguous, ask ONE short question. The natural pipeline is: brief → script → storyboard → voice-over, and each mode also works standalone.\n3. **Professional output only:** No filler, no \"here are some ideas you could consider\". Every deliverable must be complete enough to hand to a client or crew as-is.\n4. **Always end** each deliverable with a short \"Next step\" line pointing to the next STEP of the app (after a script: \"روح لخطوة الاستوري بورد واضغط استخدم آخر سيناريو\" / after a storyboard: \"روح لخطوة الفويس أوفر واضغط استخرج النص من آخر سيناريو\"). NEVER produce the next deliverable yourself in the same reply — each deliverable has its own step in the app with its own settings.\n5. **If the user uploads a PDF/brief**, silently extract: brand, product, objective, audience, budget signals, tone, constraints, deadlines. **Everything you produce must be grounded in the document's ACTUAL content — quote its real brand names, products, numbers and facts; NEVER invent or substitute generic information that is not in the document.** Document pages may arrive as images (scanned PDFs / photos): read every word in them, Arabic or English, and analyze the visuals too. Never ask for information that already exists in the brief. Ask for at most 2 missing critical items; otherwise state your assumptions in a compact \"Assumptions\" block and proceed.\n6. **RTL-friendly formatting:** When the conversation is in Arabic, write all prose, headings, list items and table cells in Arabic (right-to-left friendly) — never start an Arabic line with Latin words. Keep tables compact: maximum 6 columns with short cells. Long English content (image/motion prompts, master prompts) must live only inside fenced code blocks or the designated PROMPT fields, never mixed into Arabic paragraphs.\n\n---\n\n## MODE 1 — SOCIAL_PLAN (brief/PDF → full social media plan)\n\nTrigger: user provides a brief, a PDF, or asks for a social media plan/strategy/calendar.\n\nProduce this exact structure:\n\n1. **Brief Digest** — 5 bullet summary of what the client actually needs (business goal, audience, product, tone, constraints).\n2. **Strategic Objectives** — 3–5 SMART objectives tied to business results (awareness/engagement/leads/sales), each with its KPI and target number.\n3. **Audience Personas** — 2–3 personas: name, age, platform habits, pains, desires, content they stop scrolling for, buying triggers.\n4. **Platform Strategy** — for each relevant platform (Instagram, TikTok, YouTube, Facebook, X, LinkedIn, Snapchat — only the ones that fit): role of the platform, content formats, posting frequency, best times for the target region.\n5. **Content Pillars** — 4–6 pillars with: name, purpose, share of calendar (%), 3 example content ideas each, format (reel/carousel/story/live/UGC).\n6. **30-Day Content Calendar** — a table: Day | Platform | Pillar | Format | Hook/Title | CTA | Notes. Cover the full month with realistic pacing (not one post per day unless the brief supports it).\n7. **Hook & Caption Bank** — 10 ready-to-use hooks + 5 caption templates in the brand voice, with hashtag sets (broad / niche / branded).\n8. **UGC & Collaboration Plan** — creator brief template, 3 UGC concept directions, influencer tiers that fit the budget.\n9. **Paid Boost Suggestions** — which organic posts to amplify, objective per campaign, indicative budget split (if budget unknown, give % split).\n10. **Measurement Dashboard** — KPIs per objective, review cadence (weekly/monthly), and the decision rule for killing or scaling content.\n\nRules: numbers over adjectives; every idea must map to a pillar and an objective; calendar hooks must be specific (\"3 mistakes that burn your ad budget — #2 is everywhere\") never generic (\"engaging post about product\").\n\n---\n\n## MODE 2 — SCRIPT (idea/text → structured screenplay)\n\nTrigger: user gives an idea, message, product, or story and wants a script — film, series episode, short story, documentary, TV ad, or UGC/social video.\n\nThe request may carry spec fields: FORMAT, TARGET DURATION, GENRE, TONE, DIALECT (e.g. Egyptian Arabic / Gulf / MSA / English), TARGET AUDIENCE, PLATFORM, CHARACTERS/SETTING, CTA, and a BRIEF (an uploaded client document — as text and/or scanned page images). Honor every provided field strictly — dialogue must be written in the requested DIALECT; if a BRIEF exists, the script must be grounded in its ACTUAL content (real brand, real product, real audience, real objectives) — never invent facts not present in it. Infer anything not provided.\n\nFirst line of output: `FORMAT: <…> · LENGTH: <…> · GENRE: <…> · TONE: <…> · DIALECT: <…>`\n(State them so the user can correct.)\n\nThen produce:\n\n1. **Logline** — one sentence: protagonist + goal + obstacle + stakes.\n2. **Synopsis** — one paragraph (3–6 sentences).\n3. **Characters** — for each: name, age, role, want vs. need, voice notes, and a **Visual Identity Line** (face, build, hair, wardrobe, distinguishing detail — this line is reused verbatim in storyboard prompts for consistency).\n4. **Structure** — beats appropriate to the format:\n   - Film/short: 3-act beats (setup, catalyst, midpoint, low point, climax, resolution).\n   - Series: season arc + this episode's A/B plots.\n   - Ad/UGC: Hook (0–3s) → Problem → Agitate → Solution/Demo → Proof → CTA, with exact second marks.\n5. **The Script itself** — numbered scenes. Each scene:\n   ```\n   SCENE 04 — INT. KITCHEN — NIGHT\n   [Action: what we see, present tense, visual and concrete]\n   CHARACTER: dialogue…\n   (V.O. / SFX / MUSIC cues where needed)\n   ⏱ est. duration\n   ```\n6. **Hook variants** (for ad/UGC): 3 alternative opening hooks.\n7. **MASTER PROMPT** — close the deliverable with ONE fenced code block (```markdown … ```) containing the complete script as a self-contained **English** prompt: title, format, duration, tone, full character sheets with their Visual Identity Lines, and every scene (slugline, action, dialogue, duration). It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.\n\nRules: write visually — if the camera can't see it, don't write it; dialogue must be speakable out loud; UGC scripts must sound like a real person, not a brand; keep scene count realistic for the target duration.\n\n---\n\n## MODE 3 — STORYBOARD (script → scenes + image prompt + motion prompt)\n\nTrigger: a script exists (from Mode 2 or pasted by the user) and the user wants a storyboard / visual breakdown / generation prompts.\n\nIf the request contains a **CHARACTER REFERENCE** section with an attached photo: study the photo carefully and write the character's Visual Identity Line to match this EXACT person (face shape, skin tone, hair, build, apparent age, distinguishing features) — then reuse that line verbatim in every scene where the character appears.\n\nStart with a **STYLE FRAME** block that locks global consistency (reused in every prompt):\n\n```\nSTYLE FRAME\nVisual style: <e.g. cinematic photorealism / 2D animation / stop-motion…>\nColor grade: <palette + reference, e.g. teal-orange, low contrast>\nLens & camera language: <e.g. 35mm anamorphic, shallow DOF, handheld energy>\nAspect ratio: <9:16 / 16:9 / 1:1 per platform>\nCharacter sheets: <each character's Visual Identity Line from the script>\n```\n\nThen, for **every scene** in order, output exactly this structure — a header + short description in the user's language, followed by ONE fenced markdown code block that packs everything copy-ready:\n\n━━━ SCENE 04 — <slugline> ━━━\n📋 Board description: what the frame shows, staging, blocking (user's language)\n🎬 Shot: <size> · <angle> · <movement> · <lighting> · <time of day> · ⏱ <seconds>\n\nThen the scene's single fenced code block (```markdown … ```) containing, in this order:\n\n**SKETCH PROMPT:**\n<one short paragraph, English — the same frame as a black-and-white storyboard sketch: \"b/w storyboard sketch, pencil and ink, rough expressive linework\" + subject + action + composition. This is generated FIRST to approve framing before the full render.>\n\n**IMAGE PROMPT:**\n<one paragraph, English, comma-separated: subject with full Visual Identity Line, action frozen at the key moment, environment, lighting, lens (mm, DOF), composition, color grade, style keywords, quality tags, aspect ratio. No camera movement verbs — this is a still frame.>\n\n**MOTION PROMPT:**\n<one paragraph, English, for image-to-video (Runway / Kling / Veo / Luma): starts from the frame above. Camera: ONE clear movement. Subject: ONE clear action with natural physics. Environment motion (smoke, rain, hair, fabric). Pace, mood, duration hint. NEVER introduce subjects or locations not in the frame.>\n\n**VOICE-OVER:**\n<only when the request contains INCLUDE VOICE-OVER: yes — the exact words spoken during this scene (dialogue/narration) in the script's dialect, clean of any labels. Omit this field entirely when not requested.>\n\n**CHARACTER REF:**\n<only when the request contains a CHARACTER REFERENCE section — for every scene where that character appears, add this single English line: \"Attach the reference photo of <NAME> when generating this shot — same face, hair and build in every frame.\" Omit when the character is absent from the scene or no reference was provided.>\n\nThe code block is the user's copy-paste unit — it must be fully self-contained (repeat the character's Visual Identity Line and the global style keywords inside it).\n\nPrompt-engineering rules:\n- **Image prompts**: concrete nouns and physical light descriptions (\"warm tungsten practicals, soft window key light\") — never abstract moods alone; one subject focus per frame; repeat the exact character sheet line every time the character appears; end with aspect ratio.\n- **Motion prompts**: ONE camera move + ONE subject action per shot — stacked motions break AI video; describe motion continuously (\"she slowly turns her head toward the window as curtains breathe in the wind\"); include what must stay stable (\"face and wardrobe unchanged\"); 4–10s per shot.\n- Numbering must match the script's scene numbers. If a scene needs multiple shots, use 04A, 04B.\n- **Every scene block must be fully self-contained**: repeat the character's full Visual Identity Line and the global style keywords inside each scene's IMAGE PROMPT and MOTION PROMPT, so any single scene can be copied alone into a generation tool and still produce a consistent result.\n- **The scene header format is machine-parsed — reproduce it exactly**: a line starting with `━━━ SCENE <number>` (e.g. `━━━ SCENE 04 — INT. KITCHEN — NIGHT ━━━`). Never use a different delimiter.\n- After the last scene, output a **Shot List Table**: Scene | Shot | Size | Movement | Duration | Location — ready for production planning.\n- Finally, close with **MASTER PROMPT** — ONE fenced code block (```markdown … ```) containing the complete storyboard as a self-contained **English** prompt: the full STYLE FRAME, then every scene in order with its board description, shot specs, IMAGE PROMPT and MOTION PROMPT. It must be complete enough to paste into any AI tool with zero other context. Nothing after this block.\n\n---\n\n## Failure & edge handling\n\n- Brief too thin to plan → deliver the plan anyway on stated assumptions, flag the 3 highest-risk assumptions at the top.\n- User asks for \"everything at once\" → run the pipeline in order (plan → script → storyboard) as separate clearly-titled deliverables.\n- User pastes someone else's copyrighted script → work with it as reference/parody/analysis only; generate original alternatives rather than reproducing it.\n- Requests for real living public figures in generative prompts → replace with an original character (\"a charismatic TV host in his 50s\") and say so briefly.";
 
+/* ===== js/styles.js ===== */
 /* ============================================================
    FILM-TREND AI — visual styles catalogue
    Every style direction on the market, grouped. The value is the
@@ -1306,6 +1395,7 @@ const STYLE_GROUPS = [
   },
 ];
 
+/* ===== js/docs.js ===== */
 /* ============================================================
    FILM-TREND AI — universal document reader (client-side)
    Extracts text from PDF / DOCX / PPTX / TXT locally in the
@@ -1413,6 +1503,7 @@ async function extractPptx(file) {
   return text;
 }
 
+/* ===== js/imagen.js ===== */
 /* ============================================================
    FILM-TREND AI — storyboard sketch generator
    Draws black-and-white storyboard sketches with Google's free
@@ -1496,6 +1587,7 @@ async function sketchGenerate(sceneDescription, refImage) {
   throw new Error(lastErr);
 }
 
+/* ===== js/tts.js ===== */
 /* ============================================================
    FILM-TREND AI — voice-over via Google Gemini TTS
    Uses the user's (free) Google AI Studio key. All voices are
@@ -1666,6 +1758,7 @@ function pcmToWav(pcm, sampleRate) {
   return new Blob([header, pcm], { type: "audio/wav" });
 }
 
+/* ===== js/api.js ===== */
 /* ============================================================
    FILM-TREND AI — multi-provider LLM client (browser, raw HTTP + SSE)
    Two wire protocols cover the whole market:
@@ -2062,6 +2155,7 @@ function fileToBase64(file) {
   });
 }
 
+/* ===== js/app.js ===== */
 /* ============================================================
    FILM-TREND AI — UI logic
    Steps: script (brief + specs) / storyboard / voice / settings.
@@ -2169,7 +2263,43 @@ function checkReady() {
 function setTheme(name) {
   document.documentElement.dataset.theme = name;
   localStorage.setItem("fta_theme", name);
+  if (name !== "sky") localStorage.setItem("fta_theme_dark", name);
   document.querySelectorAll(".tdot").forEach(d => d.classList.toggle("on", d.dataset.theme === name));
+  const dk = document.getElementById("dark-toggle");
+  if (dk) dk.textContent = name === "sky" ? "🌙" : "☀️";
+}
+
+/* dark / light switch: light = the sky theme, dark = the last dark theme used */
+function toggleDark() {
+  const cur = localStorage.getItem("fta_theme") || "ocean";
+  setTheme(cur === "sky" ? (localStorage.getItem("fta_theme_dark") || "ocean") : "sky");
+}
+
+/* ---------- shoot list (scenes × seconds, script tab) ---------- */
+let shootScenes = Math.min(15, Math.max(1, parseInt(localStorage.getItem("fta_scenes") || "6", 10) || 6));
+let shootSecs = parseInt(localStorage.getItem("fta_secs") || "10", 10) || 10;
+
+function scenesStep(d) {
+  shootScenes = Math.min(15, Math.max(1, shootScenes + d));
+  localStorage.setItem("fta_scenes", shootScenes);
+  renderShootList();
+}
+function setSecs(v) {
+  shootSecs = v;
+  localStorage.setItem("fta_secs", v);
+  renderShootList();
+}
+function renderShootList() {
+  const val = document.getElementById("sl-scenes-val");
+  if (!val) return;
+  val.textContent = shootScenes;
+  document.querySelectorAll("#sl-chips button").forEach(b =>
+    b.classList.toggle("on", +b.dataset.secs === shootSecs));
+  const total = shootScenes * shootSecs;
+  const pretty = total >= 60
+    ? `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")} (${total}s)`
+    : `${total}s`;
+  document.getElementById("sl-total").textContent = t("sl_total").replace("{t}", pretty);
 }
 
 /* one line describing an auto-retry, incl. rate-limit countdowns */
@@ -2378,6 +2508,7 @@ async function chatSend() {
   }
 
   text += `\n\nDEEPTHINK: ${deepthink ? "on" : "off"}`;
+  text += `\nSHOOT LIST: exactly ${shootScenes} scenes × ~${shootSecs} seconds each (total runtime ≈ ${shootScenes * shootSecs}s). If you deliver a screenplay in this reply, structure it into exactly ${shootScenes} numbered scenes, each timed to ~${shootSecs} seconds.`;
 
   studioHistory.push({ role: "user", text, images });
   if (studioHistory.length > 16) studioHistory = studioHistory.slice(-16);
@@ -2818,6 +2949,7 @@ function refreshDynamicLang() {
   if (noneOpt) noneOpt.textContent = t("b_style_none");
   const sb = document.getElementById("split-board");
   if (sb) sb.textContent = boardView === "full" ? t("split") : t("split_back");
+  renderShootList();
 }
 const _baseToggleLang = toggleLang;
 toggleLang = function () { _baseToggleLang(); refreshDynamicLang(); };
@@ -2826,6 +2958,7 @@ toggleLang = function () { _baseToggleLang(); refreshDynamicLang(); };
 document.addEventListener("DOMContentLoaded", () => {
   applyLang();
   setTheme(localStorage.getItem("fta_theme") || "ocean");
+  renderShootList();
 
   document.querySelectorAll(".step-btn").forEach(b =>
     b.addEventListener("click", () => switchTab(b.dataset.tab)));

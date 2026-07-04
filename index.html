@@ -30,6 +30,8 @@
         <button class="tdot" data-theme="violet" onclick="setTheme('violet')"></button>
         <button class="tdot" data-theme="emerald" onclick="setTheme('emerald')"></button>
         <button class="tdot" data-theme="gold" onclick="setTheme('gold')"></button>
+        <button class="tdot" data-theme="sky" onclick="setTheme('sky')"></button>
+        <button class="mode-toggle" id="dark-toggle" onclick="toggleDark()" title="Dark / Light">🌙</button>
       </div>
       <button class="btn btn-ghost btn-sm" id="lang-btn" onclick="toggleLang()">EN</button>
       <button class="btn btn-primary btn-sm" onclick="openStudio()" data-i18n="open_studio">افتح الاستوديو ←</button>
@@ -146,6 +148,32 @@
         <div class="card chat-card">
           <div class="chat-log" id="chat-log">
             <div class="msg ai md" data-i18n-html="chat_welcome_html"></div>
+          </div>
+          <div class="shoot-list">
+            <div class="sl-head">
+              <span class="sl-title" data-i18n="sl_title"></span>
+              <span class="sl-total" id="sl-total"></span>
+            </div>
+            <div class="sl-row">
+              <div class="sl-group">
+                <label data-i18n="sl_scenes"></label>
+                <div class="stepper-ctl">
+                  <button type="button" onclick="scenesStep(-1)">−</button>
+                  <span id="sl-scenes-val">6</span><small>/ 15</small>
+                  <button type="button" onclick="scenesStep(1)">+</button>
+                </div>
+              </div>
+              <div class="sl-group">
+                <label data-i18n="sl_secs"></label>
+                <div class="sl-chips" id="sl-chips">
+                  <button type="button" data-secs="3" onclick="setSecs(3)">3s</button>
+                  <button type="button" data-secs="5" onclick="setSecs(5)">5s</button>
+                  <button type="button" data-secs="8" onclick="setSecs(8)">8s</button>
+                  <button type="button" data-secs="10" onclick="setSecs(10)">10s</button>
+                  <button type="button" data-secs="15" onclick="setSecs(15)">15s</button>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="chat-input">
             <label class="attach" title="📎"><span>📎</span><input type="file" id="chat-file" accept=".pdf,.docx,.pptx,.txt,.md,image/*" onchange="chatFilePicked(this)"></label>

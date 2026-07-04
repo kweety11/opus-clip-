@@ -35,6 +35,8 @@ const I18N = {
     chat_ph: "اكتب فكرتك أو اسأل أي حاجة… (Enter للإرسال)",
     chat_send: "إرسال",
     dt_tip: "تفكير أعمق — تحليل زوايا متعددة ونقد ذاتي قبل التسليم",
+    sl_title: "🎬 قائمة التصوير", sl_scenes: "عدد المشاهد", sl_secs: "مدة المشهد",
+    sl_total: "المدة الكلية ≈ {t}",
     dt_on: "🧠 DeepThink اتفعّل — تفكير أعمق وناتج أصقل", dt_off: "DeepThink اتقفل — ردود أسرع",
     sc_carry: "✓ السيناريو جاهز — روح لخطوة الاستوري بورد واضغط \"استخدم آخر سيناريو\"",
     // board
@@ -137,6 +139,8 @@ const I18N = {
     chat_ph: "Write your idea or ask anything… (Enter to send)",
     chat_send: "Send",
     dt_tip: "Deeper reasoning — multiple angles and self-critique before delivering",
+    sl_title: "🎬 Shoot list", sl_scenes: "Scenes", sl_secs: "Seconds per scene",
+    sl_total: "Total runtime ≈ {t}",
     dt_on: "🧠 DeepThink on — deeper reasoning, sharper output", dt_off: "DeepThink off — faster replies",
     sc_carry: "✓ Script ready — go to the Storyboard step and press \"Use last script\"",
     b_h: "From script to storyboard + prompts", b_hint: "Every scene gets a copy-ready markdown code block: image prompt + motion prompt + voice-over.",

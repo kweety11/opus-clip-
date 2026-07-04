@@ -105,7 +105,43 @@ function checkReady() {
 function setTheme(name) {
   document.documentElement.dataset.theme = name;
   localStorage.setItem("fta_theme", name);
+  if (name !== "sky") localStorage.setItem("fta_theme_dark", name);
   document.querySelectorAll(".tdot").forEach(d => d.classList.toggle("on", d.dataset.theme === name));
+  const dk = document.getElementById("dark-toggle");
+  if (dk) dk.textContent = name === "sky" ? "🌙" : "☀️";
+}
+
+/* dark / light switch: light = the sky theme, dark = the last dark theme used */
+function toggleDark() {
+  const cur = localStorage.getItem("fta_theme") || "ocean";
+  setTheme(cur === "sky" ? (localStorage.getItem("fta_theme_dark") || "ocean") : "sky");
+}
+
+/* ---------- shoot list (scenes × seconds, script tab) ---------- */
+let shootScenes = Math.min(15, Math.max(1, parseInt(localStorage.getItem("fta_scenes") || "6", 10) || 6));
+let shootSecs = parseInt(localStorage.getItem("fta_secs") || "10", 10) || 10;
+
+function scenesStep(d) {
+  shootScenes = Math.min(15, Math.max(1, shootScenes + d));
+  localStorage.setItem("fta_scenes", shootScenes);
+  renderShootList();
+}
+function setSecs(v) {
+  shootSecs = v;
+  localStorage.setItem("fta_secs", v);
+  renderShootList();
+}
+function renderShootList() {
+  const val = document.getElementById("sl-scenes-val");
+  if (!val) return;
+  val.textContent = shootScenes;
+  document.querySelectorAll("#sl-chips button").forEach(b =>
+    b.classList.toggle("on", +b.dataset.secs === shootSecs));
+  const total = shootScenes * shootSecs;
+  const pretty = total >= 60
+    ? `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")} (${total}s)`
+    : `${total}s`;
+  document.getElementById("sl-total").textContent = t("sl_total").replace("{t}", pretty);
 }
 
 /* one line describing an auto-retry, incl. rate-limit countdowns */
@@ -314,6 +350,7 @@ async function chatSend() {
   }
 
   text += `\n\nDEEPTHINK: ${deepthink ? "on" : "off"}`;
+  text += `\nSHOOT LIST: exactly ${shootScenes} scenes × ~${shootSecs} seconds each (total runtime ≈ ${shootScenes * shootSecs}s). If you deliver a screenplay in this reply, structure it into exactly ${shootScenes} numbered scenes, each timed to ~${shootSecs} seconds.`;
 
   studioHistory.push({ role: "user", text, images });
   if (studioHistory.length > 16) studioHistory = studioHistory.slice(-16);
@@ -754,6 +791,7 @@ function refreshDynamicLang() {
   if (noneOpt) noneOpt.textContent = t("b_style_none");
   const sb = document.getElementById("split-board");
   if (sb) sb.textContent = boardView === "full" ? t("split") : t("split_back");
+  renderShootList();
 }
 const _baseToggleLang = toggleLang;
 toggleLang = function () { _baseToggleLang(); refreshDynamicLang(); };
@@ -762,6 +800,7 @@ toggleLang = function () { _baseToggleLang(); refreshDynamicLang(); };
 document.addEventListener("DOMContentLoaded", () => {
   applyLang();
   setTheme(localStorage.getItem("fta_theme") || "ocean");
+  renderShootList();
 
   document.querySelectorAll(".step-btn").forEach(b =>
     b.addEventListener("click", () => switchTab(b.dataset.tab)));
