@@ -543,10 +543,13 @@ async function drawSketch(i) {
       : e.message === "BUSY" ? t("sk_busy")
       : e.message === "BAD_KEY" ? t("v_bad_key")
       : t("sk_fail");
-    box.innerHTML = `<button class="btn btn-ghost btn-xs" onclick="drawSketch(${i})">${t("sk_draw")}</button> <span class="sketch-status">⚠️ ${msg}</span>`;
+    // surface Google's real reason so failures are debuggable, not silent
+    const detail = e.detail ? `<div class="sketch-detail" dir="ltr">${e.detail.slice(0, 220).replace(/&/g, "&amp;").replace(/</g, "&lt;")}</div>` : "";
+    box.innerHTML = `<button class="btn btn-ghost btn-xs" onclick="drawSketch(${i})">${t("sk_draw")}</button> <span class="sketch-status">⚠️ ${msg}</span>${detail}`;
     if (e.message === "NO_KEY") { switchTab("settings"); toast(t("sk_no_key")); return "stop"; }
+    if (e.message === "BAD_KEY") { toast(t("v_bad_key")); return "stop"; }
     if (e.message === "RATE") return "wait"; // free tier: pause then continue
-    return "done";
+    return "fail";
   }
 }
 
@@ -575,19 +578,28 @@ async function drawAllSketches(onProgress) {
   sketchesRunning = true;
   try {
     const n = (window._scenes || []).length;
+    let ok = 0, failStreak = 0;
     for (let i = 0; i < n; i++) {
       if (onProgress) onProgress(i + 1, n);
       // sequential on purpose — the free tier rate-limits parallel image calls
-      const r = await drawSketch(i);
+      let r = await drawSketch(i);
       if (r === "stop") break;
       if (r === "wait") {
-        // rate-limited: visible one-minute countdown, then retry the same scene once
+        // rate-limited with zero successes so far → the key can't draw right now; don't loop for ages
+        if (ok === 0) { toast(t("sk_quota_stop")); break; }
+        // otherwise: visible one-minute countdown, then retry the same scene once
         const box = document.getElementById("sketch-" + i);
         for (let s = 60; s > 0; s -= 5) {
           if (box) box.innerHTML = `<span class="sketch-status">${t("sk_wait").replace("{s}", s)}</span>`;
           await new Promise(res => setTimeout(res, 5000));
         }
-        await drawSketch(i);
+        r = await drawSketch(i);
+      }
+      if (r === "done") { ok++; failStreak = 0; }
+      else if (r === "fail" || r === "wait") {
+        failStreak++;
+        // three scenes in a row failed and nothing ever succeeded → abort with a clear message
+        if (ok === 0 && failStreak >= 3) { toast(t("sk_quota_stop")); break; }
       }
     }
   } finally {

@@ -685,6 +685,12 @@ html[data-theme="sky"] .tdot.on { border-color: var(--accent); }
 .lib-cat.lib-pack { border-style: dashed; color: var(--accent); }
 #lib-types { margin-top: -8px; }
 
+/* raw provider error under a failed sketch — small, technical, LTR */
+.sketch-detail {
+  font-family: var(--mono); font-size: 10.5px; line-height: 1.5; color: var(--faint);
+  margin-top: 6px; text-align: left; word-break: break-word;
+}
+
 /* character reference (storyboard) */
 .char-ref { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
 .char-ref .upload { flex: 1; padding: 12px; margin: 0; }

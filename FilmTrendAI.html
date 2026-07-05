@@ -698,6 +698,12 @@ html[data-theme="sky"] .tdot.on { border-color: var(--accent); }
 .lib-cat.lib-pack { border-style: dashed; color: var(--accent); }
 #lib-types { margin-top: -8px; }
 
+/* raw provider error under a failed sketch — small, technical, LTR */
+.sketch-detail {
+  font-family: var(--mono); font-size: 10.5px; line-height: 1.5; color: var(--faint);
+  margin-top: 6px; text-align: left; word-break: break-word;
+}
+
 /* character reference (storyboard) */
 .char-ref { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
 .char-ref .upload { flex: 1; padding: 12px; margin: 0; }
@@ -1139,6 +1145,7 @@ const I18N = {
     lib_expand: "اضغط لعرض البرومبت كامل",
     sk_running: "الرسم شغال بالفعل — استنى الجولة الحالية تخلص",
     sk_wait: "⏳ وقفة بسبب الحد المجاني — هنكمل تلقائيًا خلال {s} ثانية…",
+    sk_quota_stop: "⛔ جوجل رافض يرسم بالمفتاح ده دلوقتي — غالبًا حد الصور المجاني اليومي خلص. جرّب تاني بعد ساعات أو بكرة، أو فعّل الفوترة في aistudio. تحت كل مشهد هتلاقي سبب جوجل الحقيقي مكتوب.",
     // chat (plan)
     // studio chat (strategist + director)
     chat_welcome_html: "<p>أهلًا بيك في الاستوديو 🎬 إحنا وكيلين شغالين معاك:</p><p><b>🎯 الاستراتيجي</b> — ارفع البريف أو أي مستند (PDF / Word / PPTX / صورة) أو احكيلي عن المشروع، وهيطلعلك <b>بريف احترافي</b> على اليمين.</p><p><b>🎬 المخرج</b> — اكتب فكرتك بأي شكل وهيسلمك <b>سيناريو احترافي كامل</b> متقسم مشاهد.</p><p>فعّل <b>🧠 DeepThink</b> لما تحب تفكير أعمق وناتج أصقل.</p>",
@@ -1258,6 +1265,7 @@ const I18N = {
     lib_expand: "Click to expand the full prompt",
     sk_running: "Drawing is already running — wait for the current pass to finish",
     sk_wait: "⏳ Free-tier pause — resuming automatically in {s}s…",
+    sk_quota_stop: "⛔ Google is refusing to draw with this key right now — most likely today's free image quota is used up. Try again in a few hours or tomorrow, or enable billing in aistudio. Google's real reason is shown under each scene.",
     chat_welcome_html: "<p>Welcome to the studio 🎬 Two agents work with you:</p><p><b>🎯 The Strategist</b> — upload the brief or any document (PDF / Word / PPTX / image) or tell me about the project, and he delivers a <b>professional brief</b> in the panel.</p><p><b>🎬 The Director</b> — write your idea in any form and he hands you a <b>complete professional script</b>, scene by scene.</p><p>Turn on <b>🧠 DeepThink</b> for deeper reasoning and a more polished result.</p>",
     chat_ph: "Write your idea or ask anything… (Enter to send)",
     chat_send: "Send",
@@ -1897,12 +1905,14 @@ async function sketchGenerate(sceneDescription, refImage) {
     if (!res.ok) {
       let msg = "HTTP " + res.status;
       try { msg = (await res.json())?.error?.message || msg; } catch (_) {}
+      // keep the raw Google message on the error so the UI can surface the real cause
+      const fail = code => { const e = new Error(code); e.detail = msg; return e; };
       if (res.status === 404 || /not found|is not supported/i.test(msg)) { lastErr = "NO_MODEL"; continue; }
-      if (res.status === 401 || res.status === 403) throw new Error("BAD_KEY");
-      if (res.status === 429) throw new Error("RATE");
-      if (/overload|unavailable|high demand/i.test(msg) || res.status >= 500) throw new Error("BUSY");
+      if (res.status === 401 || res.status === 403) throw fail("BAD_KEY");
+      if (res.status === 429) throw fail("RATE");
+      if (/overload|unavailable|high demand/i.test(msg) || res.status >= 500) throw fail("BUSY");
       if (res.status === 400 && /modalit/i.test(msg)) { lastErr = msg; continue; }
-      throw new Error(msg);
+      throw fail(msg);
     }
 
     const data = await res.json();
@@ -3030,10 +3040,13 @@ async function drawSketch(i) {
       : e.message === "BUSY" ? t("sk_busy")
       : e.message === "BAD_KEY" ? t("v_bad_key")
       : t("sk_fail");
-    box.innerHTML = `<button class="btn btn-ghost btn-xs" onclick="drawSketch(${i})">${t("sk_draw")}</button> <span class="sketch-status">⚠️ ${msg}</span>`;
+    // surface Google's real reason so failures are debuggable, not silent
+    const detail = e.detail ? `<div class="sketch-detail" dir="ltr">${e.detail.slice(0, 220).replace(/&/g, "&amp;").replace(/</g, "&lt;")}</div>` : "";
+    box.innerHTML = `<button class="btn btn-ghost btn-xs" onclick="drawSketch(${i})">${t("sk_draw")}</button> <span class="sketch-status">⚠️ ${msg}</span>${detail}`;
     if (e.message === "NO_KEY") { switchTab("settings"); toast(t("sk_no_key")); return "stop"; }
+    if (e.message === "BAD_KEY") { toast(t("v_bad_key")); return "stop"; }
     if (e.message === "RATE") return "wait"; // free tier: pause then continue
-    return "done";
+    return "fail";
   }
 }
 
@@ -3062,19 +3075,28 @@ async function drawAllSketches(onProgress) {
   sketchesRunning = true;
   try {
     const n = (window._scenes || []).length;
+    let ok = 0, failStreak = 0;
     for (let i = 0; i < n; i++) {
       if (onProgress) onProgress(i + 1, n);
       // sequential on purpose — the free tier rate-limits parallel image calls
-      const r = await drawSketch(i);
+      let r = await drawSketch(i);
       if (r === "stop") break;
       if (r === "wait") {
-        // rate-limited: visible one-minute countdown, then retry the same scene once
+        // rate-limited with zero successes so far → the key can't draw right now; don't loop for ages
+        if (ok === 0) { toast(t("sk_quota_stop")); break; }
+        // otherwise: visible one-minute countdown, then retry the same scene once
         const box = document.getElementById("sketch-" + i);
         for (let s = 60; s > 0; s -= 5) {
           if (box) box.innerHTML = `<span class="sketch-status">${t("sk_wait").replace("{s}", s)}</span>`;
           await new Promise(res => setTimeout(res, 5000));
         }
-        await drawSketch(i);
+        r = await drawSketch(i);
+      }
+      if (r === "done") { ok++; failStreak = 0; }
+      else if (r === "fail" || r === "wait") {
+        failStreak++;
+        // three scenes in a row failed and nothing ever succeeded → abort with a clear message
+        if (ok === 0 && failStreak >= 3) { toast(t("sk_quota_stop")); break; }
       }
     }
   } finally {

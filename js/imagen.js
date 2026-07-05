@@ -62,12 +62,14 @@ async function sketchGenerate(sceneDescription, refImage) {
     if (!res.ok) {
       let msg = "HTTP " + res.status;
       try { msg = (await res.json())?.error?.message || msg; } catch (_) {}
+      // keep the raw Google message on the error so the UI can surface the real cause
+      const fail = code => { const e = new Error(code); e.detail = msg; return e; };
       if (res.status === 404 || /not found|is not supported/i.test(msg)) { lastErr = "NO_MODEL"; continue; }
-      if (res.status === 401 || res.status === 403) throw new Error("BAD_KEY");
-      if (res.status === 429) throw new Error("RATE");
-      if (/overload|unavailable|high demand/i.test(msg) || res.status >= 500) throw new Error("BUSY");
+      if (res.status === 401 || res.status === 403) throw fail("BAD_KEY");
+      if (res.status === 429) throw fail("RATE");
+      if (/overload|unavailable|high demand/i.test(msg) || res.status >= 500) throw fail("BUSY");
       if (res.status === 400 && /modalit/i.test(msg)) { lastErr = msg; continue; }
-      throw new Error(msg);
+      throw fail(msg);
     }
 
     const data = await res.json();

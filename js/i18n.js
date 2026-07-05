@@ -43,6 +43,7 @@ const I18N = {
     lib_expand: "اضغط لعرض البرومبت كامل",
     sk_running: "الرسم شغال بالفعل — استنى الجولة الحالية تخلص",
     sk_wait: "⏳ وقفة بسبب الحد المجاني — هنكمل تلقائيًا خلال {s} ثانية…",
+    sk_quota_stop: "⛔ جوجل رافض يرسم بالمفتاح ده دلوقتي — غالبًا حد الصور المجاني اليومي خلص. جرّب تاني بعد ساعات أو بكرة، أو فعّل الفوترة في aistudio. تحت كل مشهد هتلاقي سبب جوجل الحقيقي مكتوب.",
     // chat (plan)
     // studio chat (strategist + director)
     chat_welcome_html: "<p>أهلًا بيك في الاستوديو 🎬 إحنا وكيلين شغالين معاك:</p><p><b>🎯 الاستراتيجي</b> — ارفع البريف أو أي مستند (PDF / Word / PPTX / صورة) أو احكيلي عن المشروع، وهيطلعلك <b>بريف احترافي</b> على اليمين.</p><p><b>🎬 المخرج</b> — اكتب فكرتك بأي شكل وهيسلمك <b>سيناريو احترافي كامل</b> متقسم مشاهد.</p><p>فعّل <b>🧠 DeepThink</b> لما تحب تفكير أعمق وناتج أصقل.</p>",
@@ -162,6 +163,7 @@ const I18N = {
     lib_expand: "Click to expand the full prompt",
     sk_running: "Drawing is already running — wait for the current pass to finish",
     sk_wait: "⏳ Free-tier pause — resuming automatically in {s}s…",
+    sk_quota_stop: "⛔ Google is refusing to draw with this key right now — most likely today's free image quota is used up. Try again in a few hours or tomorrow, or enable billing in aistudio. Google's real reason is shown under each scene.",
     chat_welcome_html: "<p>Welcome to the studio 🎬 Two agents work with you:</p><p><b>🎯 The Strategist</b> — upload the brief or any document (PDF / Word / PPTX / image) or tell me about the project, and he delivers a <b>professional brief</b> in the panel.</p><p><b>🎬 The Director</b> — write your idea in any form and he hands you a <b>complete professional script</b>, scene by scene.</p><p>Turn on <b>🧠 DeepThink</b> for deeper reasoning and a more polished result.</p>",
     chat_ph: "Write your idea or ask anything… (Enter to send)",
     chat_send: "Send",
