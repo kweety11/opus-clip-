@@ -749,6 +749,19 @@ function fillProviderUI(provider) {
   document.getElementById("pdf-note").style.display = P.pdf ? "none" : "block";
 }
 
+/* dedicated Gemini key (sketches + voice-over) — saved on its own,
+   never touches the active text provider */
+function saveGeminiKey(v) {
+  v = (v || "").trim();
+  if (!v) return;
+  localStorage.setItem("fta_key_gemini", v);
+  const a = document.getElementById("gemini-key-extra");
+  const b = document.getElementById("board-gemini-key");
+  if (a) a.value = v;
+  if (b) b.value = v;
+  toast(t("gk_saved"));
+}
+
 function persistSettings() {
   const provider = document.getElementById("set-provider").value;
   const key = document.getElementById("set-key").value;
@@ -838,6 +851,13 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("voice-provider").value = savedTts;
   document.getElementById("eleven-key").value = localStorage.getItem("fta_key_elevenlabs") || "";
   voiceProviderChanged();
+
+  // prefill the dedicated Gemini key fields (sketches + voice-over)
+  const gk = localStorage.getItem("fta_key_gemini") || "";
+  const gkA = document.getElementById("gemini-key-extra");
+  const gkB = document.getElementById("board-gemini-key");
+  if (gkA) gkA.value = gk;
+  if (gkB) gkB.value = gk;
 
   // populate provider dropdown from the registry
   const provSel = document.getElementById("set-provider");

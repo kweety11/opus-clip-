@@ -44,6 +44,11 @@ const I18N = {
     sk_running: "الرسم شغال بالفعل — استنى الجولة الحالية تخلص",
     sk_wait: "⏳ وقفة بسبب الحد المجاني — هنكمل تلقائيًا خلال {s} ثانية…",
     sk_quota_stop: "⛔ جوجل رافض يرسم بالمفتاح ده دلوقتي — غالبًا حد الصور المجاني اليومي خلص. جرّب تاني بعد ساعات أو بكرة، أو فعّل الفوترة في aistudio. تحت كل مشهد هتلاقي سبب جوجل الحقيقي مكتوب.",
+    gk_label: "🎨 مفتاح Google Gemini — للاسكتشات والفويس أوفر",
+    gk_hint_html: "مفتاح <b>منفصل ومجاني</b> من <span dir=\"ltr\">aistudio.google.com/apikey</span> — مش بيغيّر مزود الكتابة بتاعك (تقدر تفضل شغال بـ OpenAI عادي). الرسم والصوت بيشتغلوا بيه هو بس.",
+    gk_save: "💾 حفظ مفتاح Gemini",
+    gk_saved: "مفتاح Gemini اتحفظ ✓ — الاسكتشات والفويس أوفر جاهزين",
+    gk_board_ph: "🎨 مفتاح Gemini للرسم — AIza... (بيتحفظ لوحده)",
     // chat (plan)
     // studio chat (strategist + director)
     chat_welcome_html: "<p>أهلًا بيك في الاستوديو 🎬 إحنا وكيلين شغالين معاك:</p><p><b>🎯 الاستراتيجي</b> — ارفع البريف أو أي مستند (PDF / Word / PPTX / صورة) أو احكيلي عن المشروع، وهيطلعلك <b>بريف احترافي</b> على اليمين.</p><p><b>🎬 المخرج</b> — اكتب فكرتك بأي شكل وهيسلمك <b>سيناريو احترافي كامل</b> متقسم مشاهد.</p><p>فعّل <b>🧠 DeepThink</b> لما تحب تفكير أعمق وناتج أصقل.</p>",
@@ -164,6 +169,11 @@ const I18N = {
     sk_running: "Drawing is already running — wait for the current pass to finish",
     sk_wait: "⏳ Free-tier pause — resuming automatically in {s}s…",
     sk_quota_stop: "⛔ Google is refusing to draw with this key right now — most likely today's free image quota is used up. Try again in a few hours or tomorrow, or enable billing in aistudio. Google's real reason is shown under each scene.",
+    gk_label: "🎨 Google Gemini key — for sketches & voice-over",
+    gk_hint_html: "A <b>separate, free</b> key from <span dir=\"ltr\">aistudio.google.com/apikey</span> — it does NOT change your writing provider (keep using OpenAI as usual). Only drawing and voice run on it.",
+    gk_save: "💾 Save Gemini key",
+    gk_saved: "Gemini key saved ✓ — sketches & voice-over are ready",
+    gk_board_ph: "🎨 Gemini key for drawing — AIza... (saves automatically)",
     chat_welcome_html: "<p>Welcome to the studio 🎬 Two agents work with you:</p><p><b>🎯 The Strategist</b> — upload the brief or any document (PDF / Word / PPTX / image) or tell me about the project, and he delivers a <b>professional brief</b> in the panel.</p><p><b>🎬 The Director</b> — write your idea in any form and he hands you a <b>complete professional script</b>, scene by scene.</p><p>Turn on <b>🧠 DeepThink</b> for deeper reasoning and a more polished result.</p>",
     chat_ph: "Write your idea or ask anything… (Enter to send)",
     chat_send: "Send",

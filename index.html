@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/app.css?v=20260705e">
+  <link rel="stylesheet" href="css/app.css?v=20260705f">
 </head>
 <body>
 
@@ -233,6 +233,7 @@
             <input type="checkbox" id="board-sketch" checked>
             <span data-i18n="b_sketch"></span>
           </label>
+          <input type="password" id="board-gemini-key" dir="ltr" data-i18n-ph="gk_board_ph" autocomplete="off" onchange="saveGeminiKey(this.value)">
           <button class="btn btn-primary btn-block" id="run-board" onclick="runBoard()" data-i18n="b_run"></button>
           <button class="btn btn-stop" id="stop-board" onclick="stopRun('board')">⏹</button>
         </div>
@@ -352,21 +353,25 @@
             <button class="btn btn-primary btn-block" onclick="persistSettings()" data-i18n="save"></button>
             <div class="note" data-i18n-html="bk_where_html"></div>
             <div class="note" id="pdf-note" style="display:none" data-i18n-html="bk_pdf_html"></div>
+            <label class="f" data-i18n="gk_label"></label>
+            <p class="hint" data-i18n-html="gk_hint_html"></p>
+            <input type="password" id="gemini-key-extra" dir="ltr" placeholder="AIza..." autocomplete="off" onchange="saveGeminiKey(this.value)">
+            <button class="btn btn-ghost btn-block" onclick="saveGeminiKey(document.getElementById('gemini-key-extra').value)" data-i18n="gk_save"></button>
           </div>
         </div>
       </div>
     </section>
   </div>
 
-  <script src="js/config.js?v=20260705e"></script>
-  <script src="js/i18n.js?v=20260705e"></script>
-  <script src="js/prompt.js?v=20260705e"></script>
-  <script src="js/styles.js?v=20260705e"></script>
-  <script src="js/promptlib.js?v=20260705e"></script>
-  <script src="js/docs.js?v=20260705e"></script>
-  <script src="js/imagen.js?v=20260705e"></script>
-  <script src="js/tts.js?v=20260705e"></script>
-  <script src="js/api.js?v=20260705e"></script>
-  <script src="js/app.js?v=20260705e"></script>
+  <script src="js/config.js?v=20260705f"></script>
+  <script src="js/i18n.js?v=20260705f"></script>
+  <script src="js/prompt.js?v=20260705f"></script>
+  <script src="js/styles.js?v=20260705f"></script>
+  <script src="js/promptlib.js?v=20260705f"></script>
+  <script src="js/docs.js?v=20260705f"></script>
+  <script src="js/imagen.js?v=20260705f"></script>
+  <script src="js/tts.js?v=20260705f"></script>
+  <script src="js/api.js?v=20260705f"></script>
+  <script src="js/app.js?v=20260705f"></script>
 </body>
 </html>

@@ -964,6 +964,7 @@ html[data-theme="sky"] .tdot.on { border-color: var(--accent); }
             <input type="checkbox" id="board-sketch" checked>
             <span data-i18n="b_sketch"></span>
           </label>
+          <input type="password" id="board-gemini-key" dir="ltr" data-i18n-ph="gk_board_ph" autocomplete="off" onchange="saveGeminiKey(this.value)">
           <button class="btn btn-primary btn-block" id="run-board" onclick="runBoard()" data-i18n="b_run"></button>
           <button class="btn btn-stop" id="stop-board" onclick="stopRun('board')">⏹</button>
         </div>
@@ -1083,6 +1084,10 @@ html[data-theme="sky"] .tdot.on { border-color: var(--accent); }
             <button class="btn btn-primary btn-block" onclick="persistSettings()" data-i18n="save"></button>
             <div class="note" data-i18n-html="bk_where_html"></div>
             <div class="note" id="pdf-note" style="display:none" data-i18n-html="bk_pdf_html"></div>
+            <label class="f" data-i18n="gk_label"></label>
+            <p class="hint" data-i18n-html="gk_hint_html"></p>
+            <input type="password" id="gemini-key-extra" dir="ltr" placeholder="AIza..." autocomplete="off" onchange="saveGeminiKey(this.value)">
+            <button class="btn btn-ghost btn-block" onclick="saveGeminiKey(document.getElementById('gemini-key-extra').value)" data-i18n="gk_save"></button>
           </div>
         </div>
       </div>
@@ -1146,6 +1151,11 @@ const I18N = {
     sk_running: "الرسم شغال بالفعل — استنى الجولة الحالية تخلص",
     sk_wait: "⏳ وقفة بسبب الحد المجاني — هنكمل تلقائيًا خلال {s} ثانية…",
     sk_quota_stop: "⛔ جوجل رافض يرسم بالمفتاح ده دلوقتي — غالبًا حد الصور المجاني اليومي خلص. جرّب تاني بعد ساعات أو بكرة، أو فعّل الفوترة في aistudio. تحت كل مشهد هتلاقي سبب جوجل الحقيقي مكتوب.",
+    gk_label: "🎨 مفتاح Google Gemini — للاسكتشات والفويس أوفر",
+    gk_hint_html: "مفتاح <b>منفصل ومجاني</b> من <span dir=\"ltr\">aistudio.google.com/apikey</span> — مش بيغيّر مزود الكتابة بتاعك (تقدر تفضل شغال بـ OpenAI عادي). الرسم والصوت بيشتغلوا بيه هو بس.",
+    gk_save: "💾 حفظ مفتاح Gemini",
+    gk_saved: "مفتاح Gemini اتحفظ ✓ — الاسكتشات والفويس أوفر جاهزين",
+    gk_board_ph: "🎨 مفتاح Gemini للرسم — AIza... (بيتحفظ لوحده)",
     // chat (plan)
     // studio chat (strategist + director)
     chat_welcome_html: "<p>أهلًا بيك في الاستوديو 🎬 إحنا وكيلين شغالين معاك:</p><p><b>🎯 الاستراتيجي</b> — ارفع البريف أو أي مستند (PDF / Word / PPTX / صورة) أو احكيلي عن المشروع، وهيطلعلك <b>بريف احترافي</b> على اليمين.</p><p><b>🎬 المخرج</b> — اكتب فكرتك بأي شكل وهيسلمك <b>سيناريو احترافي كامل</b> متقسم مشاهد.</p><p>فعّل <b>🧠 DeepThink</b> لما تحب تفكير أعمق وناتج أصقل.</p>",
@@ -1266,6 +1276,11 @@ const I18N = {
     sk_running: "Drawing is already running — wait for the current pass to finish",
     sk_wait: "⏳ Free-tier pause — resuming automatically in {s}s…",
     sk_quota_stop: "⛔ Google is refusing to draw with this key right now — most likely today's free image quota is used up. Try again in a few hours or tomorrow, or enable billing in aistudio. Google's real reason is shown under each scene.",
+    gk_label: "🎨 Google Gemini key — for sketches & voice-over",
+    gk_hint_html: "A <b>separate, free</b> key from <span dir=\"ltr\">aistudio.google.com/apikey</span> — it does NOT change your writing provider (keep using OpenAI as usual). Only drawing and voice run on it.",
+    gk_save: "💾 Save Gemini key",
+    gk_saved: "Gemini key saved ✓ — sketches & voice-over are ready",
+    gk_board_ph: "🎨 Gemini key for drawing — AIza... (saves automatically)",
     chat_welcome_html: "<p>Welcome to the studio 🎬 Two agents work with you:</p><p><b>🎯 The Strategist</b> — upload the brief or any document (PDF / Word / PPTX / image) or tell me about the project, and he delivers a <b>professional brief</b> in the panel.</p><p><b>🎬 The Director</b> — write your idea in any form and he hands you a <b>complete professional script</b>, scene by scene.</p><p>Turn on <b>🧠 DeepThink</b> for deeper reasoning and a more polished result.</p>",
     chat_ph: "Write your idea or ask anything… (Enter to send)",
     chat_send: "Send",
@@ -3246,6 +3261,19 @@ function fillProviderUI(provider) {
   document.getElementById("pdf-note").style.display = P.pdf ? "none" : "block";
 }
 
+/* dedicated Gemini key (sketches + voice-over) — saved on its own,
+   never touches the active text provider */
+function saveGeminiKey(v) {
+  v = (v || "").trim();
+  if (!v) return;
+  localStorage.setItem("fta_key_gemini", v);
+  const a = document.getElementById("gemini-key-extra");
+  const b = document.getElementById("board-gemini-key");
+  if (a) a.value = v;
+  if (b) b.value = v;
+  toast(t("gk_saved"));
+}
+
 function persistSettings() {
   const provider = document.getElementById("set-provider").value;
   const key = document.getElementById("set-key").value;
@@ -3335,6 +3363,13 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("voice-provider").value = savedTts;
   document.getElementById("eleven-key").value = localStorage.getItem("fta_key_elevenlabs") || "";
   voiceProviderChanged();
+
+  // prefill the dedicated Gemini key fields (sketches + voice-over)
+  const gk = localStorage.getItem("fta_key_gemini") || "";
+  const gkA = document.getElementById("gemini-key-extra");
+  const gkB = document.getElementById("board-gemini-key");
+  if (gkA) gkA.value = gk;
+  if (gkB) gkB.value = gk;
 
   // populate provider dropdown from the registry
   const provSel = document.getElementById("set-provider");
