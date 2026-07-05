@@ -192,6 +192,8 @@ function startRun(tool, text, sysAddon, images) {
         // sketches in scene order, one after the other
         if (document.getElementById("board-sketch").checked) {
           setTimeout(() => {
+            // no Gemini key → skip the auto-run quietly; the manual buttons explain what's needed
+            if (!(localStorage.getItem("fta_key_gemini") || "").trim()) { toast(t("sk_no_key")); return; }
             if (boardView === "full") toggleBoardView();
             if ((window._scenes || []).length) {
               toast(t("sk_auto"));
@@ -551,28 +553,40 @@ async function drawSketch(i) {
 /* the visible one-click entry: split if needed, then draw everything in order */
 async function generateSketches() {
   const btn = document.getElementById("gen-sketches");
-  if (sketchesRunning) return;
+  if (sketchesRunning) { toast(t("sk_running")); return; }
+  if (!(localStorage.getItem("fta_key_gemini") || "").trim()) {
+    switchTab("settings");
+    toast(t("sk_no_key"));
+    return;
+  }
   if (boardView === "full") toggleBoardView();
   if (!(window._scenes || []).length) return; // toggleBoardView already toasted
   if (btn) { btn.disabled = true; btn.textContent = t("sk_gen_busy"); }
   toast(t("sk_auto"));
-  await drawAllSketches();
+  await drawAllSketches((i, n) => {
+    if (btn) btn.textContent = `${t("sk_gen_busy")} ${i}/${n}`;
+  });
   if (btn) { btn.disabled = false; btn.textContent = t("sk_gen_done"); }
 }
 
 let sketchesRunning = false;
-async function drawAllSketches() {
+async function drawAllSketches(onProgress) {
   if (sketchesRunning) return;
   sketchesRunning = true;
   try {
     const n = (window._scenes || []).length;
     for (let i = 0; i < n; i++) {
+      if (onProgress) onProgress(i + 1, n);
       // sequential on purpose — the free tier rate-limits parallel image calls
       const r = await drawSketch(i);
       if (r === "stop") break;
       if (r === "wait") {
-        // rate-limited: breathe for a minute, retry the same scene once
-        await new Promise(res => setTimeout(res, 61000));
+        // rate-limited: visible one-minute countdown, then retry the same scene once
+        const box = document.getElementById("sketch-" + i);
+        for (let s = 60; s > 0; s -= 5) {
+          if (box) box.innerHTML = `<span class="sketch-status">${t("sk_wait").replace("{s}", s)}</span>`;
+          await new Promise(res => setTimeout(res, 5000));
+        }
         await drawSketch(i);
       }
     }
@@ -792,6 +806,7 @@ function refreshDynamicLang() {
   const sb = document.getElementById("split-board");
   if (sb) sb.textContent = boardView === "full" ? t("split") : t("split_back");
   renderShootList();
+  renderLibrary();
 }
 const _baseToggleLang = toggleLang;
 toggleLang = function () { _baseToggleLang(); refreshDynamicLang(); };
@@ -801,6 +816,7 @@ document.addEventListener("DOMContentLoaded", () => {
   applyLang();
   setTheme(localStorage.getItem("fta_theme") || "sky");
   renderShootList();
+  renderLibrary();
 
   document.querySelectorAll(".step-btn").forEach(b =>
     b.addEventListener("click", () => switchTab(b.dataset.tab)));
