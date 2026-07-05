@@ -144,6 +144,7 @@ const PROMPT_LIB = [
 
 /* ---------- render ---------- */
 let libCat = "";
+let libType = "";
 
 const LIB_TYPE_META = {
   idea:  { key: "lib_t_idea",  cls: "lt-idea"  },
@@ -160,6 +161,14 @@ function renderLibrary() {
     `<button class="lib-cat ${libCat === "" ? "on" : ""}" onclick="libSetCat('')">${t("lib_all")}</button>` +
     PROMPT_LIB.map((c, ci) =>
       `<button class="lib-cat ${libCat === c.cat ? "on" : ""}" onclick="libSetCat('${c.cat.replace(/'/g, "\\'")}')">${c.cat}</button>`
+    ).join("") +
+    (libCat ? `<button class="lib-cat lib-pack" onclick="libCopyPack()">${t("lib_pack")}</button>` : "");
+
+  const types = document.getElementById("lib-types");
+  if (types) types.innerHTML =
+    `<button class="lib-cat ${libType === "" ? "on" : ""}" onclick="libSetType('')">${t("lib_all")}</button>` +
+    Object.entries(LIB_TYPE_META).map(([ty, m]) =>
+      `<button class="lib-cat ${libType === ty ? "on" : ""}" onclick="libSetType('${ty}')">${t(m.key)}</button>`
     ).join("");
 
   const q = (document.getElementById("lib-search").value || "").trim().toLowerCase();
@@ -167,6 +176,7 @@ function renderLibrary() {
   PROMPT_LIB.forEach((c, ci) => {
     if (libCat && c.cat !== libCat) return;
     c.items.forEach((it, ii) => {
+      if (libType && it.type !== libType) return;
       if (q && !(it.t + " " + it.d + " " + it.p + " " + c.cat).toLowerCase().includes(q)) return;
       const meta = LIB_TYPE_META[it.type];
       const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
@@ -178,7 +188,8 @@ function renderLibrary() {
           </div>
           <h4>${esc(it.t)}</h4>
           <p class="lib-desc">${esc(it.d)}</p>
-          <pre class="lib-preview" dir="${it.type === "idea" ? "rtl" : "ltr"}">${esc(it.p)}</pre>
+          <pre class="lib-preview" dir="${it.type === "idea" ? "rtl" : "ltr"}" title="${t("lib_expand")}"
+               onclick="this.classList.toggle('open')">${esc(it.p)}</pre>
           <div class="lib-actions">
             <button class="btn btn-primary btn-xs" onclick="libCopy(${ci},${ii})">${t("lib_copy")}</button>
             ${it.type === "idea" ? `<button class="btn btn-ghost btn-xs" onclick="libUse(${ci},${ii})">${t("lib_use")}</button>` : ""}
@@ -187,12 +198,29 @@ function renderLibrary() {
     });
   });
 
+  const count = document.getElementById("lib-count");
+  if (count) count.textContent = t("lib_count").replace("{n}", cards.length);
+
   grid.innerHTML = cards.length ? cards.join("") : `<p class="hint">${t("lib_empty")}</p>`;
 }
 
 function libSetCat(cat) {
   libCat = cat;
   renderLibrary();
+}
+
+function libSetType(ty) {
+  libType = ty;
+  renderLibrary();
+}
+
+/* copy the selected niche's full pack (all its prompts, labelled) */
+function libCopyPack() {
+  const c = PROMPT_LIB.find(x => x.cat === libCat);
+  if (!c) return;
+  const pack = c.cat + "\n" + "=".repeat(30) + "\n\n" +
+    c.items.map(it => `【${t(LIB_TYPE_META[it.type].key)} — ${it.t}】\n${it.p}`).join("\n\n---\n\n");
+  navigator.clipboard.writeText(pack).then(() => toast(t("t_copied")));
 }
 
 function libCopy(ci, ii) {
